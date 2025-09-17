@@ -4,8 +4,8 @@
 - Sebastian Albarracin Silva
 - Raquel Iveth Selma Ayala
 - Juan Pablo Nieto Cortes
-- Deisy Lorena Guzman Cabrales 
-'
+- Deisy Lorena Guzman Cabrales
+  '
 ## Maven Corriendo
 ![img.png](docs/imagenes/img.png)
 
@@ -92,14 +92,6 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
     - Materias en las que está inscrito actualmente.
 - **Reglas de Negocio Implementadas:** Las validaciones clave (límite de cupos, cruce de horarios, fechas permitidas) deben estar programadas e integradas en el flujo de aprobación de solicitudes.
 
-# 5. Diagrama de Contexto 
-
-![img_1.png](docs/imagenes/diagramadecontex.png)
-
-# 6. Diagrama de casos de uso 
-
-![img_1.png](docs/imagenes/casosdeuso.png)
-
 ---
 
 # Hallazgos Comunes y Retroalimentación de los Entrevistados
@@ -161,3 +153,52 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 - **Funcionalidad deseada:** Mayor automatización, especialmente que los estudiantes puedan realizar cambios ellos mismos si hay cupos, y aprovechar los datos de preinscripción.
 
 ---
+## Nuevos requisitos por las encuestas y divididos por gesiton
+
+## 2. Gestión por Decanatura
+
+- **RS-05:** La decanatura debe contar con un dashboard en tiempo real que muestre:
+    - Número de solicitudes pendientes, en proceso y resueltas.
+    - Capacidad de grupos más demandados.
+    - Tiempos promedio de resolución.
+
+- **RS-06:** El sistema debe permitir a la decanatura ver toda la información relevante del estudiante en un solo menú (horario, semáforo académico, materias inscritas, historial de solicitudes).
+
+- **RS-07:** Debe existir un sistema de alertas inteligentes (ejemplo: cuando un curso está con alta demanda o cuando un estudiante está repitiendo una materia crítica).
+
+
+## 3. Gestión de Grupos y Materias (Admin)
+
+- **RS-08:** El sistema debe permitir configurar listas de espera automáticas cuando un grupo llegue al 100% de capacidad.
+
+- **RS-09:** Posibilidad de reubicar automáticamente estudiantes en grupos alternos en caso de sobrecupo o cancelación de un grupo.
+
+- **RS-10:** El administrador podrá configurar reglas especiales de capacidad dinámica (ejemplo: habilitar temporalmente un 5% extra de cupos con justificación).
+
+
+## 4. Gestión de Solicitudes
+
+- **RS-11:** El sistema debe manejar solicitudes compuestas como una unidad, permitiendo aprobar/rechazar todos los cambios relacionados en un solo flujo.
+
+- **RS-12:** Se debe habilitar la opción de responder solicitudes parcialmente (aprobar un cambio y rechazar otro dentro de la misma solicitud compuesta).
+
+- **RS-13:** Integración con un módulo de trazabilidad visual, donde se muestre el estado de cada solicitud con una línea de tiempo.
+
+
+## 5. Reportes y Estadísticas
+
+- **RS-14:** Generación de reportes en tiempo real (no solo históricos).
+
+- **RS-15:** Implementación de indicadores de satisfacción (tiempo promedio de atención, porcentaje de solicitudes resueltas en plazo).
+
+- **RS-16:** Reporte de grupos críticos (con mayor demanda o con más rechazos por falta de cupo).
+
+---
+
+#  Diagrama de Contexto
+
+![img_1.png](docs/imagenes/diagramadecontex.png)
+
+#  Diagrama de casos de uso
+
+![img_1.j](docs/imagenes/casosdeuso.png)
