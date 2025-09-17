@@ -90,7 +90,7 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
     - Horarios de semestres anteriores.
     - Materias aprobadas y cursadas para calcular el semáforo académico.
     - Materias en las que está inscrito actualmente.
-- **Reglas de Negocio Implementadas:** Las validaciones clave (límite de cupos, cruce de horarios, fechas permitidas) deben estar programadas e integradas en el flujo de aprobación de solicitudes.  
+- **Reglas de Negocio Implementadas:** Las validaciones clave (límite de cupos, cruce de horarios, fechas permitidas) deben estar programadas e integradas en el flujo de aprobación de solicitudes.
 
 # 5. Diagrama de Contexto 
 
@@ -99,3 +99,65 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 # 6. Diagrama de casos de uso 
 
 ![img_1.png](docs/imagenes/casosdeuso.png)
+
+---
+
+# Hallazgos Comunes y Retroalimentación de los Entrevistados
+
+## Proceso Actual
+
+- Todos confirman que el proceso se realiza principalmente a través de **"Enlace Académico"**.
+- Es semi-automatizado: la solicitud se digitaliza, pero la revisión, validación y aprobación son en gran medida manuales.
+- La priorización de las solicitudes es estrictamente por **orden de llegada**.
+
+## Problemas Identificados
+
+- Falta de automatización en validaciones críticas (cruces de horario, cupos llenos).
+- Comunicación lenta entre departamentos y decanaturas, lo que retrasa la resolución.
+- Interfaz compleja y poco amigable de la herramienta actual.
+- Manejo ineficiente de **solicitudes compuestas** (varios cambios relacionados se gestionan como solicitudes independientes).
+- No hay un sistema de notificación proactivo para los estudiantes.
+- Falta de reportes automatizados en tiempo real para la toma de decisiones.
+
+## Funcionalidades Deseadas (Requerimientos para SIRHA)
+
+- **Automatización total del flujo:** desde la solicitud hasta la inscripción automática al aprobar.
+- **Sistema de alertas inteligentes:** para grupos llenos, alta demanda o casos especiales (ej: estudiantes repitiendo materia).
+- **Dashboard administrativo:** métricas en tiempo real sobre estado de solicitudes, tiempo de atención, carga de grupos.
+- **Manejo de solicitudes compuestas** como una única unidad.
+- **Posibilidad de intercambios** entre estudiantes de diferentes grupos.
+- **Notificaciones automáticas** a estudiantes sobre el estado de sus solicitudes.
+
+## Resistencia al Cambio Anticipada
+
+- La principal preocupación es la falta de preparación o disposición del personal y estudiantes para adaptarse a un nuevo sistema y flujo de trabajo.
+
+## Resumen de Respuestas por Participante
+
+### 1. Juan Felipe Mora Quintero
+
+- **Proceso:** Solicitud vía "Enlace Académico"; luego, en primera semana, el estudiante puede acudir a Decanatura.
+- **Roles involucrados:** Profesor encargado de horarios, decanatura, departamento de la materia.
+- **Restricciones automatizadas:** El sistema actual sí muestra si una solicitud se puede aceptar o no.
+- **Problemas comunes:** Problemas de conexión y tiempos de espera largos.
+- **Funcionalidad deseada:** Ver toda la información del estudiante y de la clase solicitada en un solo menú.
+
+### 2. Claudia Patricia Santiago Cely
+
+- **Proceso:** Semi-automatizado en "Enlace Académico", pero con revisión manual. No hay restricciones automatizadas.
+- **Problemas comunes:** Interfaz no amigable, errores en cambios de grupo, gestión ineficiente de solicitudes compuestas y comunicación lenta entre áreas.
+- **Funcionalidades deseadas:**
+    - Automatización de la inscripción al aprobar una solicitud.
+    - Manejo de solicitudes compuestas.
+    - Alertas inteligentes (ej: alta demanda de un curso).
+    - Reportes en tiempo real.
+    - Sistema de intercambios entre estudiantes.
+
+### 3. Leydi Natalia Suarez Ruiz
+
+- **Proceso:** Similar a los demás, mediante "Enlace Académico". Las restricciones se revisan manualmente.
+- **Perspectiva:** Considera el proceso actual ágil, transparente y confiable.
+- **Problema común:** Los estudiantes quieren cambiarse al grupo "más conveniente", no siempre posible.
+- **Funcionalidad deseada:** Mayor automatización, especialmente que los estudiantes puedan realizar cambios ellos mismos si hay cupos, y aprovechar los datos de preinscripción.
+
+---
