@@ -4,7 +4,7 @@
 - Sebastian Albarracin Silva
 - Raquel Iveth Selma Ayala
 - Juan Pablo Nieto Cortes
-- Deysi Lorena Gusman 
+- Deisy Lorena Guzman Cabrales 
 '
 ## Maven Corriendo
 ![img.png](docs/imagenes/img.png)
@@ -91,3 +91,11 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
     - Materias aprobadas y cursadas para calcular el semáforo académico.
     - Materias en las que está inscrito actualmente.
 - **Reglas de Negocio Implementadas:** Las validaciones clave (límite de cupos, cruce de horarios, fechas permitidas) deben estar programadas e integradas en el flujo de aprobación de solicitudes.  
+
+# 5. Diagrama de Contexto 
+
+![img_1.png](docs/imagenes/diagramadecontex.png)
+
+# 6. Diagrama de casos de uso 
+
+![img_1.png](docs/imagenes/casosdeuso.png)
