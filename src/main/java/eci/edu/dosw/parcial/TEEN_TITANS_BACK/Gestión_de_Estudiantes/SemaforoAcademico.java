@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-class SemaforoAcademico {
+public class SemaforoAcademico {
     private static final Logger logger = Logger.getLogger(SemaforoAcademico.class.getName());
 
     public String calcularEstado(List<MateriaInscrita> materias) {

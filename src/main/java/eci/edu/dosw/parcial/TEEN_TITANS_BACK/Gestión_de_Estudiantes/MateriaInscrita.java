@@ -1,6 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.Gestión_de_Estudiantes;
 
-class MateriaInscrita {
+public class MateriaInscrita {
     private String codigo;
     private String nombre;
     private int creditos;

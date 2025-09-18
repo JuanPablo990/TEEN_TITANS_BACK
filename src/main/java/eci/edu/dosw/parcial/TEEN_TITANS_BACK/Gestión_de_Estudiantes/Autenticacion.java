@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-class Autenticacion {
+public class Autenticacion {
     private static final Logger logger = Logger.getLogger(Autenticacion.class.getName());
     private final Hashtable<String, String> credenciales; // usuario -> password
 
