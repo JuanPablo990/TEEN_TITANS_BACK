@@ -1,6 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.Gestión_de_Estudiantes;
 
-class MateriaInscrita {
+public class MateriaInscrita {
     private String codigo;
     private String nombre;
     private int creditos;
@@ -9,6 +9,10 @@ class MateriaInscrita {
         this.codigo = codigo;
         this.nombre = nombre;
         this.creditos = creditos;
+    }
+
+    public MateriaInscrita(String materia1) {
+    this.codigo = materia1;
     }
 
     public String getCodigo() { return codigo; }

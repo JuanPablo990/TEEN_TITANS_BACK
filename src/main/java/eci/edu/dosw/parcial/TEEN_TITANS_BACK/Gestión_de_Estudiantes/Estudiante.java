@@ -10,7 +10,7 @@ public class Estudiante {
 
     private String id;
     private String nombre;
-    private Horario horario;
+    public Horario horario;
     private SemaforoAcademico semaforo;
     private List<SolicitudCambio> solicitudes;
 
@@ -32,5 +32,9 @@ public class Estudiante {
         return solicitudes.stream()
                 .filter(s -> s.getEstado().equals("PENDIENTE"))
                 .collect(Collectors.toList());
+    }
+
+    public String getNombre() {
+        return nombre;
     }
 }

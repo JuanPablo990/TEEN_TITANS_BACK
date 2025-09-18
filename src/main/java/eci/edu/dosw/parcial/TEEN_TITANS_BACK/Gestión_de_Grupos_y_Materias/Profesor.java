@@ -6,9 +6,9 @@ public class Profesor {
     private static final Logger logger = Logger.getLogger(Profesor.class.getName());
 
     private final String idProfesor;
-    private final String nombre;
+    private String nombre = new String();
 
-    public Profesor(String idProfesor, String nombre) {
+    public Profesor(String idProfesor) {
         this.idProfesor = idProfesor;
         this.nombre = nombre;
         logger.info(() -> "Profesor registrado: " + nombre + " (ID: " + idProfesor + ")");

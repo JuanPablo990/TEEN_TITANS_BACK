@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-class  SolicitudCambio {
+public class  SolicitudCambio {
     private static final Logger logger = Logger.getLogger(SolicitudCambio.class.getName());
 
     private String id;

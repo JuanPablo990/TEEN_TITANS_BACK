@@ -3,7 +3,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.Gestión_de_Estudiantes;
 import java.util.*;
 import java.util.concurrent.*;
 
-class CrearSolicitudCommand implements SolicitudCommand {
+public class CrearSolicitudCommand implements SolicitudCommand {
     private Estudiante estudiante;
     private SolicitudCambio solicitud;
 

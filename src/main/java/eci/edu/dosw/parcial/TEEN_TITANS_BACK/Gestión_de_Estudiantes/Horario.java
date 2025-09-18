@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-class Horario {
+public class Horario {
     private static final Logger logger = Logger.getLogger(Horario.class.getName());
 
     private Hashtable<String, MateriaInscrita> materias; // clave: código materia
