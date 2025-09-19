@@ -85,7 +85,7 @@ public class FachadaSistema {
         logger.info(() -> "Procesada solicitud en cadena: " + idSolicitud);
     }
 
-    public IteradorSolicitudes obtenerIteradorPorEstado(EstadoSolicitud estado) {
+    public IteradorSolicitudes obtenerIteradorPorEstado(Solicitud.EstadoSolicitud estado) {
         return gestorSolicitudes.getIteradorPorEstado(estado);
     }
 

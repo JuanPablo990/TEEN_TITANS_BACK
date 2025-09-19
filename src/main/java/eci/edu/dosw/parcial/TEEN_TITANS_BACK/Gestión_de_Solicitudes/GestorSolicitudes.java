@@ -18,7 +18,8 @@ public class GestorSolicitudes implements SolicitudMediator {
         logger.info("Notificación de cambio de estado en solicitud: " + solicitud.getId());
     }
 
-    public IteradorSolicitudes getIteradorPorEstado(EstadoSolicitud estado) {
+    // CAMBIO IMPORTANTE: Usar Solicitud.EstadoSolicitud en lugar de solo EstadoSolicitud
+    public IteradorSolicitudes getIteradorPorEstado(Solicitud.EstadoSolicitud estado) {
         return new IteradorSolicitudes(solicitudes, estado);
     }
 }

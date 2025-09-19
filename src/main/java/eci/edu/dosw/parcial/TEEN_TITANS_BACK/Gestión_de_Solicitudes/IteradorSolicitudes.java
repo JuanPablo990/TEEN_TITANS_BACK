@@ -1,22 +1,22 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.Gestión_de_Solicitudes;
 
-import java.util.Iterator;
 import java.util.List;
 
-public class IteradorSolicitudes implements Iterator<Solicitud> {
+public class IteradorSolicitudes {
     private List<Solicitud> solicitudes;
-    private EstadoSolicitud estado;
-    private int posicion = 0;
+    private Solicitud.EstadoSolicitud estadoFiltro; // Usar la referencia completa
+    private int posicion;
 
-    public IteradorSolicitudes(List<Solicitud> solicitudes, EstadoSolicitud estado) {
+    public IteradorSolicitudes(List<Solicitud> solicitudes, Solicitud.EstadoSolicitud estado) {
         this.solicitudes = solicitudes;
-        this.estado = estado;
+        this.estadoFiltro = estado;
+        this.posicion = 0;
     }
 
-    @Override
     public boolean hasNext() {
         while (posicion < solicitudes.size()) {
-            if (solicitudes.get(posicion).getEstado().getClass().equals(estado.getClass())) {
+            Solicitud solicitud = solicitudes.get(posicion);
+            if (solicitud.getEstado().getClass().equals(estadoFiltro.getClass())) {
                 return true;
             }
             posicion++;
@@ -24,8 +24,10 @@ public class IteradorSolicitudes implements Iterator<Solicitud> {
         return false;
     }
 
-    @Override
     public Solicitud next() {
-        return solicitudes.get(posicion++);
+        if (hasNext()) {
+            return solicitudes.get(posicion++);
+        }
+        return null;
     }
 }

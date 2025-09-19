@@ -3,13 +3,12 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.Gestión_de_Solicitudes;
 import java.util.UUID;
 
 public abstract class Solicitud {
-
     private final String id;
     protected EstadoSolicitud estado;
 
     public Solicitud() {
         this.id = UUID.randomUUID().toString();
-        this.estado = new EstadoPendiente(); // Clase interna o importada
+        this.estado = new EstadoPendiente();
     }
 
     public String getId() {
@@ -30,7 +29,6 @@ public abstract class Solicitud {
 
     public abstract void procesar();
 
-    // ------------------ Clases de estado como clases internas ------------------
     public interface EstadoSolicitud {
         void manejar(Solicitud solicitud);
     }
@@ -52,14 +50,12 @@ public abstract class Solicitud {
     public static class EstadoAprobada implements EstadoSolicitud {
         @Override
         public void manejar(Solicitud solicitud) {
-            // Estado final, no cambia más
         }
     }
 
     public static class EstadoRechazada implements EstadoSolicitud {
         @Override
         public void manejar(Solicitud solicitud) {
-            // Estado final
         }
     }
 }
