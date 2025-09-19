@@ -7,7 +7,7 @@
 - Deisy Lorena Guzman Cabrales
   '
 ## Maven Corriendo
-![img.png](docs/imagenes/img.png)
+![img.png](docs/imagenes/img.png
 
 1. **Identificación de requisitos:**
 
@@ -134,7 +134,7 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 - **Problemas comunes:** Problemas de conexión y tiempos de espera largos.
 - **Funcionalidad deseada:** Ver toda la información del estudiante y de la clase solicitada en un solo menú.
 
-### 2. Claudia Patricia Santiago Cely
+`### 2. Claudia Patricia Santiago Cely
 
 - **Proceso:** Semi-automatizado en "Enlace Académico", pero con revisión manual. No hay restricciones automatizadas.
 - **Problemas comunes:** Interfaz no amigable, errores en cambios de grupo, gestión ineficiente de solicitudes compuestas y comunicación lenta entre áreas.
@@ -144,13 +144,35 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
     - Alertas inteligentes (ej: alta demanda de un curso).
     - Reportes en tiempo real.
     - Sistema de intercambios entre estudiantes.
-
+`
 ### 3. Leydi Natalia Suarez Ruiz
 
 - **Proceso:** Similar a los demás, mediante "Enlace Académico". Las restricciones se revisan manualmente.
 - **Perspectiva:** Considera el proceso actual ágil, transparente y confiable.
 - **Problema común:** Los estudiantes quieren cambiarse al grupo "más conveniente", no siempre posible.
 - **Funcionalidad deseada:** Mayor automatización, especialmente que los estudiantes puedan realizar cambios ellos mismos si hay cupos, y aprovechar los datos de preinscripción.
+
+### Rodrigo Humberto Gualtero Martinez
+
+- **Proceso:** Las solicitudes se realizan a través de "Enlace Académico", atendidas por gestores de decanatura. Cambios posteriores se comunican por Teams o correo electrónico.
+- **Estados de solicitudes:** Pendiente (no procesada), En Proceso (gestionada por gestor de decanatura), Aprobado/Rechazado (resultado final).
+- **Problemas comunes:**
+    - Falta de notificaciones (estudiantes deben consultar manualmente).
+    - Validación manual constante por parte de gestores.
+    - Asignación manual de solicitudes a gestores.
+    - Tiempos de atención muy extensos.
+    - Estudiantes quedan en "carrito" (limbo académico) durante el proceso.
+- **Criterios de evaluación:**
+    - Capacidad del salón.
+    - Riesgo metodológico de grupos grandes.
+- **Percepción del sistema:** Confiable pero optimizable.
+- **Comunicación:** Se busca comunicación directa con estudiantes vía Teams cuando las solicitudes están en proceso.
+- **Expectativas para SIRHA:**
+    - Centralización de información en una sola vista.
+    - Indicadores de tiempos de respuesta de solicitudes.
+    - Manejo de cualquier tipo de solicitud, no solo reasignaciones.
+    - Integración con el proceso de elaboración de horarios (actualmente en Enlace).
+- **Desconocimiento:** No tiene claridad sobre las capacidades del sistema SIRHA (generación de reportes, gestión y asignación de solicitudes).
 
 ---
 ## Nuevos requisitos por las encuestas y divididos por gesiton
@@ -194,6 +216,87 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 - **RS-16:** Reporte de grupos críticos (con mayor demanda o con más rechazos por falta de cupo).
 
 ---
+
+### 1️. Módulo de **Gestión de Estudiantes**
+- **Estudiante** → entidad principal con datos personales, historial, horario, semáforo académico.
+- **Horario** → representa materias inscritas en un semestre.
+- **MateriaInscrita** → relación entre estudiante y materia en un periodo.
+- **Autenticacion** → gestiona validación de credenciales institucionales.
+- **SolicitudCambio** → el estudiante crea solicitudes (puede ser compuesta).
+- **SemaforoAcademico** → calcula estado de avance en el plan de estudios.
+
+🔹 **Patrones aplicados:**
+- MVC
+- Command → `SolicitudCommand`
+- Memento → `HistorialMemento`
+- Strategy
+
+---
+
+### 2️. Módulo de **Gestión por Decanatura**
+- **Decanatura** → actor con permisos para revisar solicitudes de su facultad.
+- **DashboardDecanatura** → panel en tiempo real con métricas de solicitudes y grupos.
+- **AlertaInteligente** → genera avisos cuando hay grupos críticos o estudiantes en riesgo.
+- **EvaluadorSolicitud** → procesa las solicitudes (aprobar, rechazar, pedir info).
+
+🔹 **Patrones aplicados:**
+- MVC
+- Observer → `SolicitudObserver`
+- Chain of Responsibility → `CadenaAprobacion`
+
+---
+
+### 3️. Módulo de **Gestión de Grupos y Materias (Admin)**
+- **Materia** → asignatura registrada en el sistema.
+- **Grupo** → instancia de una materia con cupo, profesor y horario.
+- **Profesor** → docente asignado a un grupo.
+- **ListaEspera** → estudiantes en espera cuando un grupo está lleno.
+- **CapacidadDinamica** → maneja reglas especiales de sobrecupo.
+
+🔹 **Patrones aplicados:**
+- Singleton → `GestorMaterias`
+- Factory → `GrupoFactory`
+- Composite → `GrupoComposite`
+
+---
+
+### 4️. Módulo **Central de Gestión de Solicitudes**
+- **GestorSolicitudes** → administra el ciclo de vida de solicitudes.
+- **Solicitud** (abstracta) → clase base.
+  - `SolicitudSimple`
+  - `SolicitudCompuesta` (contiene varias solicitudes).
+- **Trazabilidad** → historial de estados de una solicitud.
+- **LineaDeTiempo** → representación visual de estados.
+
+🔹 **Patrones aplicados:**
+- State → `EstadoSolicitud`
+- Mediator → `SolicitudMediator`
+- Iterator → `IteradorSolicitudes`
+- Command, Memento
+
+---
+
+### 5. Módulo de **Reportes y Estadísticas**
+- **GeneradorReportes** → base para generar diferentes reportes.
+  - `ReporteHistorialEstudiante`
+  - `ReporteGruposCriticos`
+  - `ReporteIndicadoresSatisfaccion`
+- **Estadistica** → cálculo de tasas y métricas.
+- **MementoReporte** → guardar configuraciones de reportes.
+
+**Patrones aplicados:**
+- Visitor → `ReporteVisitor`
+- Composite → `ReporteComposite`
+- Memento
+
+---
+
+### 6️. Sistema General
+- **FachadaSistema** → interfaz simplificada para acceder a los módulos principales.
+
+🔹 **Patrón aplicado:**
+- Facade
+
 
 #  Diagrama de Contexto
 
