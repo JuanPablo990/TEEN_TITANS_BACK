@@ -134,7 +134,7 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 - **Problemas comunes:** Problemas de conexión y tiempos de espera largos.
 - **Funcionalidad deseada:** Ver toda la información del estudiante y de la clase solicitada en un solo menú.
 
-### 2. Claudia Patricia Santiago Cely
+`### 2. Claudia Patricia Santiago Cely
 
 - **Proceso:** Semi-automatizado en "Enlace Académico", pero con revisión manual. No hay restricciones automatizadas.
 - **Problemas comunes:** Interfaz no amigable, errores en cambios de grupo, gestión ineficiente de solicitudes compuestas y comunicación lenta entre áreas.
@@ -144,13 +144,35 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
     - Alertas inteligentes (ej: alta demanda de un curso).
     - Reportes en tiempo real.
     - Sistema de intercambios entre estudiantes.
-
+`
 ### 3. Leydi Natalia Suarez Ruiz
 
 - **Proceso:** Similar a los demás, mediante "Enlace Académico". Las restricciones se revisan manualmente.
 - **Perspectiva:** Considera el proceso actual ágil, transparente y confiable.
 - **Problema común:** Los estudiantes quieren cambiarse al grupo "más conveniente", no siempre posible.
 - **Funcionalidad deseada:** Mayor automatización, especialmente que los estudiantes puedan realizar cambios ellos mismos si hay cupos, y aprovechar los datos de preinscripción.
+
+### Rodrigo Humberto Gualtero Martinez
+
+- **Proceso:** Las solicitudes se realizan a través de "Enlace Académico", atendidas por gestores de decanatura. Cambios posteriores se comunican por Teams o correo electrónico.
+- **Estados de solicitudes:** Pendiente (no procesada), En Proceso (gestionada por gestor de decanatura), Aprobado/Rechazado (resultado final).
+- **Problemas comunes:**
+    - Falta de notificaciones (estudiantes deben consultar manualmente).
+    - Validación manual constante por parte de gestores.
+    - Asignación manual de solicitudes a gestores.
+    - Tiempos de atención muy extensos.
+    - Estudiantes quedan en "carrito" (limbo académico) durante el proceso.
+- **Criterios de evaluación:**
+    - Capacidad del salón.
+    - Riesgo metodológico de grupos grandes.
+- **Percepción del sistema:** Confiable pero optimizable.
+- **Comunicación:** Se busca comunicación directa con estudiantes vía Teams cuando las solicitudes están en proceso.
+- **Expectativas para SIRHA:**
+    - Centralización de información en una sola vista.
+    - Indicadores de tiempos de respuesta de solicitudes.
+    - Manejo de cualquier tipo de solicitud, no solo reasignaciones.
+    - Integración con el proceso de elaboración de horarios (actualmente en Enlace).
+- **Desconocimiento:** No tiene claridad sobre las capacidades del sistema SIRHA (generación de reportes, gestión y asignación de solicitudes).
 
 ---
 ## Nuevos requisitos por las encuestas y divididos por gesiton
