@@ -147,7 +147,7 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 `
 ### 3. Leydi Natalia Suarez Ruiz
 
-- **Proceso:** Similar a los demás, mediante "Enlace Académico". Las restricciones se revisan manualmente.
+- **Proceso:** Las restricciones se revisan manualmente.
 - **Perspectiva:** Considera el proceso actual ágil, transparente y confiable.
 - **Problema común:** Los estudiantes quieren cambiarse al grupo "más conveniente", no siempre posible.
 - **Funcionalidad deseada:** Mayor automatización, especialmente que los estudiantes puedan realizar cambios ellos mismos si hay cupos, y aprovechar los datos de preinscripción.
@@ -175,7 +175,7 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 - **Desconocimiento:** No tiene claridad sobre las capacidades del sistema SIRHA (generación de reportes, gestión y asignación de solicitudes).
 
 ---
-## Nuevos requisitos por las encuestas y divididos por gesiton
+## Nuevos requisitos por las encuestas y divididos por gestion
 
 ## 2. Gestión por Decanatura
 
