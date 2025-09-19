@@ -195,6 +195,87 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 
 ---
 
+### 1️. Módulo de **Gestión de Estudiantes**
+- **Estudiante** → entidad principal con datos personales, historial, horario, semáforo académico.
+- **Horario** → representa materias inscritas en un semestre.
+- **MateriaInscrita** → relación entre estudiante y materia en un periodo.
+- **Autenticacion** → gestiona validación de credenciales institucionales.
+- **SolicitudCambio** → el estudiante crea solicitudes (puede ser compuesta).
+- **SemaforoAcademico** → calcula estado de avance en el plan de estudios.
+
+🔹 **Patrones aplicados:**
+- MVC
+- Command → `SolicitudCommand`
+- Memento → `HistorialMemento`
+- Strategy
+
+---
+
+### 2️. Módulo de **Gestión por Decanatura**
+- **Decanatura** → actor con permisos para revisar solicitudes de su facultad.
+- **DashboardDecanatura** → panel en tiempo real con métricas de solicitudes y grupos.
+- **AlertaInteligente** → genera avisos cuando hay grupos críticos o estudiantes en riesgo.
+- **EvaluadorSolicitud** → procesa las solicitudes (aprobar, rechazar, pedir info).
+
+🔹 **Patrones aplicados:**
+- MVC
+- Observer → `SolicitudObserver`
+- Chain of Responsibility → `CadenaAprobacion`
+
+---
+
+### 3️. Módulo de **Gestión de Grupos y Materias (Admin)**
+- **Materia** → asignatura registrada en el sistema.
+- **Grupo** → instancia de una materia con cupo, profesor y horario.
+- **Profesor** → docente asignado a un grupo.
+- **ListaEspera** → estudiantes en espera cuando un grupo está lleno.
+- **CapacidadDinamica** → maneja reglas especiales de sobrecupo.
+
+🔹 **Patrones aplicados:**
+- Singleton → `GestorMaterias`
+- Factory → `GrupoFactory`
+- Composite → `GrupoComposite`
+
+---
+
+### 4️. Módulo **Central de Gestión de Solicitudes**
+- **GestorSolicitudes** → administra el ciclo de vida de solicitudes.
+- **Solicitud** (abstracta) → clase base.
+  - `SolicitudSimple`
+  - `SolicitudCompuesta` (contiene varias solicitudes).
+- **Trazabilidad** → historial de estados de una solicitud.
+- **LineaDeTiempo** → representación visual de estados.
+
+🔹 **Patrones aplicados:**
+- State → `EstadoSolicitud`
+- Mediator → `SolicitudMediator`
+- Iterator → `IteradorSolicitudes`
+- Command, Memento
+
+---
+
+### 5. Módulo de **Reportes y Estadísticas**
+- **GeneradorReportes** → base para generar diferentes reportes.
+  - `ReporteHistorialEstudiante`
+  - `ReporteGruposCriticos`
+  - `ReporteIndicadoresSatisfaccion`
+- **Estadistica** → cálculo de tasas y métricas.
+- **MementoReporte** → guardar configuraciones de reportes.
+
+**Patrones aplicados:**
+- Visitor → `ReporteVisitor`
+- Composite → `ReporteComposite`
+- Memento
+
+---
+
+### 6️. Sistema General
+- **FachadaSistema** → interfaz simplificada para acceder a los módulos principales.
+
+🔹 **Patrón aplicado:**
+- Facade
+
+
 #  Diagrama de Contexto
 
 ![img_1.png](docs/imagenes/diagramadecontex.png)
