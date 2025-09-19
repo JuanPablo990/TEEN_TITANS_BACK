@@ -305,3 +305,6 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 #  Diagrama de casos de uso
 
 ![img_1.j](docs/imagenes/casosdeuso.png)
+
+#  Diagrama de clases (temporal)
+![img_1.png](docs/imagenes/img_1.png)
