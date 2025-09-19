@@ -7,7 +7,7 @@
 - Deisy Lorena Guzman Cabrales
   '
 ## Maven Corriendo
-![img.png](docs/imagenes/img.png)
+![img.png](docs/imagenes/img.png
 
 1. **Identificación de requisitos:**
 
