@@ -8,6 +8,9 @@ public class academicCycle {
     private String academicSituation;
     private String programStatus;
     private String actionReason;
+    private academicCalendar academicCalendar;
+    private academicPerformance academicPerformance;
+    private studentProgress studentProgress;
 
     public int getCycleId() {
         return cycleId;
@@ -35,5 +38,17 @@ public class academicCycle {
 
     public String getActionReason() {
         return actionReason;
+    }
+
+    public academicCalendar getAcademicCalendar() {
+        return academicCalendar;
+    }
+
+    public academicPerformance getAcademicPerformance() {
+        return academicPerformance;
+    }
+
+    public studentProgress getStudentProgress() {
+        return studentProgress;
     }
 }
