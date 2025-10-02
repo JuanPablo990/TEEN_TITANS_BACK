@@ -1,4 +1,8 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
-public class requestStatus {
+public enum requestStatus {
+    PENDING,
+    UNDER_REVIEW,
+    APPROVED,
+    REJECTED
 }
