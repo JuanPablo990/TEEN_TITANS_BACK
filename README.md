@@ -98,7 +98,7 @@ Los commits deben ser claros, breves y con un prefijo que indique el propósito:
 
 ###  Diagrama de Contexto
 
-![img_1.png](docs/imagenes/diagramadecontex.png)
+![contexto.png](docs/uml/contexto.png)
 
 ###  Diagrama de casos de uso
 
@@ -106,11 +106,15 @@ Los commits deben ser claros, breves y con un prefijo que indique el propósito:
 
 ###  Diagrama de clases 
 
-![Diagramaclases.png](docs/imagenes/Diagramaclases.png)
+![Diagramaclases.png](docs/uml/Diagramaclases.png)
 
 ### Diagrama de Componentes
 
-
-### Diagrama de Secuencias
+#### Diagrama de Componentes General
+![componentesgeneral.png](docs/uml/componentesgeneral.png)
+#### Diagrama de Componentes Específico
+![componentes especifico.png](docs/uml/componentes%20especifico.png)
 
 ### Modelo de Base de Datos
+
+![bases de datos.png](docs/uml/bases%20de%20datos.png)
