@@ -20,7 +20,10 @@ public class StatisticsService {
     private final List<Student> students = new ArrayList<>();
     private final List<Subject> subjects = new ArrayList<>();
     private final List<AcademicCycle> academicCycles = new ArrayList<>();
-
+    /**
+     * Genera estadísticas de aprobación y rechazo de solicitudes
+     * dentro de un rango de fechas dado.
+     */
     public Map<String, Object> getApprovalRejectionStats(DateRange dateRange) {
         List<Request> filteredRequests = requests.stream()
                 .filter(request -> isWithinDateRange(request.getCreationDate(), dateRange))
@@ -38,7 +41,10 @@ public class StatisticsService {
         stats.put("approvalRate", filteredRequests.isEmpty() ? 0 : (double) approved / filteredRequests.size());
         return stats;
     }
-
+    /**
+     * Obtiene estadísticas de volumen de solicitudes agrupadas
+     * según un periodo de tiempo (diario, mensual, anual).
+     */
     public Map<String, Object> getRequestVolumeStats(String timePeriod) {
         Map<String, Long> volumeByPeriod = requests.stream()
                 .collect(Collectors.groupingBy(
@@ -52,7 +58,10 @@ public class StatisticsService {
         stats.put("totalRequests", requests.size());
         return stats;
     }
-
+    /**
+     * Calcula el tiempo promedio de procesamiento de solicitudes
+     * y devuelve métricas relacionadas.
+     */
     public Map<String, Object> getProcessingTimeStats() {
         List<Request> processedRequests = requests.stream()
                 .filter(req -> req.getSolveDate() != null)
@@ -67,7 +76,10 @@ public class StatisticsService {
         stats.put("avgProcessingTimeHours", avgProcessingTime.isPresent() ? avgProcessingTime.getAsDouble() / (1000 * 60 * 60) : 0);
         return stats;
     }
-
+    /**
+     * Genera estadísticas de aprobación y rechazo de solicitudes
+     * filtradas por facultad y rango de fechas.
+     */
     public Map<String, Object> getFacultyApprovalStats(String faculty, DateRange dateRange) {
         List<Request> facultyRequests = requests.stream()
                 .filter(request -> request.getStudent() != null && faculty.equals(request.getStudent().getCareer()))
@@ -85,7 +97,10 @@ public class StatisticsService {
         stats.put("approvalRate", facultyRequests.isEmpty() ? 0 : (double) approved / facultyRequests.size());
         return stats;
     }
-
+    /**
+     * Devuelve las asignaturas más solicitadas por los estudiantes
+     * de una facultad específica.
+     */
     public List<Map<String, Object>> getFacultyMostRequestedSubjects(String faculty) {
         return requests.stream()
                 .filter(request -> request.getStudent() != null && faculty.equals(request.getStudent().getCareer()))
@@ -104,7 +119,10 @@ public class StatisticsService {
                 })
                 .collect(Collectors.toList());
     }
-
+    /**
+     * Calcula el rendimiento académico promedio de los estudiantes
+     * pertenecientes a una facultad determinada.
+     */
     public Map<String, Object> getFacultyStudentPerformance(String faculty) {
         List<AcademicCycle> facultyCycles = academicCycles.stream()
                 .filter(cycle -> {
@@ -123,7 +141,10 @@ public class StatisticsService {
         performance.put("avgCumulative", avgCumulative.isPresent() ? avgCumulative.getAsDouble() : 0);
         return performance;
     }
-
+    /**
+     * Mide el nivel de utilización de cupos en las asignaturas
+     * de una facultad específica.
+     */
     public Map<String, Object> getFacultyCapacityUtilization(String faculty) {
         List<Subject> facultySubjects = subjects.stream()
                 .filter(subject -> {
@@ -142,7 +163,10 @@ public class StatisticsService {
         capacity.put("avgUtilization", avgUtilization);
         return capacity;
     }
-
+    /**
+     * Genera estadísticas globales de aprobación y rechazo de solicitudes
+     * en todo el sistema.
+     */
     public Map<String, Object> getSystemWideApprovalStats() {
         long total = requests.size();
         long approved = requests.stream().filter(req -> req.getStatus() == RequestStatus.APPROVED).count();
@@ -155,7 +179,10 @@ public class StatisticsService {
         stats.put("approvalRate", total == 0 ? 0 : (double) approved / total);
         return stats;
     }
-
+    /**
+     * Retorna un listado de las asignaturas más solicitadas
+     * a nivel institucional.
+     */
     public List<Map<String, Object>> getGlobalMostRequestedSubjects() {
         return requests.stream()
                 .filter(request -> request.getTargetSubject() != null)
@@ -173,7 +200,10 @@ public class StatisticsService {
                 })
                 .collect(Collectors.toList());
     }
-
+    /**
+     * Calcula el progreso académico general, incluyendo créditos aprobados
+     * y promedios por estudiante.
+     */
     public Map<String, Object> getOverallAcademicProgress() {
         int totalStudents = students.size();
         int totalApprovedCredits = academicCycles.stream()
@@ -187,7 +217,10 @@ public class StatisticsService {
         progress.put("avgCreditsPerStudent", totalStudents == 0 ? 0 : totalApprovedCredits / totalStudents);
         return progress;
     }
-
+    /**
+     * Proporciona una visión general de la capacidad institucional,
+     * incluyendo cupos totales, ocupación y tasa de utilización.
+     */
     public Map<String, Object> getInstitutionalCapacityOverview() {
         int totalCapacity = subjects.stream().mapToInt(Subject::getQuotas).sum();
         int totalRegistered = subjects.stream().mapToInt(Subject::getRegistered).sum();
@@ -200,13 +233,18 @@ public class StatisticsService {
         overview.put("availableSpots", totalCapacity - totalRegistered);
         return overview;
     }
-
+    /**
+     * Verifica si una fecha dada se encuentra dentro de un rango de fechas.
+     */
     private boolean isWithinDateRange(Date date, DateRange dateRange) {
         return date != null && dateRange != null &&
                 !date.before(dateRange.getStartDate()) &&
                 !date.after(dateRange.getEndDate());
     }
-
+    /**
+     * Extrae un identificador de periodo de tiempo (día, mes o año)
+     * a partir de una fecha dada.
+     */
     private String extractTimePeriod(Date date, String timePeriod) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);

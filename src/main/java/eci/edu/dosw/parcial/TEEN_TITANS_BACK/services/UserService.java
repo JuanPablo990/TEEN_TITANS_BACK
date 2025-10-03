@@ -12,6 +12,9 @@ public class UserService {
 
     private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
+    /**
+     * Crea un nuevo usuario a partir de un UserDTO y lo guarda en memoria.
+     */
     public User createUser(UserDTO userData) {
         User user = createUserFromDTO(userData);
         if (user != null) {
@@ -21,10 +24,16 @@ public class UserService {
         return null;
     }
 
+    /**
+     * Obtiene un usuario según su identificador único.
+     */
     public User getUserById(String userId) {
         return users.get(userId);
     }
 
+    /**
+     * Busca un usuario por su correo electrónico.
+     */
     public User getUserByEmail(String email) {
         return users.values().stream()
                 .filter(user -> user.getBring().equals(email))
@@ -32,6 +41,9 @@ public class UserService {
                 .orElse(null);
     }
 
+    /**
+     * Actualiza los datos de un usuario existente.
+     */
     public User updateUser(String userId, UserDTO userData) {
         User existingUser = users.get(userId);
         if (existingUser != null) {
@@ -42,32 +54,42 @@ public class UserService {
         return null;
     }
 
+    /**
+     * Elimina un usuario del sistema usando su ID.
+     */
     public boolean deleteUser(String userId) {
         return users.remove(userId) != null;
     }
 
+    /**
+     * Retorna la lista completa de usuarios registrados.
+     */
     public List<User> getAllUsers() {
         return users.values().stream().collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene los usuarios que pertenecen a un rol específico (Administrator, Dean, etc.).
+     */
     public List<User> getUsersByRole(String role) {
         return users.values().stream()
                 .filter(user -> user.getClass().getSimpleName().equalsIgnoreCase(role))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Crea un objeto User según el rol especificado en el DTO.
+     */
     private User createUserFromDTO(UserDTO dto) {
         try {
             User user;
             switch (dto.getRole().toUpperCase()) {
                 case "ADMINISTRATOR":
                     Administrator admin = new Administrator();
-                    // Usar reflection para setear campos si es necesario
                     user = admin;
                     break;
                 case "DEAN":
                     Dean dean = new Dean();
-                    // Usar reflection para setear campos si es necesario
                     user = dean;
                     break;
                 default:

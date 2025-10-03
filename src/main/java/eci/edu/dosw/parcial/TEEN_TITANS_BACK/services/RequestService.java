@@ -15,6 +15,10 @@ public class RequestService {
     private final Map<String, Request> requests = new ConcurrentHashMap<>();
     private final AtomicLong idCounter = new AtomicLong(1L);
 
+    /**
+     * Crea una nueva solicitud de cambio a partir de la información
+     * contenida en el DTO y la registra en el sistema.
+     */
     public Request createChangeRequest(RequestDTO requestDTO) {
         String requestId = "REQ-" + idCounter.getAndIncrement();
 
@@ -44,6 +48,9 @@ public class RequestService {
         return newRequest;
     }
 
+    /**
+     * Consulta el estado actual de una solicitud dado su identificador.
+     */
     public RequestStatus getRequestStatus(String requestId) {
         Request request = requests.get(requestId);
         if (request == null) {
@@ -52,6 +59,9 @@ public class RequestService {
         return request.getStatus();
     }
 
+    /**
+     * Obtiene todas las solicitudes asociadas a un estudiante específico.
+     */
     public List<Request> getStudentRequests(String studentId) {
         return requests.values().stream()
                 .filter(request -> request.getStudent() != null)
@@ -59,6 +69,9 @@ public class RequestService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene todas las solicitudes pendientes de un estudiante específico.
+     */
     public List<Request> getPendingRequests(String studentId) {
         return requests.values().stream()
                 .filter(request -> request.getStudent() != null)
@@ -67,6 +80,10 @@ public class RequestService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene el historial de solicitudes resueltas (no pendientes)
+     * de un estudiante específico.
+     */
     public List<Request> getRequestHistory(String studentId) {
         return requests.values().stream()
                 .filter(request -> request.getStudent() != null)
@@ -75,6 +92,9 @@ public class RequestService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Cancela una solicitud pendiente, eliminándola del sistema.
+     */
     public boolean cancelRequest(String requestId) {
         Request request = requests.get(requestId);
         if (request != null && request.getStatus() == RequestStatus.PENDING) {
@@ -84,6 +104,10 @@ public class RequestService {
         return false;
     }
 
+    /**
+     * Extrae el identificador único de un estudiante combinando
+     * su estándar académico y carrera.
+     */
     private String extractStudentId(Student student) {
         return student.getStandard() + "-" + student.getCareer();
     }

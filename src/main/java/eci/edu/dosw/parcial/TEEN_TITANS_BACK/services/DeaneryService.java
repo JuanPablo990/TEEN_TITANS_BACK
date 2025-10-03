@@ -17,6 +17,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio que gestiona solicitudes académicas dirigidas a decanatura,
+ * incluyendo aprobación, rechazo, monitoreo de cupos y alertas.
+ */
 @Service
 public class DeaneryService {
 
@@ -24,6 +28,12 @@ public class DeaneryService {
     private final List<Student> students = new ArrayList<>();
     private final List<AcademicCycle> academicCycles = new ArrayList<>();
 
+    /**
+     * Obtiene todas las solicitudes registradas en una facultad.
+     *
+     * @param faculty Nombre de la facultad
+     * @return Lista de solicitudes de la facultad
+     */
     public List<DeaneryRequestDTO> getFacultyRequests(String faculty) {
         return requests.stream()
                 .filter(request -> Optional.ofNullable(request.getStudent())
@@ -36,12 +46,24 @@ public class DeaneryService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene la información académica de un estudiante.
+     *
+     * @param studentId Identificador del estudiante
+     * @return Ciclo académico asociado al estudiante
+     */
     public AcademicCycle getStudentAcademicInfo(String studentId) {
         return academicCycles.stream()
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Información académica no encontrada para el estudiante: " + studentId));
     }
 
+    /**
+     * Obtiene los grupos disponibles asociados a una asignatura.
+     *
+     * @param subjectId Identificador de la asignatura
+     * @return Lista de grupos disponibles
+     */
     public List<Integer> getAvailableGroups(String subjectId) {
         return requests.stream()
                 .filter(request -> request.getOriginalSubject() != null)
@@ -51,6 +73,13 @@ public class DeaneryService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Aprueba una solicitud específica de decanatura.
+     *
+     * @param requestId Identificador de la solicitud
+     * @param comments Comentarios de resolución
+     * @return Solicitud aprobada en forma de DTO
+     */
     public DeaneryRequestDTO approveRequest(String requestId, String comments) {
         return requests.stream()
                 .filter(request -> request.getId().equals(requestId))
@@ -65,6 +94,13 @@ public class DeaneryService {
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada: " + requestId));
     }
 
+    /**
+     * Rechaza una solicitud específica de decanatura.
+     *
+     * @param requestId Identificador de la solicitud
+     * @param reason Razón del rechazo
+     * @return Solicitud rechazada en forma de DTO
+     */
     public DeaneryRequestDTO rejectRequest(String requestId, String reason) {
         return requests.stream()
                 .filter(request -> request.getId().equals(requestId))
@@ -79,6 +115,13 @@ public class DeaneryService {
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada: " + requestId));
     }
 
+    /**
+     * Solicita información adicional sobre una solicitud existente.
+     *
+     * @param requestId Identificador de la solicitud
+     * @param message Mensaje con la información solicitada
+     * @return Solicitud actualizada en forma de DTO
+     */
     public DeaneryRequestDTO requestAdditionalInfo(String requestId, String message) {
         return requests.stream()
                 .filter(request -> request.getId().equals(requestId))
@@ -94,6 +137,12 @@ public class DeaneryService {
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada: " + requestId));
     }
 
+    /**
+     * Obtiene las alertas de capacidad de grupo de una facultad.
+     *
+     * @param faculty Nombre de la facultad
+     * @return Lista de solicitudes críticas
+     */
     public List<DeaneryRequestDTO> getGroupCapacityAlerts(String faculty) {
         return requests.stream()
                 .filter(request -> request.getStatus() == RequestStatus.PENDING)
@@ -107,6 +156,12 @@ public class DeaneryService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Monitorea la capacidad de un grupo específico.
+     *
+     * @param groupId Identificador del grupo
+     * @return Mapa con información del estado del grupo
+     */
     public Map<String, Object> monitorGroupCapacity(String groupId) {
         long groupRequests = requests.stream()
                 .filter(request -> String.valueOf(request.getOriginalGroup()).equals(groupId) ||
@@ -121,6 +176,12 @@ public class DeaneryService {
         return capacityStatus;
     }
 
+    /**
+     * Convierte una solicitud en un objeto DTO para decanatura.
+     *
+     * @param request Solicitud original
+     * @return DTO de la solicitud
+     */
     private DeaneryRequestDTO convertToDeaneryRequestDTO(Request request) {
         DeaneryRequestDTO dto = new DeaneryRequestDTO();
         dto.setId(request.getId());
@@ -138,14 +199,29 @@ public class DeaneryService {
         return dto;
     }
 
+    /**
+     * Agrega una nueva solicitud al sistema.
+     *
+     * @param request Solicitud a registrar
+     */
     public void addRequest(Request request) {
         requests.add(request);
     }
 
+    /**
+     * Agrega un nuevo estudiante al sistema.
+     *
+     * @param student Estudiante a registrar
+     */
     public void addStudent(Student student) {
         students.add(student);
     }
 
+    /**
+     * Agrega un ciclo académico al sistema.
+     *
+     * @param cycle Ciclo académico a registrar
+     */
     public void addAcademicCycle(AcademicCycle cycle) {
         academicCycles.add(cycle);
     }

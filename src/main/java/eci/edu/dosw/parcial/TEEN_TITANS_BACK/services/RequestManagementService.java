@@ -16,6 +16,10 @@ public class RequestManagementService {
 
     private final List<Request> requests = new ArrayList<>();
 
+    /**
+     * Crea una nueva solicitud académica para un estudiante
+     * a partir de los datos enviados en un DTO.
+     */
     public Request createRequestForStudent(StudentRequestDTO requestData) {
         Request request = new Request() {
             @Override public String getId() { return UUID.randomUUID().toString(); }
@@ -35,6 +39,10 @@ public class RequestManagementService {
         return request;
     }
 
+    /**
+     * Obtiene todas las solicitudes que se encuentran pendientes,
+     * ordenadas por fecha de creación.
+     */
     public List<Request> getPendingRequests() {
         return requests.stream()
                 .filter(request -> request.getStatus() == RequestStatus.PENDING)
@@ -42,6 +50,10 @@ public class RequestManagementService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Cancela una solicitud existente marcándola como REJECTED,
+     * con observación predeterminada de cancelación por el usuario.
+     */
     public Request cancelRequest(String requestId) {
         return requests.stream()
                 .filter(request -> request.getId().equals(requestId))
@@ -50,6 +62,10 @@ public class RequestManagementService {
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
     }
 
+    /**
+     * Aprueba una solicitud existente y agrega comentarios
+     * relacionados con la decisión.
+     */
     public Request approveRequest(String requestId, String comments) {
         return requests.stream()
                 .filter(request -> request.getId().equals(requestId))
@@ -58,6 +74,10 @@ public class RequestManagementService {
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
     }
 
+    /**
+     * Rechaza una solicitud existente agregando una razón
+     * para el rechazo.
+     */
     public Request rejectRequest(String requestId, String reason) {
         return requests.stream()
                 .filter(request -> request.getId().equals(requestId))
@@ -66,6 +86,10 @@ public class RequestManagementService {
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
     }
 
+    /**
+     * Solicita información adicional sobre una solicitud ya creada,
+     * agregando un mensaje a las observaciones.
+     */
     public Request requestAdditionalInfo(String requestId, String message) {
         return requests.stream()
                 .filter(request -> request.getId().equals(requestId))
@@ -77,6 +101,10 @@ public class RequestManagementService {
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
     }
 
+    /**
+     * Busca solicitudes filtrando por término de búsqueda,
+     * que puede coincidir con id, estudiante o materias involucradas.
+     */
     public List<Request> searchRequests(String searchTerm) {
         return requests.stream()
                 .filter(request ->
@@ -88,6 +116,10 @@ public class RequestManagementService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene todas las solicitudes que corresponden a un estado
+     * específico, ordenadas por fecha de creación.
+     */
     public List<Request> getRequestsByStatus(RequestStatus status) {
         return requests.stream()
                 .filter(request -> request.getStatus() == status)
@@ -95,6 +127,10 @@ public class RequestManagementService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Crea una nueva instancia de solicitud a partir de otra ya existente,
+     * modificando únicamente el estado y las observaciones.
+     */
     private Request createUpdatedRequest(Request original, RequestStatus newStatus, String newObservations) {
         return new Request() {
             @Override public String getId() { return original.getId(); }

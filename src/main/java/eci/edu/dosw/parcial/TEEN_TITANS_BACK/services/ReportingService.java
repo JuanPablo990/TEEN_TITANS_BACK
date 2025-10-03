@@ -17,6 +17,12 @@ public class ReportingService {
     private final List<Student> students = new ArrayList<>();
     private final List<Subject> subjects = new ArrayList<>();
 
+    /**
+     * Genera un reporte del historial de cambios realizados por un estudiante.
+     *
+     * @param studentId identificador único del estudiante
+     * @return objeto con estadísticas y solicitudes del estudiante
+     */
     public StudentHistoryReportDTO generateStudentChangeHistory(String studentId) {
         List<Request> studentRequests = requests.stream()
                 .filter(request -> request.getStudent() != null && request.getStudent().getId().equals(studentId))
@@ -31,6 +37,11 @@ public class ReportingService {
         return report;
     }
 
+    /**
+     * Obtiene los grupos más solicitados por los estudiantes.
+     *
+     * @return lista de estadísticas con el ID del grupo y la cantidad de solicitudes
+     */
     public List<Map<String, Object>> getMostRequestedGroups() {
         return requests.stream()
                 .filter(request -> request.getTargetSubject() != null)
@@ -49,6 +60,12 @@ public class ReportingService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene estadísticas de aprobación y rechazo de solicitudes en un rango de fechas.
+     *
+     * @param dateRange rango de fechas a considerar
+     * @return mapa con estadísticas de solicitudes aprobadas, rechazadas y pendientes
+     */
     public Map<String, Object> getApprovalRejectionStats(DateRange dateRange) {
         List<Request> filteredRequests = requests.stream()
                 .filter(request -> isWithinDateRange(request.getCreationDate(), dateRange))
@@ -67,6 +84,11 @@ public class ReportingService {
         return stats;
     }
 
+    /**
+     * Genera un reporte del progreso académico global de los estudiantes.
+     *
+     * @return mapa con métricas generales de solicitudes y estudiantes
+     */
     public Map<String, Object> getGlobalAcademicProgress() {
         Map<String, Object> progress = new HashMap<>();
         progress.put("totalStudents", students.size());
@@ -84,6 +106,12 @@ public class ReportingService {
         return progress;
     }
 
+    /**
+     * Genera reportes detallados para una facultad específica.
+     *
+     * @param faculty nombre de la facultad
+     * @return mapa con estadísticas de solicitudes filtradas por la facultad
+     */
     public Map<String, Object> generateFacultyReports(String faculty) {
         List<Request> facultyRequests = requests.stream()
                 .filter(request -> request.getStudent() != null && faculty.equals(request.getStudent().getCareer()))
@@ -103,12 +131,16 @@ public class ReportingService {
         return report;
     }
 
+    // Método de utilidad privado (no requiere JavaDoc público)
     private boolean isWithinDateRange(Date date, DateRange dateRange) {
         return date != null && dateRange != null &&
                 !date.before(dateRange.getStartDate()) &&
                 !date.after(dateRange.getEndDate());
     }
 
+    /**
+     * Clase interna que define un rango de fechas para filtrar reportes.
+     */
     public static class DateRange {
         private Date startDate;
         private Date endDate;

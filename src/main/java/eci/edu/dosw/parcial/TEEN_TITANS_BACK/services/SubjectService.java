@@ -11,7 +11,10 @@ import java.util.stream.Collectors;
 public class SubjectService {
 
     private final ConcurrentHashMap<String, Subject> subjects = new ConcurrentHashMap<>();
-
+    /**
+     * Crea una nueva asignatura en el sistema
+     * (solo permitido para usuarios administradores).
+     */
     public Subject createSubject(SubjectDTO subjectData, User user) {
         if (!isAdministrator(user)) return null;
 
@@ -20,11 +23,16 @@ public class SubjectService {
         subjects.put(subjectId, subject);
         return subject;
     }
-
+    /**
+     * Obtiene una asignatura por su identificador único.
+     */
     public Subject getSubject(String subjectId) {
         return subjects.get(subjectId);
     }
-
+    /**
+     * Actualiza los datos de una asignatura existente
+     * (solo administradores).
+     */
     public Subject updateSubject(String subjectId, SubjectDTO updates, User user) {
         if (!isAdministrator(user)) return null;
 
@@ -36,56 +44,84 @@ public class SubjectService {
         }
         return null;
     }
-
+    /**
+     * Elimina una asignatura del sistema
+     * (solo administradores).
+     */
     public boolean deleteSubject(String subjectId, User user) {
         if (!isAdministrator(user)) return false;
         return subjects.remove(subjectId) != null;
     }
-
+    /**
+     * Retorna la lista completa de asignaturas registradas.
+     */
     public List<Subject> getAllSubjects() {
         return subjects.values().stream().collect(Collectors.toList());
     }
+    /**
+     * Agrega un grupo a una asignatura existente
+     * (solo administradores).
+     */
 
     public Subject addGroupToSubject(String subjectId, SubjectDTO groupData, User user) {
         if (!isAdministrator(user)) return null;
         return subjects.get(subjectId);
     }
-
+    /**
+     * Elimina un grupo específico de una asignatura
+     * (solo administradores).
+     */
     public boolean removeGroupFromSubject(String subjectId, int groupNumber, User user) {
         if (!isAdministrator(user)) return false;
         return subjects.containsKey(subjectId);
     }
-
+    /**
+     * Actualiza la capacidad de un grupo en una asignatura
+     * (solo administradores).
+     */
     public boolean updateGroupCapacity(String subjectId, int groupNumber, int newCapacity, User user) {
         if (!isAdministrator(user)) return false;
         return subjects.containsKey(subjectId);
     }
-
+    /**
+     * Obtiene todas las asignaturas que pertenecen a una facultad dada.
+     */
     public List<Subject> getSubjectsByFaculty(String faculty) {
         return subjects.values().stream()
                 .filter(subject -> true)
                 .collect(Collectors.toList());
     }
-
+    /**
+     * Obtiene todas las asignaturas dictadas por un profesor específico.
+     */
     public List<Subject> getSubjectsByTeacher(String teacher) {
         return subjects.values().stream()
                 .filter(subject -> subject.getTeacher().equals(teacher))
                 .collect(Collectors.toList());
     }
-
+    /**
+     * Busca asignaturas cuyo nombre coincida (parcialmente) con el criterio dado.
+     */
     public List<Subject> searchSubjectsByName(String name) {
         return subjects.values().stream()
                 .filter(subject -> subject.getName().toLowerCase().contains(name.toLowerCase()))
                 .collect(Collectors.toList());
     }
-
+    /**
+     * Genera un identificador único para una asignatura basado en su nombre y grupo.
+     */
     private String generateSubjectId(Subject subject) {
         return subject.getName().replaceAll("\\s+", "-").toUpperCase() + "-" + subject.getGroup();
     }
-
+    /**
+     * Verifica si el usuario es administrador.
+     */
     private boolean isAdministrator(User user) {
         return user instanceof Administrator;
     }
+    /**
+     * Convierte un objeto SubjectDTO en una entidad Subject usando reflexión.
+     */
 
     private Subject convertToEntity(SubjectDTO dto) {
         Subject subject = new Subject();
