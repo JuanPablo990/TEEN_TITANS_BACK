@@ -57,9 +57,6 @@ class RequestManagementServiceTest {
         });
     }
 
-
-
-
     @Test
     void testSearchRequestsEmpty() {
         var result = requestManagementService.searchRequests("test");
@@ -101,4 +98,98 @@ class RequestManagementServiceTest {
 
         assertEquals(RequestType.REQUEST_FOR_LATE_REGISTRATION, result.getType());
     }
+
+    @Test
+    void testSearchRequestsByStudentInfo() {
+        Request request = requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        var result = requestManagementService.searchRequests("test");
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testGetRequestsByStatusApproved() {
+        requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        var result = requestManagementService.getRequestsByStatus(RequestStatus.APPROVED);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testGetRequestsByStatusRejected() {
+        requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        var result = requestManagementService.getRequestsByStatus(RequestStatus.REJECTED);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testGetRequestsByStatusUnderReview() {
+        requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        var result = requestManagementService.getRequestsByStatus(RequestStatus.UNDER_REVIEW);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testCreateRequestForStudentGroupExchange() {
+        studentRequestDTO.setRequestType("REQUEST_FOR_STUDENT_GROUP_EXCHANGE");
+
+        Request result = requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        assertEquals(RequestType.REQUEST_FOR_STUDENT_GROUP_EXCHANGE, result.getType());
+    }
+
+    @Test
+    void testCreateRequestForComposite() {
+        studentRequestDTO.setRequestType("COMPOSITE_REQUEST");
+
+        Request result = requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        assertEquals(RequestType.COMPOSITE_REQUEST, result.getType());
+    }
+
+    @Test
+    void testCreateRequestForExceptionalCircumstances() {
+        studentRequestDTO.setRequestType("REQUEST_FOR_EXCEPTIONAL_CIRCUMSTANCES");
+
+        Request result = requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        assertEquals(RequestType.REQUEST_FOR_EXCEPTIONAL_CIRCUMSTANCES, result.getType());
+    }
+
+    @Test
+    void testRequestIdGeneration() {
+        Request request1 = requestManagementService.createRequestForStudent(studentRequestDTO);
+        Request request2 = requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        assertNotNull(request1.getId());
+        assertNotNull(request2.getId());
+        assertNotEquals(request1.getId(), request2.getId());
+    }
+
+    @Test
+    void testRequestCreationDate() {
+        Request request = requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        assertNotNull(request.getCreationDate());
+    }
+
+    @Test
+    void testMultiplePendingRequests() {
+        requestManagementService.createRequestForStudent(studentRequestDTO);
+        requestManagementService.createRequestForStudent(studentRequestDTO);
+        requestManagementService.createRequestForStudent(studentRequestDTO);
+
+        var result = requestManagementService.getPendingRequests();
+
+        assertEquals(3, result.size());
+        assertTrue(result.stream().allMatch(req -> req.getStatus() == RequestStatus.PENDING));
+    }
+
+
 }

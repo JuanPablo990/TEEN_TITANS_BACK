@@ -109,4 +109,93 @@ class RequestServiceTest {
 
         assertEquals(RequestStatus.PENDING, status);
     }
+
+    @Test
+    void testCancelRequestAlreadyProcessed() {
+        Request request = requestService.createChangeRequest(requestDTO);
+        String requestId = request.getId();
+
+        boolean firstCancel = requestService.cancelRequest(requestId);
+        boolean secondCancel = requestService.cancelRequest(requestId);
+
+        assertTrue(firstCancel);
+        assertFalse(secondCancel);
+    }
+
+    @Test
+    void testGetStudentRequestsWithStudentData() {
+        Request request = requestService.createChangeRequest(requestDTO);
+
+        var result = requestService.getStudentRequests("1-Engineering");
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testGetPendingRequestsWithStudentData() {
+        Request request = requestService.createChangeRequest(requestDTO);
+
+        var result = requestService.getPendingRequests("1-Engineering");
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testGetRequestHistoryWithStudentData() {
+        Request request = requestService.createChangeRequest(requestDTO);
+
+        var result = requestService.getRequestHistory("1-Engineering");
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestIdFormat() {
+        Request request = requestService.createChangeRequest(requestDTO);
+
+        assertNotNull(request.getId());
+        assertTrue(request.getId().startsWith("REQ-"));
+        assertTrue(request.getId().length() > 4);
+    }
+
+    @Test
+    void testRequestCreationDate() {
+        Request request = requestService.createChangeRequest(requestDTO);
+
+        assertNotNull(request.getCreationDate());
+    }
+
+    @Test
+    void testMultipleRequestsDifferentIds() {
+        Request request1 = requestService.createChangeRequest(requestDTO);
+        Request request2 = requestService.createChangeRequest(requestDTO);
+        Request request3 = requestService.createChangeRequest(requestDTO);
+
+        assertNotEquals(request1.getId(), request2.getId());
+        assertNotEquals(request2.getId(), request3.getId());
+        assertNotEquals(request1.getId(), request3.getId());
+    }
+
+    @Test
+    void testRequestTypePreserved() {
+        requestDTO.setType(RequestType.REQUEST_FOR_GROUP_CHANGE);
+        Request request = requestService.createChangeRequest(requestDTO);
+
+        assertEquals(RequestType.REQUEST_FOR_GROUP_CHANGE, request.getType());
+    }
+
+    @Test
+    void testRequestInitialStatus() {
+        Request request = requestService.createChangeRequest(requestDTO);
+
+        assertEquals(RequestStatus.PENDING, request.getStatus());
+    }
+
+    @Test
+    void testEmptyRequestServiceState() {
+        assertEquals(0, requestService.getStudentRequests("any").size());
+        assertEquals(0, requestService.getPendingRequests("any").size());
+        assertEquals(0, requestService.getRequestHistory("any").size());
+    }
+
 }

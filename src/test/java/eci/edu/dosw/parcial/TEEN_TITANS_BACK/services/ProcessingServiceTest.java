@@ -5,6 +5,8 @@ import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -143,6 +145,243 @@ class ProcessingServiceTest {
         boolean routed = service.routeRequestToFaculty(null);
 
         assertFalse(routed, "No debe enrutar cuando el ID es null");
+    }
+
+    @Test
+    void testValidateScheduleOverlapReturnsFalseForSameTimes() throws Exception {
+        var classTimeField = Subject.class.getDeclaredField("classTime");
+        classTimeField.setAccessible(true);
+        classTimeField.set(originalSubject, "10:00");
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateScheduleOverlap(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateCapacityWithNullTargetSubjectReturnsFalse() throws Exception {
+        var tSubjectField = ChangeRequestDTO.class.getDeclaredField("targetSubject");
+        tSubjectField.setAccessible(true);
+        tSubjectField.set(requestData, null);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateCapacity(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateScheduleOverlapWithNullSubjectsReturnsFalse() throws Exception {
+        var oSubjectField = ChangeRequestDTO.class.getDeclaredField("originalSubject");
+        oSubjectField.setAccessible(true);
+        oSubjectField.set(requestData, null);
+
+        var tSubjectField = ChangeRequestDTO.class.getDeclaredField("targetSubject");
+        tSubjectField.setAccessible(true);
+        tSubjectField.set(requestData, null);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateScheduleOverlap(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateScheduleOverlapWithNullOriginalSubject() throws Exception {
+        var oSubjectField = ChangeRequestDTO.class.getDeclaredField("originalSubject");
+        oSubjectField.setAccessible(true);
+        oSubjectField.set(requestData, null);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateScheduleOverlap(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateScheduleOverlapWithNullTargetSubject() throws Exception {
+        var tSubjectField = ChangeRequestDTO.class.getDeclaredField("targetSubject");
+        tSubjectField.setAccessible(true);
+        tSubjectField.set(requestData, null);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateScheduleOverlap(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateCapacityWithExactQuotas() throws Exception {
+        var registeredField = Subject.class.getDeclaredField("registered");
+        registeredField.setAccessible(true);
+        registeredField.set(targetSubject, 30);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateCapacity(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateCapacityWithZeroQuotas() throws Exception {
+        var quotasField = Subject.class.getDeclaredField("quotas");
+        quotasField.setAccessible(true);
+        quotasField.set(targetSubject, 0);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateCapacity(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateScheduleOverlapWithEmptyClassTime() throws Exception {
+        var classTimeField = Subject.class.getDeclaredField("classTime");
+        classTimeField.setAccessible(true);
+        classTimeField.set(originalSubject, "");
+        classTimeField.set(targetSubject, "");
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateScheduleOverlap(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testAssignAutomaticPriorityMaintainsOtherProperties() {
+        Request originalRequest = service.receiveStudentRequest(requestData);
+        Request prioritizedRequest = service.assignAutomaticPriority(originalRequest);
+
+        assertEquals(originalRequest.getType(), prioritizedRequest.getType());
+        assertEquals(originalRequest.getStudent(), prioritizedRequest.getStudent());
+        assertEquals(originalRequest.getOriginalSubject(), prioritizedRequest.getOriginalSubject());
+        assertEquals(originalRequest.getTargetSubject(), prioritizedRequest.getTargetSubject());
+    }
+
+    @Test
+    void testMultipleAssignAutomaticPriorityCalls() {
+        Request request = service.receiveStudentRequest(requestData);
+        Request prioritized1 = service.assignAutomaticPriority(request);
+        Request prioritized2 = service.assignAutomaticPriority(prioritized1);
+
+        assertEquals(prioritized1.getPriority(), prioritized2.getPriority());
+    }
+
+    @Test
+    void testValidateCapacityWithNegativeRegistered() throws Exception {
+        var registeredField = Subject.class.getDeclaredField("registered");
+        registeredField.setAccessible(true);
+        registeredField.set(targetSubject, -5);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateCapacity(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateCapacityWithNegativeQuotas() throws Exception {
+        var quotasField = Subject.class.getDeclaredField("quotas");
+        quotasField.setAccessible(true);
+        quotasField.set(targetSubject, -10);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateCapacity(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateScheduleOverlapWithNullClassTime() throws Exception {
+        var classTimeField = Subject.class.getDeclaredField("classTime");
+        classTimeField.setAccessible(true);
+        classTimeField.set(originalSubject, null);
+        classTimeField.set(targetSubject, null);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateScheduleOverlap(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testGetRequestAuditTrailFormat() {
+        Request request = service.receiveStudentRequest(requestData);
+        List<String> auditTrail = service.getRequestAuditTrail(request.getId());
+
+        for (String entry : auditTrail) {
+            assertNotNull(entry);
+            assertFalse(entry.trim().isEmpty());
+        }
+    }
+
+    @Test
+    void testRouteRequestToFacultyWithEmptyStudentId() throws Exception {
+        var studentField = Student.class.getDeclaredField("id");
+        studentField.setAccessible(true);
+        studentField.set(student, "");
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.routeRequestToFaculty(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testRouteRequestToFacultyWithNullStudentId() throws Exception {
+        var studentField = Student.class.getDeclaredField("id");
+        studentField.setAccessible(true);
+        studentField.set(student, null);
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.routeRequestToFaculty(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidateScheduleOverlapWithDifferentFormats() throws Exception {
+        var classTimeField = Subject.class.getDeclaredField("classTime");
+        classTimeField.setAccessible(true);
+        classTimeField.set(originalSubject, "08:00 AM");
+        classTimeField.set(targetSubject, "08:00");
+
+        Request request = service.receiveStudentRequest(requestData);
+        boolean result = service.validateScheduleOverlap(request.getId());
+        assertFalse(result);
+    }
+
+    @Test
+    void testRequestCreationDateIsRecent() {
+        Request request = service.receiveStudentRequest(requestData);
+        Date now = new Date();
+        long timeDifference = now.getTime() - request.getCreationDate().getTime();
+        assertTrue(timeDifference < 1000);
+    }
+
+    @Test
+    void testRequestSolveDateIsNullForNewRequests() {
+        Request request = service.receiveStudentRequest(requestData);
+        assertNull(request.getSolveDate());
+    }
+
+    @Test
+    void testRequestObservationsMatchInput() {
+        Request request = service.receiveStudentRequest(requestData);
+        assertEquals("Cambio por choque de horarios", request.getObservations());
+    }
+
+    @Test
+    void testRequestGroupsAreCorrect() {
+        Request request = service.receiveStudentRequest(requestData);
+        assertEquals(101, request.getOriginalGroup());
+        assertEquals(202, request.getTargetGroup());
+    }
+
+    @Test
+    void testRequestTypeConversion() {
+        Request request = service.receiveStudentRequest(requestData);
+        assertEquals(RequestType.REQUEST_FOR_GROUP_CHANGE, request.getType());
+    }
+
+    @Test
+    void testRequestStatusIsAlwaysPending() {
+        Request request = service.receiveStudentRequest(requestData);
+        assertEquals(RequestStatus.PENDING, request.getStatus());
+    }
+
+    @Test
+    void testRequestStudentCareer() throws Exception {
+        Request request = service.receiveStudentRequest(requestData);
+        assertEquals("Engineering", request.getStudent().getCareer());
     }
 
 }
