@@ -1,6 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.services;
 
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dtos.ChangeRequestData;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dtos.ChangeRequestDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Request;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Subject;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Student;
@@ -9,14 +9,13 @@ import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.RequestStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProcessingService {
 
     private final List<Request> requests = new ArrayList<>();
 
-    public Request receiveStudentRequest(ChangeRequestData requestData) {
+    public Request receiveStudentRequest(ChangeRequestDTO requestData) {
         Request request = createRequestFromData(requestData);
         requests.add(request);
         return request;
@@ -73,7 +72,7 @@ public class ProcessingService {
                 .orElse(Collections.emptyList());
     }
 
-    private Request createRequestFromData(ChangeRequestData requestData) {
+    private Request createRequestFromData(ChangeRequestDTO requestData) {
         return new Request() {
             @Override
             public String getId() { return UUID.randomUUID().toString(); }

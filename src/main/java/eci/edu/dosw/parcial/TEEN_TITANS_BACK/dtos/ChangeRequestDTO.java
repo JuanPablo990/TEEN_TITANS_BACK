@@ -3,7 +3,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.dtos;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Student;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Subject;
 
-public class ChangeRequestData {
+public class ChangeRequestDTO {
     private String requestType;
     private Student student;
     private Subject originalSubject;
