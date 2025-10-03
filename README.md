@@ -5,7 +5,7 @@
 - Raquel Iveth Selma Ayala
 - Juan Pablo Nieto Cortes
 - Deisy Lorena Guzman Cabrales
-  
+
 ---
 
 #  SIRHA - Sistema de Reasignación de Horarios Académicos
@@ -104,7 +104,7 @@ Los commits deben ser claros, breves y con un prefijo que indique el propósito:
 
 ![img_1.j](docs/imagenes/casosdeuso.png)
 
-###  Diagrama de clases 
+###  Diagrama de clases
 
 ![Diagramaclases.png](docs/uml/Diagramaclases.png)
 
