@@ -5,7 +5,7 @@ import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.AcademicCycle;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.StudentProgress;
 import java.util.List;
 
-public class AcademicDashboardDTO {
+public class AcademicDTO {
     private List<Subject> currentSchedule;
     private List<AcademicCycle> academicHistory;
     private String academicTrafficLight;

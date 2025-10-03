@@ -1,6 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.services;
 
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dtos.AcademicDashboardDTO;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dtos.AcademicDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Subject;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.AcademicCycle;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.AcademicPerformance;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 
 public class AcademicService {
 
-    public AcademicDashboardDTO getStudentDashboard(String studentId) {
-        AcademicDashboardDTO dashboard = new AcademicDashboardDTO();
+    public AcademicDTO getStudentDashboard(String studentId) {
+        AcademicDTO dashboard = new AcademicDTO();
 
         dashboard.setCurrentSchedule(getCurrentSchedule(studentId));
         dashboard.setAcademicHistory(getAcademicHistory(studentId));
