@@ -188,6 +188,8 @@ public class StatisticsService {
         return progress;
     }
 
+
+
     public Map<String, Object> getInstitutionalCapacityOverview() {
         int totalCapacity = subjects.stream().mapToInt(Subject::getQuotas).sum();
         int totalRegistered = subjects.stream().mapToInt(Subject::getRegistered).sum();
@@ -226,5 +228,8 @@ public class StatisticsService {
             default:
                 return "unknown";
         }
+
+
     }
+
 }
