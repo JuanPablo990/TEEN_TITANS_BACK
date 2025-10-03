@@ -4,10 +4,19 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
  * Informacion academica del estudiante.
  */
 public class Student {
+    private String id;
     private int standard;
     private String career;
     private String gatSemester;
     private String gatCareer;
+
+    /**
+     * Obtiene el identificador único del estudiante.
+     * @return Identificador del estudiante
+     */
+    public String getId() {
+        return id;
+    }
 
     /**
      * Obtiene el estandar del estudiante.

@@ -39,6 +39,69 @@ public class Request {
     }
 
     /**
+     * Obtiene el estudiante que realizó la solicitud.
+     *
+     * @return Estudiante solicitante
+     */
+    public Student getStudent() {
+        return student;
+    }
+
+    /**
+     * Obtiene la materia original de la solicitud.
+     *
+     * @return Materia original
+     */
+    public Subject getOriginalSubject() {
+        return originalSubject;
+    }
+
+    /**
+     * Obtiene la materia objetivo de la solicitud.
+     *
+     * @return Materia objetivo
+     */
+    public Subject getTargetSubject() {
+        return targetSubject;
+    }
+
+    /**
+     * Obtiene el grupo original de la solicitud.
+     *
+     * @return Grupo original
+     */
+    public int getOriginalGroup() {
+        return originalGroup;
+    }
+
+    /**
+     * Obtiene el grupo objetivo de la solicitud.
+     *
+     * @return Grupo objetivo
+     */
+    public int getTargetGroup() {
+        return targetGroup;
+    }
+
+    /**
+     * Obtiene el estado actual de la solicitud.
+     *
+     * @return Estado de la solicitud
+     */
+    public RequestStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * Obtiene la prioridad de la solicitud.
+     *
+     * @return Prioridad de la solicitud
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
      * Obtiene la fecha de creación de la solicitud.
      *
      * @return Fecha de creación
@@ -54,5 +117,14 @@ public class Request {
      */
     public Date getSolveDate() {
         return resolutionDate;
+    }
+
+    /**
+     * Obtiene las observaciones de la solicitud.
+     *
+     * @return Observaciones de la solicitud
+     */
+    public String getObservations() {
+        return observations;
     }
 }
