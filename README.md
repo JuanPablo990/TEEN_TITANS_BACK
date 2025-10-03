@@ -102,7 +102,7 @@ Los commits deben ser claros, breves y con un prefijo que indique el propósito:
 
 ###  Diagrama de casos de uso
 
-![img_1.j](docs/imagenes/casosdeuso.png)
+![diagramaCasosdeUso.png](docs%2Fimagenes%2FdiagramaCasosdeUso.png)
 
 ###  Diagrama de clases
 
