@@ -127,4 +127,58 @@ class DeaneryServiceTest {
                 () -> assertNotNull(status.get("timestamp"))
         );
     }
+    @Test
+    void testApproveRequestNotFound() {
+        Exception ex = assertThrows(RuntimeException.class,
+                () -> service.approveRequest("REQ-999", "Aprobado con comentarios"));
+
+        assertTrue(ex.getMessage().contains("Solicitud no encontrada"));
+    }
+
+    @Test
+    void testRejectRequestNotFound() {
+        Exception ex = assertThrows(RuntimeException.class,
+                () -> service.rejectRequest("REQ-999", "Razón de rechazo"));
+
+        assertTrue(ex.getMessage().contains("Solicitud no encontrada"));
+    }
+
+    @Test
+    void testRequestAdditionalInfoNotFound() {
+        Exception ex = assertThrows(RuntimeException.class,
+                () -> service.requestAdditionalInfo("REQ-999", "Falta documento"));
+
+        assertTrue(ex.getMessage().contains("Solicitud no encontrada"));
+    }
+
+    @Test
+    void testGetFacultyRequestsEmpty() {
+        List<DeaneryRequestDTO> result = service.getFacultyRequests("Law");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "No debería devolver solicitudes para una facultad inexistente");
+    }
+
+    @Test
+    void testGetGroupCapacityAlertsEmpty() {
+        List<DeaneryRequestDTO> alerts = service.getGroupCapacityAlerts("Law");
+
+        assertNotNull(alerts);
+        assertTrue(alerts.isEmpty(), "No debería haber alertas para una facultad sin solicitudes");
+    }
+
+    @Test
+    void testMonitorGroupCapacityWithNoRequests() {
+        Map<String, Object> status = service.monitorGroupCapacity("999");
+
+        assertAll("Monitor vacío",
+                () -> assertEquals("999", status.get("groupId")),
+                () -> assertEquals(0L, status.get("activeRequests")),
+                () -> assertEquals("NORMAL", status.get("status")),
+                () -> assertNotNull(status.get("timestamp"))
+        );
+    }
+
+
+
 }

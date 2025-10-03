@@ -120,4 +120,29 @@ class ProcessingServiceTest {
     }
 
 
+
+    @Test
+    void testReceiveStudentRequestGeneratesUniqueId() {
+        Request req1 = service.receiveStudentRequest(requestData);
+        Request req2 = service.receiveStudentRequest(requestData);
+
+        assertNotEquals(req1.getId(), req2.getId(),
+                "Cada request debe generar un ID único");
+    }
+
+    @Test
+    void testReceiveStudentRequestStatusIsPending() {
+        Request req = service.receiveStudentRequest(requestData);
+
+        assertEquals(RequestStatus.PENDING, req.getStatus(),
+                "Al recibir una solicitud nueva, el estado debe ser PENDING");
+    }
+
+    @Test
+    void testRouteRequestWithNullId() {
+        boolean routed = service.routeRequestToFaculty(null);
+
+        assertFalse(routed, "No debe enrutar cuando el ID es null");
+    }
+
 }
