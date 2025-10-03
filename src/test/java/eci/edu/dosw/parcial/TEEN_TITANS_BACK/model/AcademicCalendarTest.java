@@ -1,6 +1,5 @@
-package eci.edu.dosw.parcial.TEEN_TITANS_BACK.testModel;
+package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.AcademicCalendar;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
