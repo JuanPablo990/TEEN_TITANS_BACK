@@ -5,30 +5,32 @@
 - Raquel Iveth Selma Ayala
 - Juan Pablo Nieto Cortes
 - Deisy Lorena Guzman Cabrales
-  '
-## Maven Corriendo
-![img.png](docs/imagenes/img.png
 
-1. **Identificación de requisitos:**
+# **Versionamiento de ramas y nomenclatura**
 
-# 1. Reglas de Negocio
+## Formato para commits:
 
-Las reglas de negocio son las políticas, restricciones y condiciones que el sistema debe hacer cumplir.
+`<tipo>(<área opcional>): <descripción corta>`
 
-- **RN-01:** Los estudiantes solo pueden generar solicitudes de cambio dentro de las fechas habilitadas por la institución.
-- **RN-02:** Un estudiante no puede solicitar cambio de una materia que ya ha cancelado en el mismo semestre.
-- **RN-03:** La prioridad de una solicitud se asigna automáticamente por orden de llegada (número de radicado).
-- **RN-04:** Una decanatura solo puede gestionar solicitudes de las materias bajo su facultad.
-- **RN-05:** No se puede aprobar un cambio si el grupo destino ya está lleno (al 100% de su capacidad).
-- **RN-06:** Las solicitudes deben ser resueltas (aprobadas o rechazadas) en un plazo máximo definido (ej. 5 días hábiles).
-- **RN-07:** Solo usuarios con rol de administrador o decanatura pueden modificar los cupos de los grupos.
-- **RN-08:** No se pueden aprobar solicitudes fuera del calendario académico establecido.
-- **RN-09:** No se permiten cupos en un grupo superiores al máximo definido para él.
-- **RN-10:** No se puede aprobar un cambio si este genera cruce de horarios con las materias obligatorias del estudiante.
-- **RN-11:** La autenticación en el sistema se realiza únicamente con credenciales institucionales.
-- **RN-12:** El sistema debe alertar cuando un grupo llega al 90% de su capacidad.
+### Ejemplo:
 
-# 2. Funcionalidades Principales
+`feat(usuario): agregar validación de correo institucional
+fix(materia): corregido error en el cálculo de cupos
+docs(readme): actualizar instrucciones de instalación`
+
+## Tipos 
+- feat → cuando agregas una nueva funcionalidad
+- fix → cuando corriges un bug o error
+- docs → cambios en documentación (README, comentarios, etc.)
+- style → cambios de formato, identación, espacios, sin afectar lógica
+- refactor → reestructuras código sin cambiar funcionalidad
+- test → agregas o corriges pruebas
+- chore → tareas de mantenimiento (dependencias, configs, etc.)
+
+
+
+
+# 1. Funcionalidades Principales
 
 Agrupadas por los módulos descritos en el documento.
 
@@ -305,6 +307,3 @@ Estas son las condiciones que deben cumplirse para que el sistema pueda funciona
 #  Diagrama de casos de uso
 
 ![img_1.j](docs/imagenes/casosdeuso.png)
-
-#  Diagrama de clases (temporal)
-![img_1.png](docs/imagenes/img_1.png)
