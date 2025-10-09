@@ -1,0 +1,107 @@
+package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
+
+import java.util.Date;
+
+/**
+ * Representa un período académico en el sistema educativo.
+ * Esta clase encapsula toda la información relevante sobre un término académico específico,
+ * incluyendo períodos de matrícula y ajuste.
+ *
+ * @author Equipo Teen Titans
+ * @version 1.0
+ * @since 2025
+ */
+public class AcademicPeriod {
+    private String periodId;
+    private String name;
+    private Date startDate;
+    private Date endDate;
+    private Date enrollmentStart;
+    private Date enrollmentEnd;
+    private Date adjustmentPeriodStart;
+    private Date adjustmentPeriodEnd;
+    private boolean isActive;
+
+    /**
+     * Obtiene el identificador único de este período académico.
+     *
+     * @return el ID del período como String
+     */
+    public String getPeriodId() {
+        return periodId;
+    }
+
+    /**
+     * Obtiene el nombre descriptivo de este período académico.
+     *
+     * @return el nombre del período como String
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Obtiene la fecha de inicio de este período académico.
+     *
+     * @return la fecha de inicio como objeto Date
+     */
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    /**
+     * Obtiene la fecha de fin de este período académico.
+     *
+     * @return la fecha de fin como objeto Date
+     */
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * Obtiene la fecha de inicio del período de matrícula.
+     *
+     * @return la fecha de inicio de matrícula como objeto Date
+     */
+    public Date getEnrollmentStart() {
+        return enrollmentStart;
+    }
+
+    /**
+     * Obtiene la fecha de fin del período de matrícula.
+     *
+     * @return la fecha de fin de matrícula como objeto Date
+     */
+    public Date getEnrollmentEnd() {
+        return enrollmentEnd;
+    }
+
+    /**
+     * Obtiene la fecha de inicio del período de ajuste.
+     * El período de ajuste normalmente permite a los estudiantes agregar o eliminar cursos.
+     *
+     * @return la fecha de inicio del período de ajuste como objeto Date
+     */
+    public Date getAdjustmentPeriodStart() {
+        return adjustmentPeriodStart;
+    }
+
+    /**
+     * Obtiene la fecha de fin del período de ajuste.
+     * El período de ajuste normalmente permite a los estudiantes agregar o eliminar cursos.
+     *
+     * @return la fecha de fin del período de ajuste como objeto Date
+     */
+    public Date getAdjustmentPeriodEnd() {
+        return adjustmentPeriodEnd;
+    }
+
+    /**
+     * Verifica si este período académico está actualmente activo.
+     *
+     * @return true si el período está activo, false en caso contrario
+     */
+    public boolean isActive() {
+        return isActive;
+    }
+}
