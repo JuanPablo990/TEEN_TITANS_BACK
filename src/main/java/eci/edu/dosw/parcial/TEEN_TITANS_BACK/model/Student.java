@@ -1,5 +1,7 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 /**
  * Representa un estudiante dentro del sistema universitario.
  * Esta clase extiende de User y añade información académica específica
@@ -9,6 +11,8 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
  * @version 1.0
  * @since 2025
  */
+
+@Document(collection = "students")
 public class Student extends User {
     private String academicProgram;
     private Integer semester;

@@ -1,5 +1,7 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 /**
  * Representa un administrador dentro del sistema universitario.
  * Esta clase extiende de User y añade información del departamento
@@ -9,6 +11,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "administrators")
 public class Administrator extends User {
     private String department;
 

@@ -1,5 +1,8 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 
 /**
@@ -11,7 +14,9 @@ import java.util.Date;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "users")
 public class User {
+    @Id
     private String id;
     private String name;
     private String email;

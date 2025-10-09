@@ -1,5 +1,9 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +17,12 @@ import java.util.List;
  * @version 1.0
  * @since 2025
  */
+
+@Document(collection = "schedule_change_requests")
 public class ScheduleChangeRequest {
+    @Id
     private String requestId;
+    @DBRef
     private Student student;
     private Group currentGroup;
     private Group requestedGroup;
@@ -22,6 +30,7 @@ public class ScheduleChangeRequest {
     private RequestStatus status;
     private Date submissionDate;
     private Date resolutionDate;
+    @DBRef
     private List<ReviewStep> reviewHistory;
 
     /**
