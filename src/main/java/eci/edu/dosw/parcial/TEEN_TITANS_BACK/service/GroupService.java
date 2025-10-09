@@ -15,7 +15,7 @@ import java.util.Map;
  * datos de capacidad, matrículas y listas de espera.
  * </p>
  *
- * @author Juan Pablo
+ * @author Equipo Teen Titans
  * @version 1.0
  */
 public abstract class GroupService {
