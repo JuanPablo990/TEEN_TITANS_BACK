@@ -15,6 +15,12 @@ public class Student extends User {
     private Double gradeAverage;
 
     /**
+     * Constructor vacío para la clase Student.
+     */
+    public Student() {
+    }
+
+    /**
      * Constructor para crear un nuevo estudiante.
      *
      * @param id el identificador único del estudiante

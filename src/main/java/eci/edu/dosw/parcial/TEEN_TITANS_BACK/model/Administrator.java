@@ -13,6 +13,12 @@ public class Administrator extends User {
     private String department;
 
     /**
+     * Constructor vacío para la clase Administrator.
+     */
+    public Administrator() {
+    }
+
+    /**
      * Constructor para crear un nuevo administrador.
      *
      * @param id el identificador único del administrador

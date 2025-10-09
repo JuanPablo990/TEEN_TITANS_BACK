@@ -25,6 +25,13 @@ public class ScheduleChangeRequest {
     private List<ReviewStep> reviewHistory;
 
     /**
+     * Constructor vacío para la clase ScheduleChangeRequest.
+     */
+    public ScheduleChangeRequest() {
+        this.reviewHistory = new ArrayList<>();
+    }
+
+    /**
      * Constructor para crear una nueva solicitud de cambio de horario.
      *
      * @param requestId el identificador único de la solicitud
@@ -128,6 +135,51 @@ public class ScheduleChangeRequest {
     }
 
     /**
+     * Actualiza el identificador único de la solicitud.
+     *
+     * @param requestId el nuevo identificador de la solicitud
+     */
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    /**
+     * Actualiza el estudiante que realizó la solicitud.
+     *
+     * @param student el nuevo estudiante solicitante
+     */
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    /**
+     * Actualiza el grupo actual del estudiante.
+     *
+     * @param currentGroup el nuevo grupo actual
+     */
+    public void setCurrentGroup(Group currentGroup) {
+        this.currentGroup = currentGroup;
+    }
+
+    /**
+     * Actualiza el grupo solicitado por el estudiante.
+     *
+     * @param requestedGroup el nuevo grupo solicitado
+     */
+    public void setRequestedGroup(Group requestedGroup) {
+        this.requestedGroup = requestedGroup;
+    }
+
+    /**
+     * Actualiza la justificación de la solicitud.
+     *
+     * @param reason la nueva justificación para el cambio
+     */
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    /**
      * Actualiza el estado de la solicitud.
      * Si el nuevo estado es APROBADO o RECHAZADO, se establece automáticamente
      * la fecha de resolución.
@@ -142,12 +194,30 @@ public class ScheduleChangeRequest {
     }
 
     /**
-     * Actualiza la justificación de la solicitud.
+     * Actualiza la fecha de envío de la solicitud.
      *
-     * @param reason la nueva justificación para el cambio
+     * @param submissionDate la nueva fecha de envío
      */
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setSubmissionDate(Date submissionDate) {
+        this.submissionDate = submissionDate;
+    }
+
+    /**
+     * Actualiza la fecha de resolución de la solicitud.
+     *
+     * @param resolutionDate la nueva fecha de resolución
+     */
+    public void setResolutionDate(Date resolutionDate) {
+        this.resolutionDate = resolutionDate;
+    }
+
+    /**
+     * Actualiza el historial de revisiones de la solicitud.
+     *
+     * @param reviewHistory el nuevo historial de revisiones
+     */
+    public void setReviewHistory(List<ReviewStep> reviewHistory) {
+        this.reviewHistory = reviewHistory;
     }
 
     /**

@@ -22,6 +22,12 @@ public class User {
     private Date updatedAt;
 
     /**
+     * Constructor vacío para la clase User.
+     */
+    public User() {
+    }
+
+    /**
      * Constructor para crear un nuevo usuario del sistema.
      *
      * @param id el identificador único del usuario
@@ -114,6 +120,15 @@ public class User {
     }
 
     /**
+     * Actualiza el identificador único del usuario.
+     *
+     * @param id el nuevo identificador del usuario
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
      * Actualiza el nombre del usuario.
      *
      * @param name el nuevo nombre del usuario
@@ -161,6 +176,24 @@ public class User {
     public void setActive(boolean active) {
         this.active = active;
         this.updatedAt = new Date();
+    }
+
+    /**
+     * Actualiza la fecha de creación del usuario.
+     *
+     * @param createdAt la nueva fecha de creación
+     */
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+     * Actualiza la fecha de última actualización del usuario.
+     *
+     * @param updatedAt la nueva fecha de última actualización
+     */
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     /**

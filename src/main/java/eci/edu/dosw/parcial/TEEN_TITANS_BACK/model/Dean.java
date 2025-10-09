@@ -14,6 +14,12 @@ public class Dean extends User {
     private String officeLocation;
 
     /**
+     * Constructor vacío para la clase Dean.
+     */
+    public Dean() {
+    }
+
+    /**
      * Constructor para crear un nuevo decano.
      *
      * @param id el identificador único del decano

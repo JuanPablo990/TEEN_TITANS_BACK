@@ -19,6 +19,12 @@ public class ReviewStep {
     private String comments;
 
     /**
+     * Constructor vacío para la clase ReviewStep.
+     */
+    public ReviewStep() {
+    }
+
+    /**
      * Constructor para crear un nuevo paso de revisión.
      *
      * @param userId el identificador del usuario que realiza la acción
@@ -77,6 +83,42 @@ public class ReviewStep {
      */
     public String getComments() {
         return comments;
+    }
+
+    /**
+     * Actualiza el identificador del usuario que realizó la acción.
+     *
+     * @param userId el nuevo identificador del usuario
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Actualiza el rol del usuario que realizó la acción.
+     *
+     * @param userRole el nuevo rol del usuario
+     */
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    /**
+     * Actualiza la acción realizada durante la revisión.
+     *
+     * @param action la nueva acción realizada
+     */
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    /**
+     * Actualiza la fecha y hora de la acción de revisión.
+     *
+     * @param timestamp la nueva fecha y hora
+     */
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     /**
