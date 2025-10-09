@@ -1,6 +1,8 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
 import java.util.Date;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Representa un período académico en el sistema educativo.
@@ -11,7 +13,9 @@ import java.util.Date;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "academic_periods")
 public class AcademicPeriod {
+    @Id
     private String periodId;
     private String name;
     private Date startDate;
