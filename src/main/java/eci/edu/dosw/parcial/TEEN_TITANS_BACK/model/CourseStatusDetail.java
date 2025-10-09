@@ -25,6 +25,43 @@ public class CourseStatusDetail {
     private String comments;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public CourseStatusDetail() {
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param course Curso asociado a este detalle
+     * @param status Estado actual del curso
+     * @param grade Calificación obtenida en el curso
+     * @param semester Semestre en el que se cursó la materia
+     * @param enrollmentDate Fecha de matrícula en el curso
+     * @param completionDate Fecha de finalización del curso
+     * @param group Grupo en el que se cursó la materia
+     * @param professor Profesor que impartió el curso
+     * @param creditsEarned Créditos obtenidos en el curso
+     * @param isApproved Indica si el curso fue aprobado
+     * @param comments Comentarios adicionales sobre el desempeño
+     */
+    public CourseStatusDetail(Course course, CourseStatus status, Double grade, String semester, Date enrollmentDate,
+                              Date completionDate, Group group, Professor professor, Integer creditsEarned,
+                              Boolean isApproved, String comments) {
+        this.course = course;
+        this.status = status;
+        this.grade = grade;
+        this.semester = semester;
+        this.enrollmentDate = enrollmentDate;
+        this.completionDate = completionDate;
+        this.group = group;
+        this.professor = professor;
+        this.creditsEarned = creditsEarned;
+        this.isApproved = isApproved;
+        this.comments = comments;
+    }
+
+    /**
      * Obtiene el curso asociado a este detalle de estado.
      *
      * @return el objeto Course asociado

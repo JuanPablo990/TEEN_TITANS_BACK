@@ -18,6 +18,31 @@ public class Group {
     private Classroom classroom;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public Group() {
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param groupId Identificador único del grupo
+     * @param section Sección específica del grupo
+     * @param course Curso asociado al grupo
+     * @param professor Profesor asignado al grupo
+     * @param schedule Horario establecido para el grupo
+     * @param classroom Aula asignada al grupo
+     */
+    public Group(String groupId, String section, Course course, Professor professor, Schedule schedule, Classroom classroom) {
+        this.groupId = groupId;
+        this.section = section;
+        this.course = course;
+        this.professor = professor;
+        this.schedule = schedule;
+        this.classroom = classroom;
+    }
+
+    /**
      * Obtiene el identificador único del grupo.
      *
      * @return el ID del grupo como String

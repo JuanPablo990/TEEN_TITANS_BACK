@@ -17,6 +17,29 @@ public class Classroom {
     private RoomType roomType;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public Classroom() {
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param classroomId Identificador único del aula
+     * @param building Edificio donde se encuentra el aula
+     * @param roomNumber Número de la sala o aula dentro del edificio
+     * @param capacity Capacidad máxima de estudiantes del aula
+     * @param roomType Tipo de aula (ej: laboratorio, auditorio, sala regular)
+     */
+    public Classroom(String classroomId, String building, String roomNumber, Integer capacity, RoomType roomType) {
+        this.classroomId = classroomId;
+        this.building = building;
+        this.roomNumber = roomNumber;
+        this.capacity = capacity;
+        this.roomType = roomType;
+    }
+
+    /**
      * Obtiene el identificador único del aula.
      *
      * @return el ID del aula como String

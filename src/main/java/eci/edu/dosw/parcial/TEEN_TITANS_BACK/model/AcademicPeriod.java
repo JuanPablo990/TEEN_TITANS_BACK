@@ -23,6 +23,42 @@ public class AcademicPeriod {
     private boolean isActive;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public AcademicPeriod() {
+
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param periodId Identificador único del período académico
+     * @param name Nombre descriptivo del período
+     * @param startDate Fecha de inicio del período académico
+     * @param endDate Fecha de fin del período académico
+     * @param enrollmentStart Fecha de inicio del período de matrícula
+     * @param enrollmentEnd Fecha de fin del período de matrícula
+     * @param adjustmentPeriodStart Fecha de inicio del período de ajuste
+     * @param adjustmentPeriodEnd Fecha de fin del período de ajuste
+     * @param isActive Indica si el período está activo
+     */
+    public AcademicPeriod(String periodId, String name, Date startDate, Date endDate,
+                          Date enrollmentStart, Date enrollmentEnd,
+                          Date adjustmentPeriodStart, Date adjustmentPeriodEnd,
+                          boolean isActive) {
+        this.periodId = periodId;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.enrollmentStart = enrollmentStart;
+        this.enrollmentEnd = enrollmentEnd;
+        this.adjustmentPeriodStart = adjustmentPeriodStart;
+        this.adjustmentPeriodEnd = adjustmentPeriodEnd;
+        this.isActive = isActive;
+    }
+
+
+    /**
      * Obtiene el identificador único de este período académico.
      *
      * @return el ID del período como String

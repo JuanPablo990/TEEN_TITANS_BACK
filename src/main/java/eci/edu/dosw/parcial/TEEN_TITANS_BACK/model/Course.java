@@ -18,6 +18,31 @@ public class Course {
     private Boolean isActive;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public Course() {
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param courseCode Código único del curso
+     * @param name Nombre descriptivo del curso
+     * @param credits Número de créditos asignados
+     * @param description Descripción detallada del curso
+     * @param academicProgram Programa académico al que pertenece
+     * @param isActive Indica si el curso está activo
+     */
+    public Course(String courseCode, String name, Integer credits, String description, String academicProgram, Boolean isActive) {
+        this.courseCode = courseCode;
+        this.name = name;
+        this.credits = credits;
+        this.description = description;
+        this.academicProgram = academicProgram;
+        this.isActive = isActive;
+    }
+
+    /**
      * Obtiene el código único que identifica el curso.
      *
      * @return el código del curso como String

@@ -16,6 +16,29 @@ public class Schedule {
     private String period;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public Schedule() {
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param scheduleId Identificador único del horario
+     * @param dayOfWeek Día de la semana en que se imparte la clase
+     * @param startHour Hora de inicio de la clase
+     * @param endHour Hora de finalización de la clase
+     * @param period Período académico asociado a este horario
+     */
+    public Schedule(String scheduleId, String dayOfWeek, String startHour, String endHour, String period) {
+        this.scheduleId = scheduleId;
+        this.dayOfWeek = dayOfWeek;
+        this.startHour = startHour;
+        this.endHour = endHour;
+        this.period = period;
+    }
+
+    /**
      * Obtiene el identificador único del horario.
      *
      * @return el ID del horario como String

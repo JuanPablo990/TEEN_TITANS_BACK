@@ -24,6 +24,42 @@ public class StudentAcademicProgress {
     private List<CourseStatusDetail> coursesStatus;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public StudentAcademicProgress() {
+
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param student Estudiante asociado a este progreso académico
+     * @param academicProgram Programa académico en el que está inscrito el estudiante
+     * @param faculty Facultad a la que pertenece el estudiante
+     * @param curriculumType Tipo de currículo del estudiante
+     * @param currentSemester Semestre actual del estudiante
+     * @param totalSemesters Total de semestres del programa académico
+     * @param completedCredits Créditos completados por el estudiante
+     * @param totalCreditsRequired Total de créditos requeridos para graduación
+     * @param cumulativeGPA Promedio académico acumulado (GPA)
+     * @param coursesStatus Lista del estado de todos los cursos del estudiante
+     */
+    public StudentAcademicProgress(Student student, String academicProgram, String faculty, String curriculumType,
+                                   Integer currentSemester, Integer totalSemesters, Integer completedCredits,
+                                   Integer totalCreditsRequired, Double cumulativeGPA, List<CourseStatusDetail> coursesStatus) {
+        this.student = student;
+        this.academicProgram = academicProgram;
+        this.faculty = faculty;
+        this.curriculumType = curriculumType;
+        this.currentSemester = currentSemester;
+        this.totalSemesters = totalSemesters;
+        this.completedCredits = completedCredits;
+        this.totalCreditsRequired = totalCreditsRequired;
+        this.cumulativeGPA = cumulativeGPA;
+        this.coursesStatus = coursesStatus;
+    }
+
+    /**
      * Obtiene el estudiante asociado a este progreso académico.
      *
      * @return el objeto Student asociado

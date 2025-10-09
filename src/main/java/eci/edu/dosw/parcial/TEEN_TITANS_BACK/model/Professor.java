@@ -17,6 +17,25 @@ public class Professor {
     private List<String> areasOfExpertise;
 
     /**
+     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     */
+    public Professor() {
+    }
+
+    /**
+     * Constructor con todos los parámetros.
+     *
+     * @param department Departamento académico al que pertenece el profesor
+     * @param isTenured Indica si el profesor es titular
+     * @param areasOfExpertise Lista de áreas de especialización del profesor
+     */
+    public Professor(String department, Boolean isTenured, List<String> areasOfExpertise) {
+        this.department = department;
+        this.isTenured = isTenured;
+        this.areasOfExpertise = areasOfExpertise;
+    }
+
+    /**
      * Obtiene el departamento académico al que pertenece el profesor.
      *
      * @return el departamento como String
