@@ -1,18 +1,31 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
 import java.util.List;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Representa el progreso académico de un estudiante en el sistema.
  * Esta clase encapsula toda la información relacionada con el avance académico del estudiante,
  * incluyendo créditos completados, semestre actual y promedio acumulado.
  *
+ * Cada instancia de esta clase se almacena como un documento en la colección "student_progress" de MongoDB.
+ * El campo {@code id} actúa como identificador único del documento.
+ *
  * @author Equipo Teen Titans
- * @version 1.0
+ * @version 1.1
  * @since 2025
  */
+@Document(collection = "student_progress")
 public class StudentAcademicProgress {
+
+    @Id
+    private String id;
+
+    @DBRef
     private Student student;
+
     private String academicProgram;
     private String faculty;
     private String curriculumType;
@@ -24,15 +37,15 @@ public class StudentAcademicProgress {
     private List<CourseStatusDetail> coursesStatus;
 
     /**
-     * Constructor vacío. Requerido para frameworks que necesitan instanciar la clase sin parámetros.
+     * Constructor vacío. Requerido por frameworks que necesitan instanciar la clase sin parámetros.
      */
     public StudentAcademicProgress() {
-
     }
 
     /**
      * Constructor con todos los parámetros.
      *
+     * @param id Identificador único del registro de progreso académico
      * @param student Estudiante asociado a este progreso académico
      * @param academicProgram Programa académico en el que está inscrito el estudiante
      * @param faculty Facultad a la que pertenece el estudiante
@@ -44,9 +57,10 @@ public class StudentAcademicProgress {
      * @param cumulativeGPA Promedio académico acumulado (GPA)
      * @param coursesStatus Lista del estado de todos los cursos del estudiante
      */
-    public StudentAcademicProgress(Student student, String academicProgram, String faculty, String curriculumType,
+    public StudentAcademicProgress(String id, Student student, String academicProgram, String faculty, String curriculumType,
                                    Integer currentSemester, Integer totalSemesters, Integer completedCredits,
                                    Integer totalCreditsRequired, Double cumulativeGPA, List<CourseStatusDetail> coursesStatus) {
+        this.id = id;
         this.student = student;
         this.academicProgram = academicProgram;
         this.faculty = faculty;
@@ -60,9 +74,18 @@ public class StudentAcademicProgress {
     }
 
     /**
+     * Obtiene el identificador único del registro de progreso académico.
+     *
+     * @return el identificador del documento como String
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
      * Obtiene el estudiante asociado a este progreso académico.
      *
-     * @return el objeto Student asociado
+     * @return el objeto {@link Student} asociado
      */
     public Student getStudent() {
         return student;
@@ -87,9 +110,9 @@ public class StudentAcademicProgress {
     }
 
     /**
-     * Obtiene el tipo de curriculum del estudiante.
+     * Obtiene el tipo de currículo del estudiante.
      *
-     * @return el tipo de curriculum como String
+     * @return el tipo de currículo como String
      */
     public String getCurriculumType() {
         return curriculumType;
@@ -123,7 +146,7 @@ public class StudentAcademicProgress {
     }
 
     /**
-     * Obtiene el total de créditos requeridos para graduación.
+     * Obtiene el total de créditos requeridos para la graduación.
      *
      * @return el total de créditos requeridos como Integer
      */
@@ -132,7 +155,7 @@ public class StudentAcademicProgress {
     }
 
     /**
-     * Obtiene el promedio académico acumulado del estudiante.
+     * Obtiene el promedio académico acumulado (GPA) del estudiante.
      *
      * @return el GPA acumulado como Double
      */
@@ -143,7 +166,7 @@ public class StudentAcademicProgress {
     /**
      * Obtiene la lista del estado de todos los cursos del estudiante.
      *
-     * @return la lista de CourseStatusDetail
+     * @return la lista de {@link CourseStatusDetail}
      */
     public List<CourseStatusDetail> getCoursesStatus() {
         return coursesStatus;

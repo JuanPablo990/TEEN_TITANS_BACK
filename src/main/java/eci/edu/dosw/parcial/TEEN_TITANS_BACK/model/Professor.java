@@ -1,5 +1,7 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 /**
@@ -11,7 +13,9 @@ import java.util.List;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "professors")
 public class Professor {
+    @Id
     private String department;
     private Boolean isTenured;
     private List<String> areasOfExpertise;

@@ -1,5 +1,8 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * Representa un horario para un curso o actividad académica.
  * Esta clase encapsula la información de los días y horarios en los que se imparte una clase.
@@ -8,7 +11,9 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "schedules")
 public class Schedule {
+    @Id
     private String scheduleId;
     private String dayOfWeek;
     private String startHour;

@@ -1,5 +1,8 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 /**
  * Representa un aula o sala de clases en el sistema académico.
  * Esta clase encapsula la información física de un espacio destinado a la impartición de clases,
@@ -9,7 +12,9 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "classrooms")
 public class Classroom {
+    @Id
     private String classroomId;
     private String building;
     private String roomNumber;

@@ -1,5 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
-
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * Representa un curso en el sistema académico.
  * Esta clase encapsula toda la información relevante sobre un curso específico,
@@ -9,7 +10,9 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "courses")
 public class Course {
+    @Id
     private String courseCode;
     private String name;
     private Integer credits;

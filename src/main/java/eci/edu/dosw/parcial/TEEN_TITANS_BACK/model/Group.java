@@ -1,4 +1,7 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Representa un grupo de estudiantes para un curso específico.
@@ -9,12 +12,18 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
  * @version 1.0
  * @since 2025
  */
+@Document(collection = "groups")
 public class Group {
+    @Id
     private String groupId;
     private String section;
+    @DBRef
     private Course course;
+    @DBRef
     private Professor professor;
+    @DBRef
     private Schedule schedule;
+    @DBRef
     private Classroom classroom;
 
     /**
