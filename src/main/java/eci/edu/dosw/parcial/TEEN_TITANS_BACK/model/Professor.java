@@ -14,7 +14,7 @@ import java.util.List;
  * @since 2025
  */
 @Document(collection = "professors")
-public class Professor {
+public class Professor extends User{
     @Id
     private String department;
     private Boolean isTenured;
