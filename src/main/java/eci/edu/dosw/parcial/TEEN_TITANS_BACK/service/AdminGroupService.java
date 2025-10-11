@@ -1,5 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.*;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,27 +50,33 @@ public class AdminGroupService extends GroupService {
      * Obtiene el curso asociado a un grupo.
      *
      * @param groupId identificador del grupo
-     * @return el curso del grupo, o {@code null} si no existe
+     * @return el curso del grupo
+     * @throws AppException si el grupo no existe
      */
     @Override
     public Course getCourse(String groupId) {
         return groupRepository.findById(groupId)
                 .map(Group::getCourse)
-                .orElse(null);
+                .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
     }
 
     /**
      * Obtiene la capacidad máxima de un grupo según su aula asignada.
      *
      * @param groupId identificador del grupo
-     * @return capacidad máxima del aula o 0 si no se encuentra
+     * @return capacidad máxima del aula
+     * @throws AppException si el grupo no existe
      */
     @Override
     public Integer getMaxCapacity(String groupId) {
-        return groupRepository.findById(groupId)
-                .map(Group::getClassroom)
-                .map(Classroom::getCapacity)
-                .orElse(0);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
+
+        if (group.getClassroom() == null) {
+            throw new AppException("El grupo no tiene aula asignada: " + groupId);
+        }
+
+        return group.getClassroom().getCapacity();
     }
 
     /**
@@ -77,12 +84,18 @@ public class AdminGroupService extends GroupService {
      *
      * @param groupId identificador del grupo
      * @return número estimado de estudiantes inscritos
+     * @throws AppException si el grupo no existe
      */
     @Override
     public Integer getCurrentEnrollment(String groupId) {
-        return groupRepository.findById(groupId)
-                .map(group -> (int) (group.getClassroom().getCapacity() * 0.6))
-                .orElse(0);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
+
+        if (group.getClassroom() == null) {
+            throw new AppException("El grupo no tiene aula asignada: " + groupId);
+        }
+
+        return (int) (group.getClassroom().getCapacity() * 0.6);
     }
 
     /**
@@ -93,6 +106,10 @@ public class AdminGroupService extends GroupService {
      */
     @Override
     public List<ScheduleChangeRequest> getWaitingList(String groupId) {
+        // Verificar que el grupo existe
+        if (!groupRepository.existsById(groupId)) {
+            throw new AppException("Grupo no encontrado con ID: " + groupId);
+        }
         return Collections.emptyList();
     }
 
@@ -101,9 +118,14 @@ public class AdminGroupService extends GroupService {
      *
      * @param courseCode código del curso
      * @return mapa con los IDs de grupo y el número de inscritos
+     * @throws AppException si el curso no existe
      */
     @Override
     public Map<String, Integer> getTotalEnrolledByCourse(String courseCode) {
+        if (!courseRepository.existsById(courseCode)) {
+            throw new AppException("Curso no encontrado con código: " + courseCode);
+        }
+
         return groupRepository.findByCourse_CourseCode(courseCode).stream()
                 .collect(Collectors.toMap(
                         Group::getGroupId,
@@ -125,9 +147,19 @@ public class AdminGroupService extends GroupService {
      *
      * @param courseCode código del curso
      * @param newCapacity nueva capacidad del aula
+     * @throws AppException si el curso no existe
      */
     public void updateCourseCapacity(String courseCode, int newCapacity) {
-        groupRepository.findByCourse_CourseCode(courseCode).forEach(group -> {
+        if (!courseRepository.existsById(courseCode)) {
+            throw new AppException("Curso no encontrado con código: " + courseCode);
+        }
+
+        List<Group> groups = groupRepository.findByCourse_CourseCode(courseCode);
+        if (groups.isEmpty()) {
+            throw new AppException("No se encontraron grupos para el curso: " + courseCode);
+        }
+
+        groups.forEach(group -> {
             if (group.getClassroom() != null) {
                 Classroom currentClassroom = group.getClassroom();
                 Classroom updatedClassroom = new Classroom(
@@ -158,8 +190,13 @@ public class AdminGroupService extends GroupService {
      * @param courseCode código del curso
      * @param course objeto {@link Course} actualizado
      * @return el curso actualizado
+     * @throws AppException si el curso no existe
      */
     public Course updateCourse(String courseCode, Course course) {
+        if (!courseRepository.existsById(courseCode)) {
+            throw new AppException("Curso no encontrado con código: " + courseCode);
+        }
+        course.setCourseCode(courseCode);
         return courseRepository.save(course);
     }
 
@@ -167,14 +204,13 @@ public class AdminGroupService extends GroupService {
      * Elimina un curso por su código.
      *
      * @param courseCode código del curso
-     * @return {@code true} si fue eliminado, {@code false} si no existe
+     * @throws AppException si el curso no existe
      */
-    public boolean deleteCourse(String courseCode) {
-        if (courseRepository.existsById(courseCode)) {
-            courseRepository.deleteById(courseCode);
-            return true;
+    public void deleteCourse(String courseCode) {
+        if (!courseRepository.existsById(courseCode)) {
+            throw new AppException("Curso no encontrado con código: " + courseCode);
         }
-        return false;
+        courseRepository.deleteById(courseCode);
     }
 
     /**
@@ -193,23 +229,37 @@ public class AdminGroupService extends GroupService {
      * @param groupId identificador del grupo
      * @param updatedGroup grupo actualizado
      * @return grupo actualizado
+     * @throws AppException si el grupo no existe
      */
     public Group updateGroup(String groupId, Group updatedGroup) {
-        return groupRepository.save(updatedGroup);
+        if (!groupRepository.existsById(groupId)) {
+            throw new AppException("Grupo no encontrado con ID: " + groupId);
+        }
+
+        // Crear NUEVA instancia usando el constructor de Group
+        Group groupToSave = new Group(
+                groupId,                    // ID específico para la actualización
+                updatedGroup.getSection(),
+                updatedGroup.getCourse(),
+                updatedGroup.getProfessor(),
+                updatedGroup.getSchedule(),
+                updatedGroup.getClassroom()
+        );
+
+        return groupRepository.save(groupToSave);
     }
 
     /**
      * Elimina un grupo.
      *
      * @param groupId identificador del grupo
-     * @return {@code true} si fue eliminado, {@code false} si no existe
+     * @throws AppException si el grupo no existe
      */
-    public boolean deleteGroup(String groupId) {
-        if (groupRepository.existsById(groupId)) {
-            groupRepository.deleteById(groupId);
-            return true;
+    public void deleteGroup(String groupId) {
+        if (!groupRepository.existsById(groupId)) {
+            throw new AppException("Grupo no encontrado con ID: " + groupId);
         }
-        return false;
+        groupRepository.deleteById(groupId);
     }
 
     /**
@@ -217,49 +267,47 @@ public class AdminGroupService extends GroupService {
      *
      * @param professorId identificador del profesor
      * @param groupId identificador del grupo
-     * @return grupo actualizado con el profesor asignado, o {@code null} si no se encontró
+     * @return grupo actualizado con el profesor asignado
+     * @throws AppException si el grupo o profesor no existen
      */
     public Group assignProfessorToGroup(String professorId, String groupId) {
-        Optional<Group> groupOpt = groupRepository.findById(groupId);
-        Optional<Professor> professorOpt = professorRepository.findById(professorId);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
 
-        if (groupOpt.isPresent() && professorOpt.isPresent()) {
-            Group group = groupOpt.get();
-            Professor professor = professorOpt.get();
+        Professor professor = professorRepository.findById(professorId)
+                .orElseThrow(() -> new AppException("Profesor no encontrado con ID: " + professorId));
 
-            Group updatedGroup = new Group(
-                    group.getGroupId(),
-                    group.getSection(),
-                    group.getCourse(),
-                    professor,
-                    group.getSchedule(),
-                    group.getClassroom()
-            );
-            return groupRepository.save(updatedGroup);
-        }
-        return null;
+        Group updatedGroup = new Group(
+                group.getGroupId(),
+                group.getSection(),
+                group.getCourse(),
+                professor,
+                group.getSchedule(),
+                group.getClassroom()
+        );
+        return groupRepository.save(updatedGroup);
     }
 
     /**
      * Elimina la asignación de profesor de un grupo.
      *
      * @param groupId identificador del grupo
-     * @return grupo actualizado sin profesor, o {@code null} si no existe
+     * @return grupo actualizado sin profesor
+     * @throws AppException si el grupo no existe
      */
     public Group removeProfessorFromGroup(String groupId) {
-        return groupRepository.findById(groupId)
-                .map(group -> {
-                    Group updatedGroup = new Group(
-                            group.getGroupId(),
-                            group.getSection(),
-                            group.getCourse(),
-                            null,
-                            group.getSchedule(),
-                            group.getClassroom()
-                    );
-                    return groupRepository.save(updatedGroup);
-                })
-                .orElse(null);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
+
+        Group updatedGroup = new Group(
+                group.getGroupId(),
+                group.getSection(),
+                group.getCourse(),
+                null,
+                group.getSchedule(),
+                group.getClassroom()
+        );
+        return groupRepository.save(updatedGroup);
     }
 
     /**
@@ -304,12 +352,17 @@ public class AdminGroupService extends GroupService {
      *
      * @param studentId identificador del estudiante
      * @param groupId identificador del grupo
-     * @return {@code true} si la asignación fue exitosa, {@code false} en caso contrario
+     * @throws AppException si el estudiante o grupo no existen
      */
-    public boolean assignStudentToGroup(String studentId, String groupId) {
-        Optional<Student> studentOpt = studentRepository.findById(studentId);
-        Optional<Group> groupOpt = groupRepository.findById(groupId);
-        return studentOpt.isPresent() && groupOpt.isPresent();
+    public void assignStudentToGroup(String studentId, String groupId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("Estudiante no encontrado con ID: " + studentId));
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
+
+        // Aquí iría la lógica real de asignación
+        // Por ahora solo verificamos que existan
     }
 
     /**
@@ -317,12 +370,17 @@ public class AdminGroupService extends GroupService {
      *
      * @param studentId identificador del estudiante
      * @param groupId identificador del grupo
-     * @return {@code true} si la remoción fue exitosa, {@code false} en caso contrario
+     * @throws AppException si el estudiante o grupo no existen
      */
-    public boolean removeStudentFromGroup(String studentId, String groupId) {
-        Optional<Student> studentOpt = studentRepository.findById(studentId);
-        Optional<Group> groupOpt = groupRepository.findById(groupId);
-        return studentOpt.isPresent() && groupOpt.isPresent();
+    public void removeStudentFromGroup(String studentId, String groupId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("Estudiante no encontrado con ID: " + studentId));
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
+
+        // Aquí iría la lógica real de remoción
+        // Por ahora solo verificamos que existan
     }
 
     /**
@@ -330,74 +388,37 @@ public class AdminGroupService extends GroupService {
      *
      * @param studentId identificador del estudiante
      * @param courseCode código del curso
-     * @return {@code true} si la asignación fue exitosa, {@code false} si no se encontró estudiante o curso
+     * @throws AppException si no se encuentra estudiante o curso
      */
-    public boolean assignCourseToStudent(String studentId, String courseCode) {
-        Optional<Student> studentOpt = studentRepository.findById(studentId);
-        Optional<Course> courseOpt = courseRepository.findById(courseCode);
+    public void assignCourseToStudent(String studentId, String courseCode) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("Estudiante no encontrado con ID: " + studentId));
 
-        if (studentOpt.isPresent() && courseOpt.isPresent()) {
-            Course course = courseOpt.get();
+        Course course = courseRepository.findById(courseCode)
+                .orElseThrow(() -> new AppException("Curso no encontrado con código: " + courseCode));
 
-            CourseStatusDetail newCourseStatus = new CourseStatusDetail(
-                    UUID.randomUUID().toString(),
-                    course,
-                    CourseStatus.ENROLLED,
-                    null,
-                    "2025-1",
-                    new Date(),
-                    null,
-                    null,
-                    null,
-                    course.getCredits(),
-                    null,
-                    "Asignado por administrador"
-            );
+        CourseStatusDetail newCourseStatus = new CourseStatusDetail(
+                UUID.randomUUID().toString(),
+                course,
+                CourseStatus.ENROLLED,
+                null,
+                "2025-1",
+                new Date(),
+                null,
+                null,
+                null,
+                course.getCredits(),
+                null,
+                "Asignado por administrador"
+        );
 
-            courseStatusDetailRepository.save(newCourseStatus);
+        courseStatusDetailRepository.save(newCourseStatus);
 
-            Optional<StudentAcademicProgress> progressOpt = studentAcademicProgressRepository.findById(studentId);
-            if (progressOpt.isPresent()) {
-                StudentAcademicProgress progress = progressOpt.get();
-                List<CourseStatusDetail> coursesStatus = new ArrayList<>(progress.getCoursesStatus());
-                coursesStatus.add(newCourseStatus);
-
-                StudentAcademicProgress updatedProgress = new StudentAcademicProgress(
-                        progress.getId(),
-                        progress.getStudent(),
-                        progress.getAcademicProgram(),
-                        progress.getFaculty(),
-                        progress.getCurriculumType(),
-                        progress.getCurrentSemester(),
-                        progress.getTotalSemesters(),
-                        progress.getCompletedCredits(),
-                        progress.getTotalCreditsRequired(),
-                        progress.getCumulativeGPA(),
-                        coursesStatus
-                );
-
-                studentAcademicProgressRepository.save(updatedProgress);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Elimina un curso del historial académico de un estudiante.
-     *
-     * @param studentId identificador del estudiante
-     * @param courseCode código del curso
-     * @return {@code true} si la eliminación fue exitosa, {@code false} en caso contrario
-     */
-    public boolean removeCourseFromStudent(String studentId, String courseCode) {
         Optional<StudentAcademicProgress> progressOpt = studentAcademicProgressRepository.findById(studentId);
-
         if (progressOpt.isPresent()) {
             StudentAcademicProgress progress = progressOpt.get();
-            List<CourseStatusDetail> updatedCourses = progress.getCoursesStatus().stream()
-                    .filter(courseStatus -> !courseCode.equals(courseStatus.getCourse().getCourseCode()))
-                    .collect(Collectors.toList());
+            List<CourseStatusDetail> coursesStatus = new ArrayList<>(progress.getCoursesStatus());
+            coursesStatus.add(newCourseStatus);
 
             StudentAcademicProgress updatedProgress = new StudentAcademicProgress(
                     progress.getId(),
@@ -410,12 +431,44 @@ public class AdminGroupService extends GroupService {
                     progress.getCompletedCredits(),
                     progress.getTotalCreditsRequired(),
                     progress.getCumulativeGPA(),
-                    updatedCourses
+                    coursesStatus
             );
 
             studentAcademicProgressRepository.save(updatedProgress);
-            return true;
+        } else {
+            throw new AppException("No se encontró progreso académico para el estudiante: " + studentId);
         }
-        return false;
+    }
+
+    /**
+     * Elimina un curso del historial académico de un estudiante.
+     *
+     * @param studentId identificador del estudiante
+     * @param courseCode código del curso
+     * @throws AppException si no se encuentra el progreso académico del estudiante
+     */
+    public void removeCourseFromStudent(String studentId, String courseCode) {
+        StudentAcademicProgress progress = studentAcademicProgressRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("Progreso académico no encontrado para el estudiante: " + studentId));
+
+        List<CourseStatusDetail> updatedCourses = progress.getCoursesStatus().stream()
+                .filter(courseStatus -> !courseCode.equals(courseStatus.getCourse().getCourseCode()))
+                .collect(Collectors.toList());
+
+        StudentAcademicProgress updatedProgress = new StudentAcademicProgress(
+                progress.getId(),
+                progress.getStudent(),
+                progress.getAcademicProgram(),
+                progress.getFaculty(),
+                progress.getCurriculumType(),
+                progress.getCurrentSemester(),
+                progress.getTotalSemesters(),
+                progress.getCompletedCredits(),
+                progress.getTotalCreditsRequired(),
+                progress.getCumulativeGPA(),
+                updatedCourses
+        );
+
+        studentAcademicProgressRepository.save(updatedProgress);
     }
 }

@@ -98,4 +98,14 @@ public class Course {
     public Boolean isActive() {
         return isActive;
     }
+
+    /**
+     * Establece el código único que identifica el curso.
+     *
+     * @param courseCode el código del curso como String
+     */
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
 }

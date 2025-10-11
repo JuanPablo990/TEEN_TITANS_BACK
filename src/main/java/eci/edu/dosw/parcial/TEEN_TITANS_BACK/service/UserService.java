@@ -1,5 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.User;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.UserRole;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.UserRepository;
@@ -27,7 +28,7 @@ public abstract class UserService {
     public User createUser(User user) {
         // Validar que el email no exista
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("El email ya está registrado: " + user.getEmail());
+            throw new AppException("El email ya está registrado: " + user.getEmail());
         }
         return userRepository.save(user);
     }
@@ -58,12 +59,12 @@ public abstract class UserService {
     public User updateUser(String id, User user) {
         // Verificar que el usuario existe
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado con ID: " + id);
+            throw new AppException("Usuario no encontrado con ID: " + id);
         }
 
         Optional<User> existingUserWithEmail = userRepository.findByEmail(user.getEmail());
         if (existingUserWithEmail.isPresent() && !existingUserWithEmail.get().getId().equals(id)) {
-            throw new RuntimeException("El email ya está en uso por otro usuario: " + user.getEmail());
+            throw new AppException("El email ya está en uso por otro usuario: " + user.getEmail());
         }
 
         user.setId(id);
@@ -76,7 +77,7 @@ public abstract class UserService {
      */
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado con ID: " + id);
+            throw new AppException("Usuario no encontrado con ID: " + id);
         }
         userRepository.deleteById(id);
     }
@@ -106,7 +107,7 @@ public abstract class UserService {
      */
     public User activateUser(String id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new AppException("Usuario no encontrado con ID: " + id));
 
         user.setActive(true);
         return userRepository.save(user);
@@ -119,7 +120,7 @@ public abstract class UserService {
      */
     public User deactivateUser(String id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new AppException("Usuario no encontrado con ID: " + id));
 
         user.setActive(false);
         return userRepository.save(user);

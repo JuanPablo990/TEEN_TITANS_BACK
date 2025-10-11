@@ -3,6 +3,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Professor;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.UserRole;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.ProfessorRepository;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,12 @@ public class ProfessorService extends UserService {
      * Crea un nuevo profesor en el sistema
      * @param professor Profesor a crear
      * @return Profesor creado
+     * @throws AppException si el email ya está registrado
      */
     public Professor createProfessor(Professor professor) {
         // Validar que el email no exista
         if (userRepository.existsByEmail(professor.getEmail())) {
-            throw new RuntimeException("El email ya está registrado: " + professor.getEmail());
+            throw new AppException("El email ya está registrado: " + professor.getEmail());
         }
 
         // Asegurar que el rol sea PROFESSOR
@@ -35,10 +37,12 @@ public class ProfessorService extends UserService {
     /**
      * Obtiene un profesor por su ID
      * @param id Identificador del profesor
-     * @return Profesor encontrado o null si no existe
+     * @return Profesor encontrado
+     * @throws AppException si no se encuentra el profesor
      */
     public Professor getProfessorById(String id) {
-        return professorRepository.findById(id).orElse(null);
+        return professorRepository.findById(id)
+                .orElseThrow(() -> new AppException("Profesor no encontrado con ID: " + id));
     }
 
     /**
@@ -54,19 +58,17 @@ public class ProfessorService extends UserService {
      * @param id Identificador del profesor a actualizar
      * @param professor Nuevos datos del profesor
      * @return Profesor actualizado
+     * @throws AppException si no se encuentra el profesor o el email ya está en uso
      */
     public Professor updateProfessor(String id, Professor professor) {
         // Verificar que el profesor existe
-        if (!professorRepository.existsById(id)) {
-            throw new RuntimeException("Profesor no encontrado con ID: " + id);
-        }
+        Professor existingProfessor = professorRepository.findById(id)
+                .orElseThrow(() -> new AppException("Profesor no encontrado con ID: " + id));
 
         // Verificar que el email no esté siendo usado por otro usuario
-        Optional<Professor> existingProfessorWithEmail = professorRepository.findById(id)
-                .filter(p -> p.getEmail().equals(professor.getEmail()));
-
-        if (existingProfessorWithEmail.isEmpty() && userRepository.existsByEmail(professor.getEmail())) {
-            throw new RuntimeException("El email ya está en uso por otro usuario: " + professor.getEmail());
+        if (!existingProfessor.getEmail().equals(professor.getEmail()) &&
+                userRepository.existsByEmail(professor.getEmail())) {
+            throw new AppException("El email ya está en uso por otro usuario: " + professor.getEmail());
         }
 
         // Establecer el ID y rol para asegurar la actualización correcta
@@ -79,18 +81,18 @@ public class ProfessorService extends UserService {
     /**
      * Elimina un profesor del sistema
      * @param id Identificador del profesor a eliminar
+     * @throws AppException si no se encuentra el profesor
      */
     public void deleteProfessor(String id) {
-        if (!professorRepository.existsById(id)) {
-            throw new RuntimeException("Profesor no encontrado con ID: " + id);
-        }
+        Professor professor = professorRepository.findById(id)
+                .orElseThrow(() -> new AppException("Profesor no encontrado con ID: " + id));
         professorRepository.deleteById(id);
     }
 
     /**
      * Busca profesores por departamento
      * @param department Departamento a buscar
-     * @return Lista de profesores del departamento especificado
+     * @return Lista de profesores del departamento especificada
      */
     public List<Professor> findByDepartment(String department) {
         return professorRepository.findByDepartment(department);

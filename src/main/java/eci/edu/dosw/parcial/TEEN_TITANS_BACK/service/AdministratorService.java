@@ -2,6 +2,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Administrator;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.AdministratorRepository;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,14 +38,14 @@ public class AdministratorService {
      *
      * @param id ID del administrador
      * @return El administrador encontrado
-     * @throws RuntimeException si no se encuentra el administrador
+     * @throws AppException si no se encuentra el administrador
      */
     public Administrator getAdministratorById(String id) {
         Optional<Administrator> admin = adminRepository.findById(id);
         if (admin.isPresent()) {
             return admin.get();
         } else {
-            throw new RuntimeException("Administrador no encontrado con ID: " + id);
+            throw new AppException("Administrador no encontrado con ID: " + id);
         }
     }
 
@@ -63,7 +64,7 @@ public class AdministratorService {
      * @param id ID del administrador a actualizar
      * @param admin Nuevos datos del administrador
      * @return El administrador actualizado
-     * @throws RuntimeException si no se encuentra el administrador
+     * @throws AppException si no se encuentra el administrador
      */
     public Administrator updateAdministrator(String id, Administrator admin) {
         Optional<Administrator> existingAdmin = adminRepository.findById(id);
@@ -71,7 +72,7 @@ public class AdministratorService {
             admin.setId(id); // Asegurar que se mantenga el mismo ID
             return adminRepository.save(admin);
         } else {
-            throw new RuntimeException("Administrador no encontrado con ID: " + id);
+            throw new AppException("Administrador no encontrado con ID: " + id);
         }
     }
 
@@ -79,14 +80,14 @@ public class AdministratorService {
      * Elimina un administrador del sistema.
      *
      * @param id ID del administrador a eliminar
-     * @throws RuntimeException si no se encuentra el administrador
+     * @throws AppException si no se encuentra el administrador
      */
     public void deleteAdministrator(String id) {
         Optional<Administrator> admin = adminRepository.findById(id);
         if (admin.isPresent()) {
             adminRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Administrador no encontrado con ID: " + id);
+            throw new AppException("Administrador no encontrado con ID: " + id);
         }
     }
 

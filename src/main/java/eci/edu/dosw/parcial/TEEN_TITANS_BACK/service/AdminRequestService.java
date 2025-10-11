@@ -2,6 +2,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.*;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.*;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,12 +79,13 @@ public class AdminRequestService {
      * @param decision Decisión (APPROVED o REJECTED)
      * @param comments Comentarios de la decisión
      * @return Solicitud actualizada
+     * @throws AppException si la decisión no es APPROVED o REJECTED
      */
     public ScheduleChangeRequest respondToRequest(String requestId, RequestStatus decision, String comments) {
         ScheduleChangeRequest request = findRequestById(requestId);
 
         if (decision != RequestStatus.APPROVED && decision != RequestStatus.REJECTED) {
-            throw new RuntimeException("La decisión debe ser APPROVED o REJECTED");
+            throw new AppException("La decisión debe ser APPROVED o REJECTED");
         }
 
         request.setStatus(decision);
@@ -105,6 +107,7 @@ public class AdminRequestService {
      * @param requestId ID de la solicitud
      * @param comments Información adicional requerida
      * @return Solicitud actualizada
+     * @throws AppException si no se encuentra la solicitud
      */
     public ScheduleChangeRequest requestAdditionalInfo(String requestId, String comments) {
         ScheduleChangeRequest request = findRequestById(requestId);
@@ -138,6 +141,7 @@ public class AdminRequestService {
      * @param requestId ID de la solicitud
      * @param comments Justificación de la aprobación especial
      * @return Solicitud aprobada
+     * @throws AppException si no se encuentra la solicitud
      */
     public ScheduleChangeRequest approveSpecialCase(String requestId, String comments) {
         ScheduleChangeRequest request = findRequestById(requestId);
@@ -277,11 +281,12 @@ public class AdminRequestService {
      *
      * @param courseCode Código del curso
      * @return Estadísticas del curso
+     * @throws AppException si no se encuentra el curso
      */
     public CourseStats generateCourseReport(String courseCode) {
         Optional<Course> courseOpt = courseRepository.findById(courseCode);
         if (courseOpt.isEmpty()) {
-            throw new RuntimeException("Curso no encontrado: " + courseCode);
+            throw new AppException("Curso no encontrado: " + courseCode);
         }
 
         Course course = courseOpt.get();
@@ -312,11 +317,12 @@ public class AdminRequestService {
      *
      * @param groupId ID del grupo
      * @return Estadísticas del grupo
+     * @throws AppException si no se encuentra el grupo
      */
     public GroupStats generateGroupReport(String groupId) {
         Optional<Group> groupOpt = groupRepository.findById(groupId);
         if (groupOpt.isEmpty()) {
-            throw new RuntimeException("Grupo no encontrado: " + groupId);
+            throw new AppException("Grupo no encontrado: " + groupId);
         }
 
         Group group = groupOpt.get();
@@ -375,15 +381,19 @@ public class AdminRequestService {
         return stats;
     }
 
-
+    /**
+     * Encuentra una solicitud por ID.
+     *
+     * @param requestId ID de la solicitud
+     * @return La solicitud encontrada
+     * @throws AppException si no se encuentra la solicitud
+     */
     private ScheduleChangeRequest findRequestById(String requestId) {
         return scheduleChangeRequestRepository.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Solicitud no encontrada: " + requestId));
+                .orElseThrow(() -> new AppException("Solicitud no encontrada: " + requestId));
     }
 
     private boolean isSpecialCase(ScheduleChangeRequest request) {
-
-
         if (request.getReviewHistory().size() > 3) {
             return true;
         }
@@ -406,7 +416,6 @@ public class AdminRequestService {
 
     private double calculateRequestPriority(ScheduleChangeRequest request) {
         double priority = 0.0;
-
 
         if (request.getReason() != null) {
             String reason = request.getReason().toLowerCase();
@@ -564,7 +573,6 @@ public class AdminRequestService {
         int currentStudents = getCurrentStudentCountInGroup(groupId);
         return ((double) currentStudents / classroom.getCapacity()) * 100;
     }
-
 
     public static class ApprovalStats {
         private double approvalRate;

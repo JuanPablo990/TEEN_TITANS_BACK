@@ -1,5 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.*;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,27 +42,29 @@ public class StudentPortalService extends GroupService {
      * Obtiene el curso asociado a un grupo.
      *
      * @param groupId identificador único del grupo
-     * @return el curso del grupo, o {@code null} si no existe
+     * @return el curso del grupo
+     * @throws AppException si no se encuentra el grupo
      */
     @Override
     public Course getCourse(String groupId) {
         return groupRepository.findById(groupId)
                 .map(Group::getCourse)
-                .orElse(null);
+                .orElseThrow(() -> new AppException("Grupo no encontrado: " + groupId));
     }
 
     /**
      * Obtiene la capacidad máxima del aula de un grupo.
      *
      * @param groupId identificador del grupo
-     * @return la capacidad del aula o 0 si no se encuentra
+     * @return la capacidad del aula
+     * @throws AppException si no se encuentra el grupo
      */
     @Override
     public Integer getMaxCapacity(String groupId) {
         return groupRepository.findById(groupId)
                 .map(Group::getClassroom)
                 .map(Classroom::getCapacity)
-                .orElse(0);
+                .orElseThrow(() -> new AppException("Grupo no encontrado: " + groupId));
     }
 
     /**
@@ -69,12 +72,13 @@ public class StudentPortalService extends GroupService {
      *
      * @param groupId identificador del grupo
      * @return número estimado de estudiantes inscritos
+     * @throws AppException si no se encuentra el grupo
      */
     @Override
     public Integer getCurrentEnrollment(String groupId) {
         return groupRepository.findById(groupId)
                 .map(group -> (int) (group.getClassroom().getCapacity() * 0.6))
-                .orElse(0);
+                .orElseThrow(() -> new AppException("Grupo no encontrado: " + groupId));
     }
 
     /**
@@ -93,10 +97,16 @@ public class StudentPortalService extends GroupService {
      *
      * @param courseCode código del curso
      * @return mapa con los IDs de grupo y el número de inscritos
+     * @throws AppException si no se encuentran grupos para el curso
      */
     @Override
     public Map<String, Integer> getTotalEnrolledByCourse(String courseCode) {
-        return groupRepository.findByCourse_CourseCode(courseCode).stream()
+        List<Group> groups = groupRepository.findByCourse_CourseCode(courseCode);
+        if (groups.isEmpty()) {
+            throw new AppException("No se encontraron grupos para el curso: " + courseCode);
+        }
+
+        return groups.stream()
                 .collect(Collectors.toMap(
                         Group::getGroupId,
                         group -> getCurrentEnrollment(group.getGroupId())
@@ -108,12 +118,13 @@ public class StudentPortalService extends GroupService {
      *
      * @param studentId identificador del estudiante
      * @return lista de grupos en los que está inscrito actualmente
+     * @throws AppException si no se encuentra el progreso académico del estudiante
      */
     public List<Group> getCurrentSchedule(String studentId) {
-        return studentAcademicProgressRepository.findById(studentId)
-                .map(StudentAcademicProgress::getCoursesStatus)
-                .orElse(Collections.emptyList())
-                .stream()
+        StudentAcademicProgress progress = studentAcademicProgressRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("Progreso académico no encontrado para el estudiante: " + studentId));
+
+        return progress.getCoursesStatus().stream()
                 .filter(this::isCourseCurrentlyEnrolled)
                 .map(CourseStatusDetail::getCourse)
                 .map(Course::getCourseCode)
@@ -127,9 +138,15 @@ public class StudentPortalService extends GroupService {
      *
      * @param courseCode código del curso
      * @return lista de grupos con cupos disponibles
+     * @throws AppException si no se encuentran grupos para el curso
      */
     public List<Group> getAvailableGroups(String courseCode) {
-        return groupRepository.findByCourse_CourseCode(courseCode).stream()
+        List<Group> groups = groupRepository.findByCourse_CourseCode(courseCode);
+        if (groups.isEmpty()) {
+            throw new AppException("No se encontraron grupos para el curso: " + courseCode);
+        }
+
+        return groups.stream()
                 .filter(group -> checkGroupAvailability(group.getGroupId()))
                 .collect(Collectors.toList());
     }
@@ -138,10 +155,12 @@ public class StudentPortalService extends GroupService {
      * Obtiene el progreso académico completo de un estudiante.
      *
      * @param studentId identificador del estudiante
-     * @return objeto {@link StudentAcademicProgress} o {@code null} si no existe
+     * @return objeto {@link StudentAcademicProgress}
+     * @throws AppException si no se encuentra el progreso académico
      */
     public StudentAcademicProgress getAcademicProgress(String studentId) {
-        return studentAcademicProgressRepository.findById(studentId).orElse(null);
+        return studentAcademicProgressRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("Progreso académico no encontrado para el estudiante: " + studentId));
     }
 
     /**
@@ -149,6 +168,7 @@ public class StudentPortalService extends GroupService {
      *
      * @param groupId identificador del grupo
      * @return {@code true} si hay cupos disponibles, {@code false} en caso contrario
+     * @throws AppException si no se encuentra el grupo
      */
     public boolean checkGroupAvailability(String groupId) {
         Integer maxCapacity = getMaxCapacity(groupId);
@@ -162,45 +182,48 @@ public class StudentPortalService extends GroupService {
      *
      * @param studentId identificador del estudiante
      * @return lista de cursos recomendados
+     * @throws AppException si no se encuentra el progreso académico del estudiante
      */
     public List<Course> getCourseRecommendations(String studentId) {
-        return studentAcademicProgressRepository.findById(studentId)
-                .map(progress -> {
-                    Set<String> takenCourses = progress.getCoursesStatus().stream()
-                            .map(CourseStatusDetail::getCourse)
-                            .map(Course::getCourseCode)
-                            .collect(Collectors.toSet());
+        StudentAcademicProgress progress = studentAcademicProgressRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("Progreso académico no encontrado para el estudiante: " + studentId));
 
-                    return courseRepository.findByAcademicProgramAndIsActive(
-                                    progress.getAcademicProgram(), true).stream()
-                            .filter(course -> !takenCourses.contains(course.getCourseCode()))
-                            .filter(course -> isCourseRecommended(course, progress))
-                            .collect(Collectors.toList());
-                })
-                .orElse(Collections.emptyList());
+        Set<String> takenCourses = progress.getCoursesStatus().stream()
+                .map(CourseStatusDetail::getCourse)
+                .map(Course::getCourseCode)
+                .collect(Collectors.toSet());
+
+        return courseRepository.findByAcademicProgramAndIsActive(
+                        progress.getAcademicProgram(), true).stream()
+                .filter(course -> !takenCourses.contains(course.getCourseCode()))
+                .filter(course -> isCourseRecommended(course, progress))
+                .collect(Collectors.toList());
     }
 
     /**
      * Obtiene el periodo académico actual y sus fechas de inscripción.
      *
-     * @return el periodo académico activo o {@code null} si no hay uno activo
+     * @return el periodo académico activo
+     * @throws AppException si no hay periodos académicos activos
      */
     public AcademicPeriod getEnrollmentDeadlines() {
         return academicPeriodRepository.findByIsActive(true).stream()
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new AppException("No hay periodos académicos activos"));
     }
 
     /**
      * Genera una lista de alertas académicas personalizadas para un estudiante.
      *
      * @param studentId identificador del estudiante
-     * @return lista de alertas académicas o mensaje de error si no hay información
+     * @return lista de alertas académicas
+     * @throws AppException si no se encuentra información académica del estudiante
      */
     public List<String> getAcademicAlerts(String studentId) {
-        return studentAcademicProgressRepository.findById(studentId)
-                .map(this::generateAcademicAlerts)
-                .orElse(Arrays.asList("No se encontró información académica del estudiante"));
+        StudentAcademicProgress progress = studentAcademicProgressRepository.findById(studentId)
+                .orElseThrow(() -> new AppException("No se encontró información académica del estudiante: " + studentId));
+
+        return generateAcademicAlerts(progress);
     }
 
     /**

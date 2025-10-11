@@ -2,6 +2,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.User;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.UserRepository;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,11 +75,11 @@ public class AuthService {
      *
      * @param user el objeto User a registrar
      * @return el usuario registrado y guardado en la base de datos
-     * @throws RuntimeException si el email ya existe en el sistema
+     * @throws AppException si el email ya existe en el sistema
      */
     public User register(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("El email ya está registrado: " + user.getEmail());
+            throw new AppException("El email ya está registrado: " + user.getEmail());
         }
 
         user.setActive(true);
@@ -99,11 +100,11 @@ public class AuthService {
      * Obtiene el usuario actualmente autenticado en el sistema.
      *
      * @return el usuario autenticado actual
-     * @throws RuntimeException si no hay usuario autenticado
+     * @throws AppException si no hay usuario autenticado
      */
     public User getCurrentUser() {
         if (currentUser == null) {
-            throw new RuntimeException("No hay usuario autenticado");
+            throw new AppException("No hay usuario autenticado");
         }
         return currentUser;
     }
@@ -128,5 +129,39 @@ public class AuthService {
      */
     public User getUserFromToken(String token) {
         return activeTokens.get(token);
+    }
+
+    /**
+     * Valida si un token es válido y retorna el usuario asociado.
+     *
+     * @param token el token a validar
+     * @return el usuario asociado al token
+     * @throws AppException si el token no es válido
+     */
+    public User validateAndGetUserFromToken(String token) {
+        if (!validateToken(token)) {
+            throw new AppException("Token inválido o expirado");
+        }
+        return getUserFromToken(token);
+    }
+
+    /**
+     * Cambia la contraseña del usuario actual.
+     *
+     * @param currentPassword la contraseña actual
+     * @param newPassword la nueva contraseña
+     * @throws AppException si la contraseña actual es incorrecta o no hay usuario autenticado
+     */
+    public void changePassword(String currentPassword, String newPassword) {
+        if (currentUser == null) {
+            throw new AppException("No hay usuario autenticado");
+        }
+
+        if (!currentUser.getPassword().equals(currentPassword)) {
+            throw new AppException("La contraseña actual es incorrecta");
+        }
+
+        currentUser.setPassword(newPassword);
+        userRepository.save(currentUser);
     }
 }

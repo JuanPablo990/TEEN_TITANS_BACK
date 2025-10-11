@@ -1,5 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Student;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.StudentAcademicProgress;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.StudentRepository;
@@ -50,12 +51,12 @@ public class TrafficLightService {
      *
      * @param studentId ID del estudiante
      * @return String que representa el color del semáforo ("GREEN", "YELLOW", "RED")
-     * @throws RuntimeException si el estudiante no existe o no tiene progreso académico
+     * @throws AppException si el estudiante no existe o no tiene progreso académico
      */
     public String getAcademicTrafficLight(String studentId) {
         Optional<Student> studentOptional = studentRepository.findById(studentId);
         if (studentOptional.isEmpty()) {
-            throw new RuntimeException("Estudiante no encontrado: " + studentId);
+            throw new AppException("Estudiante no encontrado: " + studentId);
         }
 
         Student student = studentOptional.get();
@@ -69,7 +70,7 @@ public class TrafficLightService {
         StudentAcademicProgress progress = findProgressByStudent(progressList, studentId);
 
         if (progress == null) {
-            throw new RuntimeException("Progreso académico no encontrado para el estudiante: " + studentId);
+            throw new AppException("Progreso académico no encontrado para el estudiante: " + studentId);
         }
 
         return calculateTrafficLight(progress, student);
@@ -80,18 +81,18 @@ public class TrafficLightService {
      *
      * @param studentId ID del estudiante
      * @return Objeto Student con la información del estudiante
-     * @throws RuntimeException si el estudiante no existe
+     * @throws AppException si el estudiante no existe
      */
     public Student getStudentInformation(String studentId) {
         Optional<Student> studentOptional = studentRepository.findById(studentId);
 
         if (studentOptional.isEmpty()) {
-            throw new RuntimeException("Estudiante no encontrado: " + studentId);
+            throw new AppException("Estudiante no encontrado: " + studentId);
         }
 
         Student student = studentOptional.get();
         if (!student.getActive()) {
-            throw new RuntimeException("Estudiante inactivo: " + studentId);
+            throw new AppException("Estudiante inactivo: " + studentId);
         }
 
         return student;
@@ -102,12 +103,12 @@ public class TrafficLightService {
      *
      * @param studentId ID del estudiante
      * @return Objeto StudentAcademicProgress con el progreso curricular
-     * @throws RuntimeException si el progreso académico no existe
+     * @throws AppException si el progreso académico no existe
      */
     public StudentAcademicProgress getCurriculumProgress(String studentId) {
         Optional<Student> studentOptional = studentRepository.findById(studentId);
         if (studentOptional.isEmpty()) {
-            throw new RuntimeException("Estudiante no encontrado: " + studentId);
+            throw new AppException("Estudiante no encontrado: " + studentId);
         }
 
         Student student = studentOptional.get();
@@ -118,7 +119,7 @@ public class TrafficLightService {
         StudentAcademicProgress progress = findProgressByStudent(progressList, studentId);
 
         if (progress == null) {
-            throw new RuntimeException("Progreso curricular no encontrado para el estudiante: " + studentId);
+            throw new AppException("Progreso curricular no encontrado para el estudiante: " + studentId);
         }
 
         return progress;
@@ -180,9 +181,7 @@ public class TrafficLightService {
         Integer currentSemester = student.get().getSemester();
         if (currentSemester == null) return 0;
 
-
         String currentSemesterStr = currentSemester.toString();
-
 
         return courseStatusDetailRepository.findBySemester(currentSemesterStr)
                 .stream()

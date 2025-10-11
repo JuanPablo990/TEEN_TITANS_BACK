@@ -2,6 +2,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.service;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Dean;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository.DeanRepository;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,14 +38,14 @@ public class DeanService {
      *
      * @param id ID del decano
      * @return El decano encontrado
-     * @throws RuntimeException si no se encuentra el decano
+     * @throws AppException si no se encuentra el decano
      */
     public Dean getDeanById(String id) {
         Optional<Dean> dean = deanRepository.findById(id);
         if (dean.isPresent()) {
             return dean.get();
         } else {
-            throw new RuntimeException("Decano no encontrado con ID: " + id);
+            throw new AppException("Decano no encontrado con ID: " + id);
         }
     }
 
@@ -63,7 +64,7 @@ public class DeanService {
      * @param id ID del decano a actualizar
      * @param dean Nuevos datos del decano
      * @return El decano actualizado
-     * @throws RuntimeException si no se encuentra el decano
+     * @throws AppException si no se encuentra el decano
      */
     public Dean updateDean(String id, Dean dean) {
         Optional<Dean> existingDean = deanRepository.findById(id);
@@ -71,7 +72,7 @@ public class DeanService {
             dean.setId(id); // Asegurar que se mantenga el mismo ID
             return deanRepository.save(dean);
         } else {
-            throw new RuntimeException("Decano no encontrado con ID: " + id);
+            throw new AppException("Decano no encontrado con ID: " + id);
         }
     }
 
@@ -79,14 +80,14 @@ public class DeanService {
      * Elimina un decano del sistema.
      *
      * @param id ID del decano a eliminar
-     * @throws RuntimeException si no se encuentra el decano
+     * @throws AppException si no se encuentra el decano
      */
     public void deleteDean(String id) {
         Optional<Dean> dean = deanRepository.findById(id);
         if (dean.isPresent()) {
             deanRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Decano no encontrado con ID: " + id);
+            throw new AppException("Decano no encontrado con ID: " + id);
         }
     }
 
@@ -111,5 +112,27 @@ public class DeanService {
      */
     public List<Dean> findByOfficeLocation(String location) {
         return deanRepository.findByOfficeLocation(location);
+    }
+
+    /**
+     * Verifica si existe un decano con el ID especificado.
+     *
+     * @param id ID del decano a verificar
+     * @return true si existe, false en caso contrario
+     */
+    public boolean existsById(String id) {
+        return deanRepository.existsById(id);
+    }
+
+    /**
+     * Obtiene un decano por facultad, lanzando excepción si no se encuentra.
+     *
+     * @param faculty Facultad a buscar
+     * @return El decano de la facultad especificada
+     * @throws AppException si no se encuentra el decano para la facultad
+     */
+    public Dean getDeanByFaculty(String faculty) {
+        return deanRepository.findByFaculty(faculty)
+                .orElseThrow(() -> new AppException("No se encontró decano para la facultad: " + faculty));
     }
 }
