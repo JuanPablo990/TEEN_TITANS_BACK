@@ -3,6 +3,7 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.ScheduleChangeRequest;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.RequestStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -38,6 +39,7 @@ public interface ScheduleChangeRequestRepository extends MongoRepository<Schedul
      * @param currentGroupId ID del grupo actual.
      * @return Lista de solicitudes con el grupo actual especificado.
      */
+    @Query("{ 'currentGroup.id': ?0 }")
     List<ScheduleChangeRequest> findByCurrentGroupId(String currentGroupId);
 
     /**
@@ -45,6 +47,7 @@ public interface ScheduleChangeRequestRepository extends MongoRepository<Schedul
      * @param requestedGroupId ID del grupo solicitado.
      * @return Lista de solicitudes con el grupo solicitado especificado.
      */
+    @Query("{ 'requestedGroup.id': ?0 }")
     List<ScheduleChangeRequest> findByRequestedGroupId(String requestedGroupId);
 
     /**
@@ -79,7 +82,8 @@ public interface ScheduleChangeRequestRepository extends MongoRepository<Schedul
     /**
      * Cuenta el número de solicitudes pendientes de un estudiante.
      * @param studentId ID del estudiante.
-     * @return Número de solicitudes pendientes del estudiante.
+     * @param status Estado de la solicitud.
+     * @return Número de solicitudes del estudiante con el estado especificado.
      */
     long countByStudentIdAndStatus(String studentId, RequestStatus status);
 }

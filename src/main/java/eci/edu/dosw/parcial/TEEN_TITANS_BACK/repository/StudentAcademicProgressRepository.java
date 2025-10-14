@@ -52,5 +52,5 @@ public interface StudentAcademicProgressRepository extends MongoRepository<Stude
      * @param cumulativeGPA Valor mínimo del promedio acumulado.
      * @return Lista de progresos académicos con GPA igual o superior al valor indicado.
      */
-    List<StudentAcademicProgress> findByCumulativeGpaGreaterThanEqual(Double cumulativeGPA);
+    List<StudentAcademicProgress> findByCumulativeGPAGreaterThanEqual(Double cumulativeGPA);
 }

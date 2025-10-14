@@ -51,5 +51,5 @@ public interface GroupRepository extends MongoRepository<Group, String> {
      * @param classroomId Identificador único del aula.
      * @return Lista de grupos que se desarrollan en el aula indicada.
      */
-    List<Group> findByClassroom_Id(String classroomId);
+    List<Group> findByClassroom_ClassroomId(String classroomId);
 }

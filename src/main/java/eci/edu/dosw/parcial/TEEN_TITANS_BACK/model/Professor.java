@@ -15,7 +15,6 @@ import java.util.List;
  */
 @Document(collection = "professors")
 public class Professor extends User{
-    @Id
     private String department;
     private Boolean isTenured;
     private List<String> areasOfExpertise;
