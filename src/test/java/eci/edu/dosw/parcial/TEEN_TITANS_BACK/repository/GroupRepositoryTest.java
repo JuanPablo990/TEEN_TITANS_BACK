@@ -13,14 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Pruebas unitarias para el repositorio de grupos.
- * Simula las operaciones de búsqueda basadas en secciones, cursos, profesores y aulas.
- *
- * Autor: Equipo Teen Titans
- * Versión: 1.0
- * Desde: 2025
- */
+
 @DataMongoTest
 public class GroupRepositoryTest {
 
@@ -41,32 +34,27 @@ public class GroupRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // Cursos
         course1 = new Course("CS101", "Programación I", 3,
                 "Introducción a la programación", "Ingeniería de Sistemas", true);
         course2 = new Course("CS102", "Estructuras de Datos", 4,
                 "Estudio de estructuras de datos", "Ingeniería de Sistemas", true);
 
-        // Profesores
         professor1 = new Professor("Ciencias de la Computación", true,
                 List.of("Inteligencia Artificial", "Programación Avanzada"));
         professor2 = new Professor("Ingeniería Electrónica", false,
                 List.of("Robótica", "Sistemas Embebidos"));
 
-        // Horarios
+
         schedule1 = new Schedule("S001", "Lunes", "08:00", "10:00", "2025-1");
         schedule2 = new Schedule("S002", "Martes", "10:00", "12:00", "2025-1");
 
-        // Aulas
         classroom1 = new Classroom("C001", "Edificio A", "101", 40, RoomType.REGULAR);
         classroom2 = new Classroom("C002", "Edificio B", "202", 35, RoomType.LABORATORY);
 
-        // Grupos
         group1 = new Group("G001", "A", course1, professor1, schedule1, classroom1);
         group2 = new Group("G002", "B", course2, professor2, schedule2, classroom2);
     }
 
-    // -------------------- findBySection --------------------
 
     @Test
     @DisplayName("Caso exitoso - findBySection retorna grupos por sección")
@@ -96,7 +84,6 @@ public class GroupRepositoryTest {
         System.out.println("Se manejó correctamente la búsqueda vacía por sección inexistente");
     }
 
-    // -------------------- findByCourse_CourseCode --------------------
 
     @Test
     @DisplayName("Caso exitoso - findByCourse_CourseCode retorna grupos por código de curso")
@@ -126,7 +113,6 @@ public class GroupRepositoryTest {
         System.out.println("Se manejó correctamente la búsqueda vacía por curso inexistente");
     }
 
-    // -------------------- findByProfessor_Id --------------------
 
     @Test
     @DisplayName("Caso exitoso - findByProfessor_Id retorna grupos por profesor")
@@ -156,7 +142,6 @@ public class GroupRepositoryTest {
         System.out.println("Se manejó correctamente la búsqueda vacía por profesor inexistente");
     }
 
-    // -------------------- findByClassroom_ClassroomId --------------------
 
     @Test
     @DisplayName("Caso exitoso - findByClassroom_ClassroomId retorna grupos por aula")

@@ -14,14 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Pruebas unitarias para la capa de repositorio ClassroomRepository.
- * Se validan los métodos de consulta personalizados con casos de éxito y error.
- *
- * @author Equipo Teen Titans
- * @version 1.0
- * @since 2025
- */
+
 @DataMongoTest
 public class ClassroomRepositoryTest {
 
@@ -37,7 +30,6 @@ public class ClassroomRepositoryTest {
         classroom2 = new Classroom("2", "Edificio B", "202", 80, RoomType.LABORATORY);
     }
 
-    // -------------------- findByBuilding --------------------
 
     @Test
     @DisplayName("Caso exitoso - findByBuilding retorna aulas en el edificio indicado")
@@ -63,7 +55,6 @@ public class ClassroomRepositoryTest {
         verify(classroomRepository, times(1)).findByBuilding("Edificio Z");
     }
 
-    // -------------------- findByRoomNumber --------------------
 
     @Test
     @DisplayName("Caso exitoso - findByRoomNumber retorna aula existente")
@@ -89,7 +80,6 @@ public class ClassroomRepositoryTest {
         verify(classroomRepository, times(1)).findByRoomNumber("999");
     }
 
-    // -------------------- findByCapacityGreaterThanEqual --------------------
 
     @Test
     @DisplayName("Caso exitoso - findByCapacityGreaterThanEqual retorna aulas con capacidad suficiente")
@@ -115,7 +105,6 @@ public class ClassroomRepositoryTest {
         verify(classroomRepository, times(1)).findByCapacityGreaterThanEqual(100);
     }
 
-    // -------------------- findByRoomType --------------------
 
     @Test
     @DisplayName("Caso exitoso - findByRoomType retorna aulas del tipo indicado")

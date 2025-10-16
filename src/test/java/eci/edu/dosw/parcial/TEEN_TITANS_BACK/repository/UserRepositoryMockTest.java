@@ -13,10 +13,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Pruebas unitarias para UserRepository usando mocks.
- * No requiere conexión a MongoDB.
- */
+
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 class UserRepositoryMockTest {
 
@@ -40,7 +37,6 @@ class UserRepositoryMockTest {
         professorInactive.setActive(false);
     }
 
-    // ----------- CASOS EXITOSOS -----------
 
     @Test
     @DisplayName("Caso exitoso: Debería encontrar usuario por email existente")
@@ -106,7 +102,6 @@ class UserRepositoryMockTest {
         assertEquals("Bruce Wayne", admins.get(0).getName());
     }
 
-    // ----------- CASOS DE ERROR -----------
 
     @Test
     @DisplayName("Caso error: No debería encontrar usuario con email inexistente")
