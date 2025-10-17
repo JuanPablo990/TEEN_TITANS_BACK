@@ -297,4 +297,226 @@ public class StudentPortalServiceTest {
         assertEquals(18, resultado);
         verify(groupRepository, times(1)).findById("GR001");
     }
+
+
+    @Test
+    @DisplayName("Caso borde - getCurrentSchedule sin cursos en progreso")
+    void testGetCurrentSchedule_SinCursosEnProgreso() {
+
+        CourseStatusDetail cursoAprobado1 = new CourseStatusDetail("CSD001", course1, CourseStatus.PASSED,
+                4.0, "2024-2", new Date(), new Date(), group1, null, 3, null, "Aprobado");
+
+        CourseStatusDetail cursoAprobado2 = new CourseStatusDetail("CSD002", course2, CourseStatus.PASSED,
+                3.8, "2024-2", new Date(), new Date(), group2, null, 3, null, "Aprobado");
+
+        StudentAcademicProgress progressSoloAprobados = new StudentAcademicProgress("PROG003", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                45, 160, 3.8, Arrays.asList(cursoAprobado1, cursoAprobado2));
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progressSoloAprobados));
+
+        List<Group> resultado = studentPortalService.getCurrentSchedule("ST001");
+
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Caso exitoso - getCourseRecommendations retorna cursos no tomados")
+    void testGetCourseRecommendations_Exitoso() {
+
+        CourseStatusDetail cursoTomado = new CourseStatusDetail("CSD001", course1, CourseStatus.PASSED,
+                4.0, "2024-2", new Date(), new Date(), group1, null, 3, null, "Aprobado");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG004", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                45, 160, 3.8, Arrays.asList(cursoTomado));
+
+
+        Course cursoRecomendado1 = new Course("CS102", "Programación II", 3,
+                "Programación orientada a objetos", "Ingeniería de Sistemas", true);
+
+        Course cursoRecomendado2 = new Course("MATH201", "Cálculo I", 4,
+                "Cálculo diferencial", "Ingeniería de Sistemas", true);
+
+        Course cursoOtroPrograma = new Course("PHYS101", "Física I", 3,
+                "Mecánica clásica", "Física", true); // No debe ser recomendado
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+        when(courseRepository.findByAcademicProgramAndIsActive("Ingeniería de Sistemas", true))
+                .thenReturn(Arrays.asList(cursoRecomendado1, cursoRecomendado2, cursoOtroPrograma));
+
+        List<Course> recomendaciones = studentPortalService.getCourseRecommendations("ST001");
+
+        assertNotNull(recomendaciones);
+
+        assertEquals(2, recomendaciones.size());
+        assertTrue(recomendaciones.stream().anyMatch(c -> c.getCourseCode().equals("CS102")));
+        assertTrue(recomendaciones.stream().anyMatch(c -> c.getCourseCode().equals("MATH201")));
+        assertTrue(recomendaciones.stream().noneMatch(c -> c.getCourseCode().equals("CS101"))); // Ya tomado
+        assertTrue(recomendaciones.stream().noneMatch(c -> c.getCourseCode().equals("PHYS101"))); // Otro programa
+    }
+
+    @Test
+    @DisplayName("Caso borde - getCourseRecommendations sin cursos disponibles")
+    void testGetCourseRecommendations_SinCursosDisponibles() {
+        CourseStatusDetail cursoTomado = new CourseStatusDetail("CSD001", course1, CourseStatus.PASSED,
+                4.0, "2024-2", new Date(), new Date(), group1, null, 3, null, "Aprobado");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG005", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                45, 160, 3.8, Arrays.asList(cursoTomado));
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+        when(courseRepository.findByAcademicProgramAndIsActive("Ingeniería de Sistemas", true))
+                .thenReturn(Collections.emptyList());
+
+        List<Course> recomendaciones = studentPortalService.getCourseRecommendations("ST001");
+
+        assertNotNull(recomendaciones);
+        assertTrue(recomendaciones.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Caso exitoso - getAcademicAlerts con GPA bajo")
+    void testGetAcademicAlerts_GPABajo() {
+        CourseStatusDetail cursoReprobado = new CourseStatusDetail("CSD001", course1, CourseStatus.FAILED,
+                2.0, "2025-1", new Date(), new Date(), group1, null, 3, null, "Reprobado");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG006", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                30, 150, 2.5, Arrays.asList(cursoReprobado));
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+
+        List<String> alertas = studentPortalService.getAcademicAlerts("ST001");
+
+        assertNotNull(alertas);
+        assertFalse(alertas.isEmpty());
+        assertTrue(alertas.stream().anyMatch(alerta -> alerta.contains("GPA")));
+    }
+
+    @Test
+    @DisplayName("Caso exitoso - getAcademicAlerts con progreso lento")
+    void testGetAcademicAlerts_ProgresoLento() {
+
+        CourseStatusDetail cursoAprobado = new CourseStatusDetail("CSD001", course1, CourseStatus.PASSED,
+                3.5, "2024-2", new Date(), new Date(), group1, null, 3, null, "Aprobado");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG007", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                20, 150, 3.8, Arrays.asList(cursoAprobado));
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+
+        List<String> alertas = studentPortalService.getAcademicAlerts("ST001");
+
+        assertNotNull(alertas);
+        assertTrue(alertas.stream().anyMatch(alerta -> alerta.contains("créditos")));
+    }
+
+
+
+    @Test
+    @DisplayName("Caso borde - getAcademicAlerts sin alertas")
+    void testGetAcademicAlerts_SinAlertas() {
+        // GPA bueno, progreso adecuado, sin materias reprobadas
+        CourseStatusDetail cursoAprobado = new CourseStatusDetail("CSD001", course1, CourseStatus.PASSED,
+                4.0, "2024-2", new Date(), new Date(), group1, null, 3, null, "Aprobado");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG009", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 6, 10,
+                90, 150, 3.8, Arrays.asList(cursoAprobado));
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+
+        List<String> alertas = studentPortalService.getAcademicAlerts("ST001");
+
+        assertNotNull(alertas);
+
+    }
+
+
+
+    @Test
+    @DisplayName("Caso borde - getWaitingList siempre retorna lista vacía")
+    void testGetWaitingList_RetornaListaVacia() {
+        List<ScheduleChangeRequest> resultado = studentPortalService.getWaitingList("GRP001");
+
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Caso borde - getCurrentEnrollment con capacidad cero")
+    void testGetCurrentEnrollment_CapacidadCero() {
+        Classroom aulaSinCapacidad = new Classroom("CL003", "Edificio C", "C101", 0, RoomType.REGULAR);
+        Group grupoSinCapacidad = new Group("GR004", "04", course1, null, null, aulaSinCapacidad);
+
+        when(groupRepository.findById("GR004")).thenReturn(Optional.of(grupoSinCapacidad));
+
+        Integer resultado = studentPortalService.getCurrentEnrollment("GR004");
+
+        assertNotNull(resultado);
+        assertEquals(0, resultado);
+    }
+
+    @Test
+    @DisplayName("Caso exitoso - getCurrentSchedule con múltiples grupos por curso")
+    void testGetCurrentSchedule_MultiplesGruposPorCurso() {
+        CourseStatusDetail cursoEnProgreso = new CourseStatusDetail("CSD001", course1, CourseStatus.IN_PROGRESS,
+                null, "2025-1", new Date(), null, group1, null, 3, null, "En progreso");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG010", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                45, 160, 3.8, Arrays.asList(cursoEnProgreso));
+
+
+        Group grupoAdicional = new Group("GR005", "02", course1, null, null, classroom);
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+        when(groupRepository.findByCourse_CourseCode("CS101")).thenReturn(Arrays.asList(group1, grupoAdicional));
+
+        List<Group> resultado = studentPortalService.getCurrentSchedule("ST001");
+
+        assertNotNull(resultado);
+        assertEquals(2, resultado.size());
+    }
+
+    @Test
+    @DisplayName("Caso borde - getAcademicAlerts con curso en estado ENROLLED")
+    void testGetAcademicAlerts_CursoEnrolled() {
+        CourseStatusDetail cursoEnrolled = new CourseStatusDetail("CSD001", course1, CourseStatus.ENROLLED,
+                null, "2025-1", new Date(), null, group1, null, 3, null, "Matriculado");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG011", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                45, 150, 3.8, Arrays.asList(cursoEnrolled));
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+
+        List<String> alertas = studentPortalService.getAcademicAlerts("ST001");
+
+        assertNotNull(alertas);
+
+    }
+
+    @Test
+    @DisplayName("Caso borde - getAcademicAlerts con curso WITHDRAWN")
+    void testGetAcademicAlerts_CursoWithdrawn() {
+        CourseStatusDetail cursoWithdrawn = new CourseStatusDetail("CSD001", course1, CourseStatus.WITHDRAWN,
+                null, "2025-1", new Date(), new Date(), group1, null, 0, false, "Retirado");
+
+        StudentAcademicProgress progress = new StudentAcademicProgress("PROG012", student,
+                "Ingeniería de Sistemas", "Facultad de Ingeniería", "Regular", 5, 10,
+                45, 150, 3.8, Arrays.asList(cursoWithdrawn));
+
+        when(studentAcademicProgressRepository.findById("ST001")).thenReturn(Optional.of(progress));
+
+        List<String> alertas = studentPortalService.getAcademicAlerts("ST001");
+
+        assertNotNull(alertas);
+
+    }
+
 }

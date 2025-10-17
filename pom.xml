@@ -9,7 +9,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.5</version>
-        <relativePath/> <!-- usa una versión estable -->
+        <relativePath/>
     </parent>
 
     <groupId>eci.edu.dosw.parcial</groupId>
@@ -20,6 +20,16 @@
 
     <properties>
         <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Propiedades para JaCoCo -->
+        <jacoco.version>0.8.11</jacoco.version>
+        <coverage.min.instruction>60%</coverage.min.instruction>
+        <coverage.min.branch>50%</coverage.min.branch>
+        <coverage.min.class>70%</coverage.min.class>
+        <coverage.min.method>60%</coverage.min.method>
+        <coverage.min.line>60%</coverage.min.line>
     </properties>
 
     <dependencies>
@@ -62,7 +72,122 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <!-- Plugin para JaCoCo -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <!-- EXCLUSIONES ESPECÍFICAS POR CLASE -->
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/TeenTitansBackApplication.class</exclude>
+
+                                <!-- EXCLUSIONES POR PAQUETE COMPLETO -->
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/model/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/dto/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/exceptions/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/config/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/enums/**</exclude>
+
+                                <!-- PATRONES GLOBALES COMO FALLBACK -->
+                                <exclude>**/TeenTitansBackApplication.class</exclude>
+                                <exclude>**/model/**</exclude>
+                                <exclude>**/dto/**</exclude>
+                                <exclude>**/exceptions/**</exclude>
+                                <exclude>**/config/**</exclude>
+                                <exclude>**/enums/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check-coverage</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/TeenTitansBackApplication.class</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/model/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/dto/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/exceptions/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/config/**</exclude>
+                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/enums/**</exclude>
+                                <exclude>**/TeenTitansBackApplication.class</exclude>
+                                <exclude>**/model/**</exclude>
+                                <exclude>**/dto/**</exclude>
+                                <exclude>**/exceptions/**</exclude>
+                                <exclude>**/config/**</exclude>
+                                <exclude>**/enums/**</exclude>
+                            </excludes>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>${coverage.min.instruction}</value>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>${coverage.min.branch}</value>
+                                        </limit>
+                                        <limit>
+                                            <counter>CLASS</counter>
+                                            <value>${coverage.min.class}</value>
+                                        </limit>
+                                        <limit>
+                                            <counter>METHOD</counter>
+                                            <value>${coverage.min.method}</value>
+                                        </limit>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>${coverage.min.line}</value>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Plugin para compilar con Java 17 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <encoding>UTF-8</encoding>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin para ejecutar tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <argLine>@{argLine} -XX:+EnableDynamicAgentLoading</argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>

@@ -152,4 +152,245 @@ class AdminGroupServiceTest {
         assertEquals("Curso no encontrado con código: MAT101", ex.getMessage());
         verify(courseRepository).existsById("MAT101");
     }
+
+    @Test
+    void assignStudentToGroup_Success() {
+        String studentId = "S1";
+        String groupId = "G1";
+
+        Student student = new Student(studentId, "John Doe", "john@eci.edu", "password", "Engineering", 1);
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+        Classroom classroom = new Classroom("CR1", "Building A", "101", 30, RoomType.REGULAR);
+        Group group = new Group(groupId, "A", course, null, null, classroom);
+
+        given(studentRepository.findById(studentId)).willReturn(Optional.of(student));
+        given(groupRepository.findById(groupId)).willReturn(Optional.of(group));
+
+        assertDoesNotThrow(() -> adminGroupService.assignStudentToGroup(studentId, groupId));
+
+        verify(studentRepository).findById(studentId);
+        verify(groupRepository).findById(groupId);
+    }
+
+    @Test
+    void assignStudentToGroup_StudentNotFound() {
+        String studentId = "S1";
+        String groupId = "G1";
+
+        given(studentRepository.findById(studentId)).willReturn(Optional.empty());
+
+        AppException ex = assertThrows(AppException.class,
+                () -> adminGroupService.assignStudentToGroup(studentId, groupId));
+        assertEquals("Estudiante no encontrado con ID: " + studentId, ex.getMessage());
+    }
+
+    @Test
+    void removeStudentFromGroup_Success() {
+        String studentId = "S1";
+        String groupId = "G1";
+
+        Student student = new Student(studentId, "John Doe", "john@eci.edu", "password", "Engineering", 1);
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+        Classroom classroom = new Classroom("CR1", "Building A", "101", 30, RoomType.REGULAR);
+        Group group = new Group(groupId, "A", course, null, null, classroom);
+
+        given(studentRepository.findById(studentId)).willReturn(Optional.of(student));
+        given(groupRepository.findById(groupId)).willReturn(Optional.of(group));
+
+        assertDoesNotThrow(() -> adminGroupService.removeStudentFromGroup(studentId, groupId));
+
+        verify(studentRepository).findById(studentId);
+        verify(groupRepository).findById(groupId);
+    }
+
+    @Test
+    void assignProfessorToGroup_Success() {
+        String professorId = "P1";
+        String groupId = "G1";
+
+        Professor professor = new Professor("Computer Science", true, List.of("AI", "Algorithms"));
+        professor.setId(professorId);
+
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+        Classroom classroom = new Classroom("CR1", "Building A", "101", 30, RoomType.REGULAR);
+        Group group = new Group(groupId, "A", course, null, null, classroom);
+
+        given(professorRepository.findById(professorId)).willReturn(Optional.of(professor));
+        given(groupRepository.findById(groupId)).willReturn(Optional.of(group));
+
+        assertDoesNotThrow(() -> adminGroupService.assignProfessorToGroup(professorId, groupId));
+
+        verify(professorRepository).findById(professorId);
+        verify(groupRepository).findById(groupId);
+    }
+
+
+
+    @Test
+    void updateCourse_Success() {
+        String courseCode = "MAT101";
+        Course updatedCourse = new Course(courseCode, "Mathematics Advanced", 4, "Advanced math", "Engineering", true);
+
+        given(courseRepository.existsById(courseCode)).willReturn(true);
+        given(courseRepository.save(any(Course.class))).willReturn(updatedCourse);
+
+        Course result = adminGroupService.updateCourse(courseCode, updatedCourse);
+
+        assertNotNull(result);
+        assertEquals("Mathematics Advanced", result.getName());
+        verify(courseRepository).existsById(courseCode);
+        verify(courseRepository).save(updatedCourse);
+    }
+
+    @Test
+    void updateCourse_CourseNotFound() {
+        String courseCode = "MAT101";
+        Course updatedCourse = new Course(courseCode, "Mathematics", 3, "Math course", "Engineering", true);
+
+        given(courseRepository.existsById(courseCode)).willReturn(false);
+
+        AppException ex = assertThrows(AppException.class,
+                () -> adminGroupService.updateCourse(courseCode, updatedCourse));
+        assertEquals("Curso no encontrado con código: " + courseCode, ex.getMessage());
+    }
+
+    @Test
+    void deleteCourse_Success() {
+        String courseCode = "MAT101";
+
+        given(courseRepository.existsById(courseCode)).willReturn(true);
+
+        assertDoesNotThrow(() -> adminGroupService.deleteCourse(courseCode));
+
+        verify(courseRepository).existsById(courseCode);
+        verify(courseRepository).deleteById(courseCode);
+    }
+
+    @Test
+    void deleteCourse_CourseNotFound() {
+        String courseCode = "MAT101";
+
+        given(courseRepository.existsById(courseCode)).willReturn(false);
+
+        AppException ex = assertThrows(AppException.class,
+                () -> adminGroupService.deleteCourse(courseCode));
+        assertEquals("Curso no encontrado con código: " + courseCode, ex.getMessage());
+    }
+
+    @Test
+    void getGroupsByDay_Success() {
+        String dayOfWeek = "Lunes";
+
+        Schedule schedule = new Schedule("S1", "Lunes", "08:00", "10:00", "2025-1");
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+        Classroom classroom = new Classroom("CR1", "Building A", "101", 30, RoomType.REGULAR);
+        Group group = new Group("G1", "A", course, null, schedule, classroom);
+
+        given(groupRepository.findAll()).willReturn(List.of(group));
+
+        List<Group> result = adminGroupService.getGroupsByDay(dayOfWeek);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("G1", result.get(0).getGroupId());
+        verify(groupRepository).findAll();
+    }
+
+
+
+    @Test
+    void createCourse_Success() {
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+
+        given(courseRepository.save(any(Course.class))).willReturn(course);
+
+        Course result = adminGroupService.createCourse(course);
+
+        assertNotNull(result);
+        assertEquals("MAT101", result.getCourseCode());
+        verify(courseRepository).save(course);
+    }
+
+    @Test
+    void getAllGroups_Success() {
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+        Classroom classroom = new Classroom("CR1", "Building A", "101", 30, RoomType.REGULAR);
+        Group group1 = new Group("G1", "A", course, null, null, classroom);
+        Group group2 = new Group("G2", "B", course, null, null, classroom);
+
+        given(groupRepository.findAll()).willReturn(List.of(group1, group2));
+
+        List<Group> result = adminGroupService.getAllGroups();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(groupRepository).findAll();
+    }
+
+    @Test
+    void deleteGroup_Success() {
+        String groupId = "G1";
+
+        given(groupRepository.existsById(groupId)).willReturn(true);
+
+        assertDoesNotThrow(() -> adminGroupService.deleteGroup(groupId));
+
+        verify(groupRepository).existsById(groupId);
+        verify(groupRepository).deleteById(groupId);
+    }
+
+    @Test
+    void deleteGroup_GroupNotFound() {
+        String groupId = "G1";
+
+        given(groupRepository.existsById(groupId)).willReturn(false);
+
+        AppException ex = assertThrows(AppException.class,
+                () -> adminGroupService.deleteGroup(groupId));
+        assertEquals("Grupo no encontrado con ID: " + groupId, ex.getMessage());
+    }
+
+    @Test
+    void getCurrentEnrollment_ZeroCapacity() {
+        Classroom zeroCapacityClassroom = new Classroom("CR1", "Building A", "101", 0, RoomType.REGULAR);
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+        Group zeroCapacityGroup = new Group("G1", "A", course, null, null, zeroCapacityClassroom);
+
+        given(groupRepository.findById("G1")).willReturn(Optional.of(zeroCapacityGroup));
+
+        Integer result = adminGroupService.getCurrentEnrollment("G1");
+
+        assertEquals(0, result);
+        verify(groupRepository).findById("G1");
+    }
+
+    @Test
+    void getGroupsByDay_NoResults() {
+        String dayOfWeek = "Domingo";
+
+        Schedule schedule = new Schedule("S1", "Lunes", "08:00", "10:00", "2025-1");
+        Course course = new Course("MAT101", "Mathematics", 3, "Math course", "Engineering", true);
+        Classroom classroom = new Classroom("CR1", "Building A", "101", 30, RoomType.REGULAR);
+        Group group = new Group("G1", "A", course, null, schedule, classroom);
+
+        given(groupRepository.findAll()).willReturn(List.of(group));
+
+        List<Group> result = adminGroupService.getGroupsByDay(dayOfWeek);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(groupRepository).findAll();
+    }
+
+    @Test
+    void getMostRequestedGroups_EmptyList() {
+        given(groupRepository.findAll()).willReturn(List.of());
+
+        List<Group> result = adminGroupService.getMostRequestedGroups();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(groupRepository).findAll();
+    }
+
 }
