@@ -45,7 +45,7 @@ class AdminGroupServiceTest {
         group = new Group("G1", "A", course, null, null, classroom);
     }
 
-    // --- getCourse() ---
+
     @Test
     @DisplayName("Caso exitoso - Obtener curso de un grupo existente")
     void getCourse_Success() {
@@ -68,7 +68,7 @@ class AdminGroupServiceTest {
         verify(groupRepository).findById("G1");
     }
 
-    // --- getMaxCapacity() ---
+
     @Test
     @DisplayName("Caso exitoso - Obtener capacidad máxima del aula del grupo")
     void getMaxCapacity_Success() {
@@ -91,7 +91,7 @@ class AdminGroupServiceTest {
     }
 
 
-    // --- getCurrentEnrollment() ---
+
     @Test
     @DisplayName("Caso exitoso - Calcular inscripción actual estimada")
     void getCurrentEnrollment_Success() {
@@ -104,7 +104,7 @@ class AdminGroupServiceTest {
     }
 
 
-    // --- getWaitingList() ---
+
     @Test
     @DisplayName("Caso exitoso - Obtener lista de espera vacía de grupo existente")
     void getWaitingList_Success() {
@@ -127,7 +127,7 @@ class AdminGroupServiceTest {
         verify(groupRepository).existsById("G1");
     }
 
-    // --- getTotalEnrolledByCourse() ---
+
     @Test
     @DisplayName("Caso exitoso - Obtener total de inscritos por curso")
     void getTotalEnrolledByCourse_Success() {

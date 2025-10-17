@@ -16,9 +16,6 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Pruebas unitarias para StudentPortalService
- */
 @ExtendWith(MockitoExtension.class)
 public class StudentPortalServiceTest {
 
@@ -53,7 +50,6 @@ public class StudentPortalServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Configurar datos de prueba
         student = new Student("ST001", "Robin", "robin@titans.edu", "pass123",
                 "Ingeniería de Sistemas", 5);
 
@@ -72,7 +68,6 @@ public class StudentPortalServiceTest {
                 3.5, "2025-1", enrollmentDate, null,
                 group1, null, 3, null, "Buen desempeño");
 
-
         progress = new StudentAcademicProgress("PROG001", student, "Ingeniería de Sistemas",
                 "Facultad de Ingeniería", "Regular", 5, 10,
                 45, 160, 3.8, Arrays.asList(courseStatus1, courseStatus2));
@@ -82,18 +77,12 @@ public class StudentPortalServiceTest {
                 new Date(), new Date(), new Date(), new Date(), true);
     }
 
-    // ========== PRUEBAS PARA getCurrentSchedule ==========
-
-
-
     @Test
     @DisplayName("Caso error - getCurrentSchedule lanza excepción cuando no encuentra progreso académico")
     void testGetCurrentSchedule_ProgresoNoEncontrado() {
-        // Configurar
         when(studentAcademicProgressRepository.findById("ST999"))
                 .thenReturn(Optional.empty());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.getCurrentSchedule("ST999"));
 
@@ -101,12 +90,9 @@ public class StudentPortalServiceTest {
         verify(studentAcademicProgressRepository, times(1)).findById("ST999");
     }
 
-    // ========== PRUEBAS PARA getAvailableGroups ==========
-
     @Test
     @DisplayName("Caso exitoso - getAvailableGroups retorna grupos disponibles")
     void testGetAvailableGroups_Exitoso() {
-        // Configurar
         when(groupRepository.findByCourse_CourseCode("CS101"))
                 .thenReturn(Arrays.asList(group1, group2));
         when(groupRepository.findById("GR001"))
@@ -114,10 +100,8 @@ public class StudentPortalServiceTest {
         when(groupRepository.findById("GR002"))
                 .thenReturn(Optional.of(group2));
 
-        // Ejecutar
         List<Group> resultado = studentPortalService.getAvailableGroups("CS101");
 
-        // Verificar
         assertNotNull(resultado);
         assertFalse(resultado.isEmpty());
         verify(groupRepository, times(1)).findByCourse_CourseCode("CS101");
@@ -126,11 +110,9 @@ public class StudentPortalServiceTest {
     @Test
     @DisplayName("Caso error - getAvailableGroups lanza excepción cuando no hay grupos")
     void testGetAvailableGroups_NoGruposEncontrados() {
-        // Configurar
         when(groupRepository.findByCourse_CourseCode("CS999"))
                 .thenReturn(Collections.emptyList());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.getAvailableGroups("CS999"));
 
@@ -138,19 +120,14 @@ public class StudentPortalServiceTest {
         verify(groupRepository, times(1)).findByCourse_CourseCode("CS999");
     }
 
-    // ========== PRUEBAS PARA getAcademicProgress ==========
-
     @Test
     @DisplayName("Caso exitoso - getAcademicProgress retorna progreso académico")
     void testGetAcademicProgress_Exitoso() {
-        // Configurar
         when(studentAcademicProgressRepository.findById("ST001"))
                 .thenReturn(Optional.of(progress));
 
-        // Ejecutar
         StudentAcademicProgress resultado = studentPortalService.getAcademicProgress("ST001");
 
-        // Verificar
         assertNotNull(resultado);
         assertEquals("PROG001", resultado.getId());
         assertEquals(3.8, resultado.getCumulativeGPA());
@@ -161,11 +138,9 @@ public class StudentPortalServiceTest {
     @Test
     @DisplayName("Caso error - getAcademicProgress lanza excepción cuando no encuentra progreso")
     void testGetAcademicProgress_NoEncontrado() {
-        // Configurar
         when(studentAcademicProgressRepository.findById("ST999"))
                 .thenReturn(Optional.empty());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.getAcademicProgress("ST999"));
 
@@ -173,31 +148,24 @@ public class StudentPortalServiceTest {
         verify(studentAcademicProgressRepository, times(1)).findById("ST999");
     }
 
-    // ========== PRUEBAS PARA checkGroupAvailability ==========
-
     @Test
     @DisplayName("Caso exitoso - checkGroupAvailability retorna true cuando hay cupos")
     void testCheckGroupAvailability_ConCupos() {
-        // Configurar
         when(groupRepository.findById("GR001"))
                 .thenReturn(Optional.of(group1));
 
-        // Ejecutar
         boolean resultado = studentPortalService.checkGroupAvailability("GR001");
 
-        // Verificar
         assertTrue(resultado);
-        verify(groupRepository, times(2)).findById("GR001"); // Se llama 2 veces en el método
+        verify(groupRepository, times(2)).findById("GR001");
     }
 
     @Test
     @DisplayName("Caso error - checkGroupAvailability lanza excepción cuando grupo no existe")
     void testCheckGroupAvailability_GrupoNoEncontrado() {
-        // Configurar
         when(groupRepository.findById("GR999"))
                 .thenReturn(Optional.empty());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.checkGroupAvailability("GR999"));
 
@@ -205,18 +173,12 @@ public class StudentPortalServiceTest {
         verify(groupRepository, times(1)).findById("GR999");
     }
 
-    // ========== PRUEBAS PARA getCourseRecommendations ==========
-
-
-
     @Test
     @DisplayName("Caso error - getCourseRecommendations lanza excepción cuando no encuentra progreso")
     void testGetCourseRecommendations_ProgresoNoEncontrado() {
-        // Configurar
         when(studentAcademicProgressRepository.findById("ST999"))
                 .thenReturn(Optional.empty());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.getCourseRecommendations("ST999"));
 
@@ -224,19 +186,14 @@ public class StudentPortalServiceTest {
         verify(studentAcademicProgressRepository, times(1)).findById("ST999");
     }
 
-    // ========== PRUEBAS PARA getEnrollmentDeadlines ==========
-
     @Test
     @DisplayName("Caso exitoso - getEnrollmentDeadlines retorna periodo académico activo")
     void testGetEnrollmentDeadlines_Exitoso() {
-        // Configurar
         when(academicPeriodRepository.findByIsActive(true))
                 .thenReturn(Arrays.asList(academicPeriod));
 
-        // Ejecutar
         AcademicPeriod resultado = studentPortalService.getEnrollmentDeadlines();
 
-        // Verificar
         assertNotNull(resultado);
         assertEquals("PER001", resultado.getPeriodId());
         assertEquals("2025-1", resultado.getName());
@@ -247,11 +204,9 @@ public class StudentPortalServiceTest {
     @Test
     @DisplayName("Caso error - getEnrollmentDeadlines lanza excepción cuando no hay periodos activos")
     void testGetEnrollmentDeadlines_NoPeriodosActivos() {
-        // Configurar
         when(academicPeriodRepository.findByIsActive(true))
                 .thenReturn(Collections.emptyList());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.getEnrollmentDeadlines());
 
@@ -259,18 +214,12 @@ public class StudentPortalServiceTest {
         verify(academicPeriodRepository, times(1)).findByIsActive(true);
     }
 
-    // ========== PRUEBAS PARA getAcademicAlerts ==========
-
-
-
     @Test
     @DisplayName("Caso error - getAcademicAlerts lanza excepción cuando no encuentra información")
     void testGetAcademicAlerts_InformacionNoEncontrada() {
-        // Configurar
         when(studentAcademicProgressRepository.findById("ST999"))
                 .thenReturn(Optional.empty());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.getAcademicAlerts("ST999"));
 
@@ -278,12 +227,9 @@ public class StudentPortalServiceTest {
         verify(studentAcademicProgressRepository, times(1)).findById("ST999");
     }
 
-    // ========== PRUEBAS PARA getTotalEnrolledByCourse ==========
-
     @Test
     @DisplayName("Caso exitoso - getTotalEnrolledByCourse retorna mapa de inscritos por grupo")
     void testGetTotalEnrolledByCourse_Exitoso() {
-        // Configurar
         when(groupRepository.findByCourse_CourseCode("CS101"))
                 .thenReturn(Arrays.asList(group1, group2));
         when(groupRepository.findById("GR001"))
@@ -291,10 +237,8 @@ public class StudentPortalServiceTest {
         when(groupRepository.findById("GR002"))
                 .thenReturn(Optional.of(group2));
 
-        // Ejecutar
         Map<String, Integer> resultado = studentPortalService.getTotalEnrolledByCourse("CS101");
 
-        // Verificar
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertTrue(resultado.containsKey("GR001"));
@@ -305,11 +249,9 @@ public class StudentPortalServiceTest {
     @Test
     @DisplayName("Caso error - getTotalEnrolledByCourse lanza excepción cuando no hay grupos")
     void testGetTotalEnrolledByCourse_NoGrupos() {
-        // Configurar
         when(groupRepository.findByCourse_CourseCode("CS999"))
                 .thenReturn(Collections.emptyList());
 
-        // Ejecutar y Verificar
         AppException exception = assertThrows(AppException.class,
                 () -> studentPortalService.getTotalEnrolledByCourse("CS999"));
 
@@ -317,19 +259,14 @@ public class StudentPortalServiceTest {
         verify(groupRepository, times(1)).findByCourse_CourseCode("CS999");
     }
 
-    // ========== PRUEBAS DE MÉTODOS HEREDADOS ==========
-
     @Test
     @DisplayName("Caso exitoso - getCourse retorna curso del grupo")
     void testGetCourse_Exitoso() {
-        // Configurar
         when(groupRepository.findById("GR001"))
                 .thenReturn(Optional.of(group1));
 
-        // Ejecutar
         Course resultado = studentPortalService.getCourse("GR001");
 
-        // Verificar
         assertNotNull(resultado);
         assertEquals("CS101", resultado.getCourseCode());
         verify(groupRepository, times(1)).findById("GR001");
@@ -338,14 +275,11 @@ public class StudentPortalServiceTest {
     @Test
     @DisplayName("Caso borde - getMaxCapacity retorna capacidad del aula")
     void testGetMaxCapacity_Exitoso() {
-        // Configurar
         when(groupRepository.findById("GR001"))
                 .thenReturn(Optional.of(group1));
 
-        // Ejecutar
         Integer resultado = studentPortalService.getMaxCapacity("GR001");
 
-        // Verificar
         assertNotNull(resultado);
         assertEquals(30, resultado);
         verify(groupRepository, times(1)).findById("GR001");
@@ -354,18 +288,13 @@ public class StudentPortalServiceTest {
     @Test
     @DisplayName("Caso borde - getCurrentEnrollment calcula inscripción actual")
     void testGetCurrentEnrollment_Exitoso() {
-        // Configurar
         when(groupRepository.findById("GR001"))
                 .thenReturn(Optional.of(group1));
 
-        // Ejecutar
         Integer resultado = studentPortalService.getCurrentEnrollment("GR001");
 
-        // Verificar
         assertNotNull(resultado);
         assertEquals(18, resultado);
         verify(groupRepository, times(1)).findById("GR001");
     }
-
-
 }

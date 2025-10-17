@@ -48,7 +48,7 @@ public class StudentPortalControllerTest {
         testGroup = new Group(GROUP_ID, "A", testCourse, null, null, null);
         testPeriod = new AcademicPeriod("2025-1", "Primer Semestre 2025", new Date(), new Date(), new Date(), new Date(), new Date(), new Date(), true);
 
-        // Crear CourseStatusDetail usando CourseStatus.PASSED
+
         testCourseStatus = new CourseStatusDetail(
                 "cs-001", testCourse, CourseStatus.PASSED, 4.0, "2024-1",
                 new Date(), new Date(), testGroup, null, 3, true, "Excelente desempeño"
