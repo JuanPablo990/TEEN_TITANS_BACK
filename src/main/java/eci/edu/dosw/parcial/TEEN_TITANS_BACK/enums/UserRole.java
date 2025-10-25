@@ -1,4 +1,4 @@
-package eci.edu.dosw.parcial.TEEN_TITANS_BACK.model;
+package eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums;
 
 /**
  * Representa los diferentes roles que puede tener un usuario en el sistema universitario.

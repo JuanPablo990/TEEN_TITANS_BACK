@@ -2,13 +2,14 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Administrator;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
- * Repositorio para manejar las operaciones CRUD y consultas personalizadas
- * sobre la colección de administradores (Administrator) en MongoDB.
+ * Repositorio para la gestión de administradores en la base de datos MongoDB.
+ * Proporciona métodos para buscar administradores por diferentes criterios.
  *
  * @author Equipo Teen Titans
  * @version 1.0
@@ -17,25 +18,49 @@ import java.util.List;
 @Repository
 public interface AdministratorRepository extends MongoRepository<Administrator, String> {
 
-    /**
-     * Busca administradores por departamento.
-     * @param department Departamento del administrador.
-     * @return Lista de administradores del departamento especificado.
-     */
+    // Búsquedas por atributos específicos de Administrator
     List<Administrator> findByDepartment(String department);
 
-    /**
-     * Busca administradores por departamento y estado de activación.
-     * @param department Departamento del administrador.
-     * @param active Estado de activación.
-     * @return Lista de administradores que cumplen con ambos criterios.
-     */
-    List<Administrator> findByDepartmentAndActive(String department, boolean active);
+    // Búsquedas por departamento (parciales)
+    List<Administrator> findByDepartmentContainingIgnoreCase(String department);
 
-    /**
-     * Verifica si existe un administrador en el departamento especificado.
-     * @param department Departamento a verificar.
-     * @return true si existe un administrador en ese departamento, false en caso contrario.
-     */
+    // Búsquedas por atributos heredados de User
+    List<Administrator> findByName(String name);
+    List<Administrator> findByEmail(String email);
+    List<Administrator> findByNameContainingIgnoreCase(String name);
+    List<Administrator> findByEmailContainingIgnoreCase(String email);
+    List<Administrator> findByActive(boolean active);
+
+    // Búsquedas combinadas con atributos heredados
+    List<Administrator> findByDepartmentAndActive(String department, boolean active);
+    List<Administrator> findByNameAndDepartment(String name, String department);
+    List<Administrator> findByEmailAndDepartment(String email, String department);
+
+    // Búsquedas con ordenamiento
+    List<Administrator> findByOrderByNameAsc();
+    List<Administrator> findByDepartmentOrderByNameAsc(String department);
+    List<Administrator> findByOrderByDepartmentAsc();
+
+    // Consultas de conteo
+    long countByDepartment(String department);
+    long countByDepartmentAndActive(String department, boolean active);
+    long countByActive(boolean active);
+
+    // Consultas personalizadas con @Query
+    @Query("{ 'department': { $regex: ?0, $options: 'i' } }")
+    List<Administrator> findByDepartmentRegex(String departmentPattern);
+
+    @Query("{ 'name': { $regex: ?0, $options: 'i' }, 'department': ?1 }")
+    List<Administrator> findByNamePatternAndDepartment(String namePattern, String department);
+
+    @Query("{ 'department': ?0, 'active': ?1 }")
+    List<Administrator> findByDepartmentAndActiveStatus(String department, boolean active);
+
+    // Verificación de existencia
     boolean existsByDepartment(String department);
+    boolean existsByEmail(String email);
+    boolean existsByDepartmentAndActive(String department, boolean active);
+
+    // Búsqueda por múltiples departamentos
+    List<Administrator> findByDepartmentIn(List<String> departments);
 }

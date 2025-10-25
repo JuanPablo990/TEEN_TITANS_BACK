@@ -1,17 +1,18 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.repository;
 
-
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.User;
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.UserRole;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Repositorio para manejar las operaciones CRUD y consultas personalizadas
- * sobre la colección de usuarios (User) en MongoDB.
+ * Repositorio para la gestión de usuarios en la base de datos MongoDB.
+ * Proporciona métodos para buscar usuarios por diferentes criterios.
  *
  * @author Equipo Teen Titans
  * @version 1.0
@@ -20,46 +21,48 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
 
-    /**
-     * Busca un usuario por su email exacto.
-     * @param email Email del usuario.
-     * @return El usuario encontrado o null si no existe.
-     */
-    Optional<User> findByEmail(String email);
-
-    /**
-     * Busca usuarios por su rol en el sistema.
-     * @param role Rol del usuario.
-     * @return Lista de usuarios con el rol especificado.
-     */
+    Optional<User> findById(String id);
+    List<User> findByName(String name);
+    List<User> findByEmail(String email);
+    List<User> findByPassword(String password);
     List<User> findByRole(UserRole role);
-
-    /**
-     * Busca usuarios por su estado de activación.
-     * @param active Estado del usuario (true = activo, false = inactivo).
-     * @return Lista de usuarios filtrados por estado.
-     */
     List<User> findByActive(boolean active);
+    List<User> findByCreatedAt(Date createdAt);
+    List<User> findByUpdatedAt(Date updatedAt);
 
-    /**
-     * Verifica si existe un usuario con el email especificado.
-     * @param email Email a verificar.
-     * @return true si existe un usuario con ese email, false en caso contrario.
-     */
-    boolean existsByEmail(String email);
-
-    /**
-     * Busca usuarios por nombre (búsqueda case-insensitive).
-     * @param name Nombre o parte del nombre del usuario.
-     * @return Lista de usuarios que coinciden con el nombre.
-     */
     List<User> findByNameContainingIgnoreCase(String name);
+    List<User> findByEmailContainingIgnoreCase(String email);
 
-    /**
-     * Busca usuarios por rol y estado de activación.
-     * @param role Rol del usuario.
-     * @param active Estado de activación.
-     * @return Lista de usuarios que cumplen con ambos criterios.
-     */
-    List<User> findByRoleAndActive(UserRole role, boolean active);
+    List<User> findByNameAndRole(String name, UserRole role);
+    List<User> findByEmailAndRole(String email, UserRole role);
+    List<User> findByNameAndActive(String name, boolean active);
+
+    List<User> findByNameOrEmail(String name, String email);
+
+    List<User> findByCreatedAtAfter(Date date);
+    List<User> findByCreatedAtBefore(Date date);
+    List<User> findByCreatedAtBetween(Date startDate, Date endDate);
+
+    List<User> findByOrderByNameAsc();
+    List<User> findByOrderByCreatedAtDesc();
+    List<User> findByRoleOrderByNameAsc(UserRole role);
+
+
+    long countByRole(UserRole role);
+    long countByActive(boolean active);
+    long countByRoleAndActive(UserRole role, boolean active);
+
+
+    @Query("{ 'name': { $regex: ?0, $options: 'i' } }")
+    List<User> findByNameRegex(String namePattern);
+
+    @Query("{ 'email': { $regex: ?0, $options: 'i' } }")
+    List<User> findByEmailRegex(String emailPattern);
+
+    @Query("{ 'createdAt': { $gte: ?0, $lte: ?1 } }")
+    List<User> findUsersCreatedBetween(Date startDate, Date endDate);
+
+
+    boolean existsByEmail(String email);
+    boolean existsByNameAndEmail(String name, String email);
 }

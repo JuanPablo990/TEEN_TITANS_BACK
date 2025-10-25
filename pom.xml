@@ -51,6 +51,20 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
+        <!-- LOMBOK -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
         <!-- Swagger / OpenAPI UI -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -64,6 +78,19 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Test MongoDB (Para tests con MongoDB embebido) - VERSIÓN AGREGADA -->
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>4.11.0</version> <!-- ✅ VERSIÓN AGREGADA -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -71,9 +98,37 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
-            <!-- Plugin para JaCoCo -->
+            <!-- Plugin para Lombok -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <encoding>UTF-8</encoding>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin para JaCoCo SIN EXCLUSIONES -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -91,27 +146,6 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
-                        <configuration>
-                            <excludes>
-                                <!-- EXCLUSIONES ESPECÍFICAS POR CLASE -->
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/TeenTitansBackApplication.class</exclude>
-
-                                <!-- EXCLUSIONES POR PAQUETE COMPLETO -->
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/model/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/dto/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/exceptions/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/config/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/enums/**</exclude>
-
-                                <!-- PATRONES GLOBALES COMO FALLBACK -->
-                                <exclude>**/TeenTitansBackApplication.class</exclude>
-                                <exclude>**/model/**</exclude>
-                                <exclude>**/dto/**</exclude>
-                                <exclude>**/exceptions/**</exclude>
-                                <exclude>**/config/**</exclude>
-                                <exclude>**/enums/**</exclude>
-                            </excludes>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>check-coverage</id>
@@ -120,20 +154,6 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <excludes>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/TeenTitansBackApplication.class</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/model/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/dto/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/exceptions/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/config/**</exclude>
-                                <exclude>eci/edu/dosw/parcial/TEEN_TITANS_BACK/enums/**</exclude>
-                                <exclude>**/TeenTitansBackApplication.class</exclude>
-                                <exclude>**/model/**</exclude>
-                                <exclude>**/dto/**</exclude>
-                                <exclude>**/exceptions/**</exclude>
-                                <exclude>**/config/**</exclude>
-                                <exclude>**/enums/**</exclude>
-                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
@@ -164,19 +184,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- Plugin para compilar con Java 17 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                    <encoding>UTF-8</encoding>
-                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                </configuration>
             </plugin>
 
             <!-- Plugin para ejecutar tests -->
