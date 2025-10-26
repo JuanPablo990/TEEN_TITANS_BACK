@@ -16,5 +16,5 @@ public class ProfessorDTO {
     private Date createdAt;
     private Date updatedAt;
 
-    // ❌ NO incluye: password
+
 }
