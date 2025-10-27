@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Proporciona endpoints para la creación, consulta, actualización,
  * eliminación, búsqueda avanzada y estadísticas relacionadas con los decanos.
  *
- * @author
+ * @author Equipo Teen Titans
  * @version 1.0
  * @since 2025
  */
