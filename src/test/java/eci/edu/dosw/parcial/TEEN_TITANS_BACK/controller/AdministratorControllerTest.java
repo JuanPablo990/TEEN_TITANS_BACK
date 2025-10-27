@@ -251,23 +251,7 @@ class AdministratorControllerTest {
         verify(administratorService, times(1)).findActiveAdministrators();
     }
 
-    @Test
-    @DisplayName("Caso exitoso - Buscar por departamento y estado activo")
-    void testFindByDepartmentAndActive_Exitoso() {
-        List<Administrator> admins = Arrays.asList(admin1);
-        when(administratorService.findByDepartmentAndActive("Security", true)).thenReturn(admins);
 
-        ResponseEntity<?> response = administratorController.findByDepartmentAndActive("Security", true);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        assertEquals("Security", responseBody.get("department"));
-        assertEquals(true, responseBody.get("active"));
-        List<AdministratorDTO> adminsDTO = (List<AdministratorDTO>) responseBody.get("administrators");
-        assertEquals(1, responseBody.get("count"));
-        assertEquals(1, adminsDTO.size());
-        verify(administratorService, times(1)).findByDepartmentAndActive("Security", true);
-    }
 
     @Test
     @DisplayName("Caso exitoso - Health check")

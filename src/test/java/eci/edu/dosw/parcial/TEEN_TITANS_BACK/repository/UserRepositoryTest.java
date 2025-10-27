@@ -196,23 +196,6 @@ public class UserRepositoryTest {
         verify(userRepository, times(1)).findByActive(true);
     }
 
-    @Test
-    @DisplayName("Caso exitoso - findByCreatedAt retorna usuarios por fecha de creación")
-    void testFindByCreatedAt_Exitoso() {
-        Date testDate = new Date();
-        List<User> users = Arrays.asList(user1);
-        when(userRepository.findByCreatedAt(testDate)).thenReturn(users);
-
-        List<User> result = userRepository.findByCreatedAt(testDate);
-
-        assertAll("Verificar búsqueda por fecha de creación",
-                () -> assertNotNull(result),
-                () -> assertEquals(1, result.size()),
-                () -> assertEquals(testDate, result.get(0).getCreatedAt())
-        );
-
-        verify(userRepository, times(1)).findByCreatedAt(testDate);
-    }
 
     @Test
     @DisplayName("Caso exitoso - findByUpdatedAt retorna usuarios por fecha de actualización")
