@@ -212,7 +212,7 @@ public class AdminRequestController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 
-    private RequestStatus parseRequestStatus(String decisionStr) {
+    RequestStatus parseRequestStatus(String decisionStr) {
         try {
             return RequestStatus.valueOf(decisionStr.toUpperCase());
         } catch (IllegalArgumentException e) {
