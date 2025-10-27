@@ -47,11 +47,9 @@ public interface UserRepository extends MongoRepository<User, String> {
     List<User> findByOrderByCreatedAtDesc();
     List<User> findByRoleOrderByNameAsc(UserRole role);
 
-
     long countByRole(UserRole role);
     long countByActive(boolean active);
     long countByRoleAndActive(UserRole role, boolean active);
-
 
     @Query("{ 'name': { $regex: ?0, $options: 'i' } }")
     List<User> findByNameRegex(String namePattern);
@@ -61,7 +59,6 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     @Query("{ 'createdAt': { $gte: ?0, $lte: ?1 } }")
     List<User> findUsersCreatedBetween(Date startDate, Date endDate);
-
 
     boolean existsByEmail(String email);
     boolean existsByNameAndEmail(String name, String email);

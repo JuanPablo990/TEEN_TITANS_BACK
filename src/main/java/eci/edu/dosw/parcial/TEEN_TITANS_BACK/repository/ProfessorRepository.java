@@ -18,44 +18,36 @@ import java.util.List;
 @Repository
 public interface ProfessorRepository extends MongoRepository<Professor, String> {
 
-    // Búsquedas por atributos específicos de Professor
     List<Professor> findByDepartment(String department);
     List<Professor> findByIsTenured(Boolean isTenured);
     List<Professor> findByAreasOfExpertiseContaining(String areaOfExpertise);
 
-    // Búsquedas por departamento y titularidad
     List<Professor> findByDepartmentAndIsTenured(String department, Boolean isTenured);
     List<Professor> findByDepartmentAndIsTenuredTrue(String department);
     List<Professor> findByDepartmentAndIsTenuredFalse(String department);
 
-    // Búsquedas por múltiples áreas de expertise
     List<Professor> findByAreasOfExpertiseIn(List<String> areasOfExpertise);
 
-    // Búsquedas por atributos heredados de User
     List<Professor> findByName(String name);
     List<Professor> findByEmail(String email);
     List<Professor> findByNameContainingIgnoreCase(String name);
     List<Professor> findByEmailContainingIgnoreCase(String email);
     List<Professor> findByActive(boolean active);
 
-    // Búsquedas combinadas con atributos heredados
     List<Professor> findByDepartmentAndActive(String department, boolean active);
     List<Professor> findByIsTenuredAndActive(Boolean isTenured, boolean active);
     List<Professor> findByNameAndDepartment(String name, String department);
     List<Professor> findByNameAndIsTenured(String name, Boolean isTenured);
 
-    // Búsquedas con ordenamiento
     List<Professor> findByOrderByNameAsc();
     List<Professor> findByDepartmentOrderByNameAsc(String department);
     List<Professor> findByIsTenuredTrueOrderByNameAsc();
 
-    // Consultas de conteo
     long countByDepartment(String department);
     long countByIsTenured(Boolean isTenured);
     long countByDepartmentAndIsTenured(String department, Boolean isTenured);
     long countByAreasOfExpertiseContaining(String areaOfExpertise);
 
-    // Consultas personalizadas con @Query
     @Query("{ 'department': { $regex: ?0, $options: 'i' } }")
     List<Professor> findByDepartmentRegex(String departmentPattern);
 
@@ -71,11 +63,9 @@ public interface ProfessorRepository extends MongoRepository<Professor, String> 
     @Query("{ 'areasOfExpertise': { $size: { $gte: ?0 } } }")
     List<Professor> findByMinimumAreasOfExpertise(int minAreas);
 
-    // Verificación de existencia
     boolean existsByDepartment(String department);
     boolean existsByEmail(String email);
     boolean existsByDepartmentAndIsTenured(String department, Boolean isTenured);
 
-    // Búsqueda de profesores por múltiples departamentos
     List<Professor> findByDepartmentIn(List<String> departments);
 }

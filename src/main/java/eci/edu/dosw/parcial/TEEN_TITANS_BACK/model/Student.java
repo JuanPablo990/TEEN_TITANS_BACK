@@ -6,15 +6,49 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * Representa a un estudiante dentro del sistema Teen Titans.
+ * Hereda de la clase {@link User} y agrega información académica específica
+ * como el programa académico, el semestre y el promedio de calificaciones.
+ *
+ * Esta clase se almacena en la colección "students" de MongoDB.
+ *
+ * @author Equipo Teen Titans
+ * @version 1.0
+ * @since 2025
+ */
 @Document(collection = "students")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Student extends User {
+
+    /**
+     * Programa académico al que pertenece el estudiante.
+     */
     private String academicProgram;
+
+    /**
+     * Semestre actual del estudiante.
+     */
     private Integer semester;
+
+    /**
+     * Promedio de calificaciones del estudiante.
+     * Por defecto, se inicializa en 0.0.
+     */
     private Double gradeAverage = 0.0;
 
+    /**
+     * Crea un nuevo estudiante con la información especificada.
+     *
+     * @param id               Identificador único del estudiante.
+     * @param name             Nombre del estudiante.
+     * @param email            Correo electrónico del estudiante.
+     * @param password         Contraseña del estudiante.
+     * @param academicProgram  Programa académico al que pertenece el estudiante.
+     * @param semester         Semestre actual del estudiante.
+     */
     public Student(String id, String name, String email, String password,
                    String academicProgram, Integer semester) {
         super(id, name, email, password, UserRole.STUDENT);

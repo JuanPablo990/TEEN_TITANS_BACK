@@ -2,7 +2,6 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.controller;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dto.ProfessorDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Professor;
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.service.ProfessorService;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar las operaciones relacionadas con los profesores.
+ * Proporciona endpoints para crear, consultar, actualizar, eliminar y filtrar profesores.
+ */
 @RestController
 @RequestMapping("/api/professors")
 @CrossOrigin(origins = "*")
@@ -21,11 +24,22 @@ public class ProfessorController {
 
     private final ProfessorService professorService;
 
+    /**
+     * Constructor del controlador con inyección de dependencias.
+     *
+     * @param professorService servicio de profesores
+     */
     @Autowired
     public ProfessorController(ProfessorService professorService) {
         this.professorService = professorService;
     }
 
+    /**
+     * Crea un nuevo profesor en el sistema.
+     *
+     * @param professorDTO datos del profesor a crear
+     * @return respuesta HTTP con el profesor creado o error
+     */
     @PostMapping
     public ResponseEntity<?> createProfessor(@RequestBody ProfessorDTO professorDTO) {
         try {
@@ -42,6 +56,12 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Obtiene un profesor por su identificador.
+     *
+     * @param id identificador del profesor
+     * @return respuesta HTTP con los datos del profesor o error
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getProfessorById(@PathVariable String id) {
         try {
@@ -57,6 +77,11 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Obtiene la lista completa de profesores.
+     *
+     * @return lista de profesores y cantidad total
+     */
     @GetMapping
     public ResponseEntity<?> getAllProfessors() {
         try {
@@ -75,6 +100,13 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Actualiza los datos de un profesor existente.
+     *
+     * @param id identificador del profesor
+     * @param professorDTO datos actualizados
+     * @return profesor actualizado o mensaje de error
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfessor(@PathVariable String id, @RequestBody ProfessorDTO professorDTO) {
         try {
@@ -91,6 +123,12 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Elimina un profesor por su identificador.
+     *
+     * @param id identificador del profesor
+     * @return mensaje de éxito o error
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProfessor(@PathVariable String id) {
         try {
@@ -108,6 +146,12 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Busca profesores por departamento.
+     *
+     * @param department nombre del departamento
+     * @return lista de profesores del departamento
+     */
     @GetMapping("/department/{department}")
     public ResponseEntity<?> findByDepartment(@PathVariable String department) {
         try {
@@ -127,6 +171,12 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Busca profesores por titularidad.
+     *
+     * @param isTenured indica si es titular
+     * @return lista de profesores filtrados
+     */
     @GetMapping("/tenured/{isTenured}")
     public ResponseEntity<?> findByTenured(@PathVariable Boolean isTenured) {
         try {
@@ -146,6 +196,12 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Busca profesores por área de especialización.
+     *
+     * @param area área de especialización
+     * @return lista de profesores con dicha especialización
+     */
     @GetMapping("/expertise/{area}")
     public ResponseEntity<?> findByAreaOfExpertise(@PathVariable String area) {
         try {
@@ -165,6 +221,11 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Obtiene los profesores activos.
+     *
+     * @return lista de profesores activos
+     */
     @GetMapping("/active")
     public ResponseEntity<?> findActiveProfessors() {
         try {
@@ -183,12 +244,16 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Obtiene estadísticas generales de los profesores.
+     *
+     * @return mapa con estadísticas como cantidad total, titulares y activos
+     */
     @GetMapping("/stats")
     public ResponseEntity<?> getProfessorStats() {
         try {
             List<Professor> allProfessors = professorService.getAllProfessors();
             List<Professor> tenuredProfessors = professorService.findByTenured(true);
-            List<Professor> activeProfessors = professorService.findActiveProfessors();
 
             long activeCount = allProfessors.stream().filter(Professor::isActive).count();
             long inactiveCount = allProfessors.size() - activeCount;
@@ -209,7 +274,13 @@ public class ProfessorController {
         }
     }
 
-    // MÉTODOS ADICIONALES ÚTILES
+    /**
+     * Busca profesores por departamento y titularidad.
+     *
+     * @param department nombre del departamento
+     * @param isTenured  indicador de titularidad
+     * @return lista de profesores filtrados
+     */
     @GetMapping("/department/{department}/tenured/{isTenured}")
     public ResponseEntity<?> findByDepartmentAndTenured(@PathVariable String department, @PathVariable Boolean isTenured) {
         try {
@@ -230,6 +301,12 @@ public class ProfessorController {
         }
     }
 
+    /**
+     * Busca profesores cuyo nombre contenga una cadena específica.
+     *
+     * @param name parte del nombre
+     * @return lista de profesores cuyo nombre coincide parcialmente
+     */
     @GetMapping("/name/{name}")
     public ResponseEntity<?> findByNameContaining(@PathVariable String name) {
         try {
@@ -249,111 +326,22 @@ public class ProfessorController {
         }
     }
 
-    @GetMapping("/department-pattern/{pattern}")
-    public ResponseEntity<?> findByDepartmentPattern(@PathVariable String pattern) {
-        try {
-            List<Professor> professors = professorService.findByDepartmentPattern(pattern);
-            List<ProfessorDTO> professorDTOs = professors.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(Map.of(
-                    "pattern", pattern,
-                    "professors", professorDTOs,
-                    "count", professorDTOs.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al buscar profesores por patrón de departamento"));
-        }
-    }
-
-    @GetMapping("/expertise/in")
-    public ResponseEntity<?> findByAreasOfExpertiseIn(@RequestParam List<String> areas) {
-        try {
-            List<Professor> professors = professorService.findByAreasOfExpertiseIn(areas);
-            List<ProfessorDTO> professorDTOs = professors.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(Map.of(
-                    "areas", areas,
-                    "professors", professorDTOs,
-                    "count", professorDTOs.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al buscar profesores por áreas de especialización"));
-        }
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<?> searchProfessors(
-            @RequestParam(required = false) String department,
-            @RequestParam(required = false) Boolean tenured,
-            @RequestParam(required = false) Boolean active) {
-
-        try {
-            List<Professor> allProfessors = professorService.getAllProfessors();
-            List<Professor> filteredProfessors = allProfessors.stream()
-                    .filter(prof -> department == null || department.equals(prof.getDepartment()))
-                    .filter(prof -> tenured == null || tenured.equals(prof.getIsTenured()))
-                    .filter(prof -> active == null || active.equals(prof.isActive()))
-                    .collect(Collectors.toList());
-
-            List<ProfessorDTO> professorDTOs = filteredProfessors.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(Map.of(
-                    "searchCriteria", Map.of(
-                            "department", department,
-                            "tenured", tenured,
-                            "active", active
-                    ),
-                    "professors", professorDTOs,
-                    "count", professorDTOs.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error en la búsqueda de profesores"));
-        }
-    }
-
-    @GetMapping("/count/department/{department}")
-    public ResponseEntity<?> countByDepartment(@PathVariable String department) {
-        try {
-            long count = professorService.countByDepartment(department);
-            return ResponseEntity.ok(Map.of(
-                    "department", department,
-                    "count", count
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al contar profesores por departamento"));
-        }
-    }
-
-    @GetMapping("/count/tenured/{isTenured}")
-    public ResponseEntity<?> countByTenured(@PathVariable Boolean isTenured) {
-        try {
-            long count = professorService.countByTenured(isTenured);
-            return ResponseEntity.ok(Map.of(
-                    "tenured", isTenured,
-                    "count", count
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al contar profesores por titularidad"));
-        }
-    }
-
+    /**
+     * Verifica el estado del controlador.
+     *
+     * @return mensaje de estado
+     */
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("ProfessorController is working properly");
     }
 
-    // MÉTODOS DE CONVERSIÓN
+    /**
+     * Convierte un objeto DTO en una entidad {@link Professor}.
+     *
+     * @param dto objeto de transferencia de datos
+     * @return entidad {@link Professor}
+     */
     private Professor convertToEntity(ProfessorDTO dto) {
         Professor professor = new Professor();
         professor.setId(dto.getId());
@@ -362,17 +350,16 @@ public class ProfessorController {
         professor.setDepartment(dto.getDepartment());
         professor.setIsTenured(dto.getIsTenured());
         professor.setAreasOfExpertise(dto.getAreasOfExpertise());
-
-        // Campos con valores por defecto si son null
-        if (dto.getActive() != null) {
-            professor.setActive(dto.getActive());
-        } else {
-            professor.setActive(true);
-        }
-
+        professor.setActive(dto.getActive() != null ? dto.getActive() : true);
         return professor;
     }
 
+    /**
+     * Convierte una entidad {@link Professor} en un objeto {@link ProfessorDTO}.
+     *
+     * @param professor entidad de profesor
+     * @return objeto DTO
+     */
     private ProfessorDTO convertToDTO(Professor professor) {
         ProfessorDTO dto = new ProfessorDTO();
         dto.setId(professor.getId());

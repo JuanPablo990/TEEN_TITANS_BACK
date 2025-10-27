@@ -13,6 +13,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST encargado de manejar las operaciones CRUD y consultas avanzadas
+ * relacionadas con los estudiantes del sistema.
+ * <p>
+ * Permite crear, obtener, actualizar, eliminar y filtrar estudiantes
+ * según diversos criterios como programa académico, semestre, promedio y estado activo.
+ *
+ * @author
+ * @version 1.0
+ * @since 2025
+ */
 @RestController
 @RequestMapping("/api/students")
 @CrossOrigin(origins = "*")
@@ -20,11 +31,22 @@ public class StudentController {
 
     private final StudentService studentService;
 
+    /**
+     * Constructor que inyecta el servicio de estudiantes.
+     *
+     * @param studentService servicio de lógica de negocio para los estudiantes
+     */
     @Autowired
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
 
+    /**
+     * Crea un nuevo estudiante en el sistema.
+     *
+     * @param studentDTO datos del estudiante a registrar
+     * @return el estudiante creado o un mensaje de error
+     */
     @PostMapping
     public ResponseEntity<?> createStudent(@RequestBody StudentDTO studentDTO) {
         try {
@@ -41,6 +63,12 @@ public class StudentController {
         }
     }
 
+    /**
+     * Obtiene un estudiante específico por su identificador.
+     *
+     * @param id identificador único del estudiante
+     * @return el estudiante encontrado o un mensaje de error
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getStudentById(@PathVariable String id) {
         try {
@@ -56,6 +84,11 @@ public class StudentController {
         }
     }
 
+    /**
+     * Obtiene todos los estudiantes registrados en el sistema.
+     *
+     * @return lista de estudiantes y cantidad total
+     */
     @GetMapping
     public ResponseEntity<?> getAllStudents() {
         try {
@@ -73,6 +106,13 @@ public class StudentController {
         }
     }
 
+    /**
+     * Actualiza la información de un estudiante existente.
+     *
+     * @param id          identificador del estudiante
+     * @param studentDTO  datos actualizados del estudiante
+     * @return el estudiante actualizado o un mensaje de error
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateStudent(@PathVariable String id, @RequestBody StudentDTO studentDTO) {
         try {
@@ -89,6 +129,12 @@ public class StudentController {
         }
     }
 
+    /**
+     * Elimina un estudiante por su identificador.
+     *
+     * @param id identificador del estudiante a eliminar
+     * @return mensaje de confirmación o error
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteStudent(@PathVariable String id) {
         try {
@@ -106,6 +152,12 @@ public class StudentController {
         }
     }
 
+    /**
+     * Busca estudiantes por su programa académico.
+     *
+     * @param program nombre del programa académico
+     * @return lista de estudiantes pertenecientes al programa
+     */
     @GetMapping("/program/{program}")
     public ResponseEntity<?> findByAcademicProgram(@PathVariable String program) {
         try {
@@ -124,6 +176,12 @@ public class StudentController {
         }
     }
 
+    /**
+     * Busca estudiantes por semestre.
+     *
+     * @param semester número del semestre académico
+     * @return lista de estudiantes en el semestre especificado
+     */
     @GetMapping("/semester/{semester}")
     public ResponseEntity<?> findBySemester(@PathVariable Integer semester) {
         try {
@@ -142,6 +200,12 @@ public class StudentController {
         }
     }
 
+    /**
+     * Busca estudiantes cuyo promedio sea mayor que el valor especificado.
+     *
+     * @param grade promedio mínimo requerido
+     * @return lista de estudiantes con promedio mayor al indicado
+     */
     @GetMapping("/grade-average/greater-than/{grade}")
     public ResponseEntity<?> findByGradeAverageGreaterThan(@PathVariable Double grade) {
         try {
@@ -160,12 +224,17 @@ public class StudentController {
         }
     }
 
+    /**
+     * Obtiene todos los estudiantes activos y calcula su porcentaje respecto al total.
+     *
+     * @return lista de estudiantes activos, cantidad y porcentaje
+     */
     @GetMapping("/active")
     public ResponseEntity<?> getActiveStudents() {
         try {
             List<Student> allStudents = studentService.getAllStudents();
             List<Student> activeStudents = allStudents.stream()
-                    .filter(Student::isActive) // Usar isActive() porque es boolean
+                    .filter(Student::isActive)
                     .collect(Collectors.toList());
             List<StudentDTO> activeStudentDTOs = activeStudents.stream()
                     .map(this::convertToStudentDTO)
@@ -183,6 +252,12 @@ public class StudentController {
         }
     }
 
+    /**
+     * Genera estadísticas generales de los estudiantes del sistema.
+     * Incluye promedios, cantidad de activos, inactivos y agrupaciones.
+     *
+     * @return mapa con estadísticas globales
+     */
     @GetMapping("/statistics")
     public ResponseEntity<?> getStudentStatistics() {
         try {
@@ -218,6 +293,15 @@ public class StudentController {
         }
     }
 
+    /**
+     * Permite realizar búsquedas dinámicas de estudiantes según múltiples filtros opcionales.
+     *
+     * @param program  programa académico (opcional)
+     * @param semester semestre (opcional)
+     * @param minGrade promedio mínimo (opcional)
+     * @param active   estado de actividad (opcional)
+     * @return lista de estudiantes filtrados según los criterios ingresados
+     */
     @GetMapping("/search")
     public ResponseEntity<?> searchStudents(
             @RequestParam(required = false) String program,
@@ -231,7 +315,7 @@ public class StudentController {
                     .filter(s -> program == null || program.equals(s.getAcademicProgram()))
                     .filter(s -> semester == null || semester.equals(s.getSemester()))
                     .filter(s -> minGrade == null || (s.getGradeAverage() != null && s.getGradeAverage() >= minGrade))
-                    .filter(s -> active == null || active.equals(s.isActive())) // Usar isActive()
+                    .filter(s -> active == null || active.equals(s.isActive()))
                     .collect(Collectors.toList());
             List<StudentDTO> filteredDTOs = filteredStudents.stream()
                     .map(this::convertToStudentDTO)
@@ -253,31 +337,38 @@ public class StudentController {
         }
     }
 
+    /**
+     * Convierte un objeto DTO a entidad {@link Student}.
+     *
+     * @param studentDTO datos del estudiante
+     * @return entidad {@link Student}
+     */
     private Student convertToStudent(StudentDTO studentDTO) {
         Student student = new Student();
         student.setId(studentDTO.getId());
         student.setName(studentDTO.getName());
         student.setEmail(studentDTO.getEmail());
         student.setPassword(studentDTO.getPassword());
-        // El rol se setea a STUDENT en el servicio, pero por si acaso lo seteamos aquí también
-        // student.setRole(UserRole.STUDENT); // No hay setRole en Student? Sí, hereda de User.
-        // Pero en el servicio de creación se setea a STUDENT. Aquí no lo seteamos para no pisar.
         student.setActive(studentDTO.getActive() != null ? studentDTO.getActive() : true);
-        // Fechas: si no vienen, se setean en el servicio o en la entidad.
         student.setAcademicProgram(studentDTO.getAcademicProgram());
         student.setSemester(studentDTO.getSemester());
         student.setGradeAverage(studentDTO.getGradeAverage());
         return student;
     }
 
+    /**
+     * Convierte una entidad {@link Student} a un objeto {@link StudentDTO}.
+     *
+     * @param student entidad estudiante
+     * @return objeto DTO del estudiante
+     */
     private StudentDTO convertToStudentDTO(Student student) {
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setId(student.getId());
         studentDTO.setName(student.getName());
         studentDTO.setEmail(student.getEmail());
-        // No incluir password en el DTO de respuesta por seguridad
         studentDTO.setRole("STUDENT");
-        studentDTO.setActive(student.isActive()); // Usar isActive() porque es boolean
+        studentDTO.setActive(student.isActive());
         studentDTO.setCreatedAt(student.getCreatedAt());
         studentDTO.setUpdatedAt(student.getUpdatedAt());
         studentDTO.setAcademicProgram(student.getAcademicProgram());

@@ -14,6 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST encargado de la gestión de decanos en el sistema.
+ * Proporciona endpoints para la creación, consulta, actualización,
+ * eliminación, búsqueda avanzada y estadísticas relacionadas con los decanos.
+ *
+ * @author
+ * @version 1.0
+ * @since 2025
+ */
 @RestController
 @RequestMapping("/api/deans")
 @CrossOrigin(origins = "*")
@@ -21,11 +30,22 @@ public class DeanController {
 
     private final DeanService deanService;
 
+    /**
+     * Constructor para la inyección del servicio de decanos.
+     *
+     * @param deanService servicio de lógica de negocio para los decanos
+     */
     @Autowired
     public DeanController(DeanService deanService) {
         this.deanService = deanService;
     }
 
+    /**
+     * Crea un nuevo decano en el sistema.
+     *
+     * @param deanDTO objeto con los datos del decano a crear
+     * @return el decano creado o un mensaje de error
+     */
     @PostMapping
     public ResponseEntity<?> createDean(@RequestBody DeanDTO deanDTO) {
         try {
@@ -42,6 +62,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Obtiene un decano específico por su identificador.
+     *
+     * @param id identificador del decano
+     * @return el decano encontrado o mensaje de error
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getDeanById(@PathVariable String id) {
         try {
@@ -57,6 +83,11 @@ public class DeanController {
         }
     }
 
+    /**
+     * Obtiene todos los decanos registrados en el sistema.
+     *
+     * @return lista de decanos y cantidad total
+     */
     @GetMapping
     public ResponseEntity<?> getAllDeans() {
         try {
@@ -75,6 +106,13 @@ public class DeanController {
         }
     }
 
+    /**
+     * Actualiza la información de un decano existente.
+     *
+     * @param id identificador del decano
+     * @param deanDTO objeto con los nuevos datos del decano
+     * @return el decano actualizado o mensaje de error
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDean(@PathVariable String id, @RequestBody DeanDTO deanDTO) {
         try {
@@ -91,6 +129,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Elimina un decano por su identificador.
+     *
+     * @param id identificador del decano
+     * @return mensaje de confirmación o error
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDean(@PathVariable String id) {
         try {
@@ -108,6 +152,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Busca decanos por facultad.
+     *
+     * @param faculty nombre de la facultad
+     * @return lista de decanos de la facultad especificada
+     */
     @GetMapping("/faculty/{faculty}")
     public ResponseEntity<?> findByFaculty(@PathVariable String faculty) {
         try {
@@ -127,6 +177,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Busca decanos por ubicación de oficina.
+     *
+     * @param location ubicación de oficina
+     * @return lista de decanos encontrados
+     */
     @GetMapping("/office/{location}")
     public ResponseEntity<?> findByOfficeLocation(@PathVariable String location) {
         try {
@@ -146,6 +202,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Obtiene el decano asignado a una facultad específica.
+     *
+     * @param faculty nombre de la facultad
+     * @return el decano correspondiente o mensaje de error
+     */
     @GetMapping("/faculty/{faculty}/dean")
     public ResponseEntity<?> getDeanByFaculty(@PathVariable String faculty) {
         try {
@@ -161,7 +223,13 @@ public class DeanController {
         }
     }
 
-    // MÉTODOS ADICIONALES ÚTILES
+    /**
+     * Busca decanos por facultad y ubicación de oficina.
+     *
+     * @param faculty nombre de la facultad
+     * @param officeLocation ubicación de oficina
+     * @return lista de decanos filtrados
+     */
     @GetMapping("/faculty/{faculty}/office/{officeLocation}")
     public ResponseEntity<?> findByFacultyAndOfficeLocation(@PathVariable String faculty, @PathVariable String officeLocation) {
         try {
@@ -182,6 +250,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Busca decanos cuyos nombres coincidan parcialmente con el patrón proporcionado.
+     *
+     * @param name patrón de nombre
+     * @return lista de decanos coincidentes
+     */
     @GetMapping("/name/{name}")
     public ResponseEntity<?> findByNameContaining(@PathVariable String name) {
         try {
@@ -201,6 +275,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Busca decanos por patrón de facultad.
+     *
+     * @param pattern patrón de búsqueda
+     * @return lista de decanos que coinciden con el patrón
+     */
     @GetMapping("/faculty-pattern/{pattern}")
     public ResponseEntity<?> findByFacultyPattern(@PathVariable String pattern) {
         try {
@@ -220,6 +300,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Busca decanos por patrón de ubicación de oficina.
+     *
+     * @param pattern patrón de búsqueda
+     * @return lista de decanos que coinciden con el patrón
+     */
     @GetMapping("/office-pattern/{pattern}")
     public ResponseEntity<?> findByOfficeLocationPattern(@PathVariable String pattern) {
         try {
@@ -239,6 +325,11 @@ public class DeanController {
         }
     }
 
+    /**
+     * Obtiene la lista de decanos activos.
+     *
+     * @return lista de decanos activos y cantidad total
+     */
     @GetMapping("/active")
     public ResponseEntity<?> findActiveDeans() {
         try {
@@ -257,6 +348,14 @@ public class DeanController {
         }
     }
 
+    /**
+     * Realiza una búsqueda avanzada filtrando por facultad, oficina o estado activo.
+     *
+     * @param faculty facultad opcional
+     * @param officeLocation ubicación de oficina opcional
+     * @param active estado activo opcional
+     * @return lista filtrada de decanos
+     */
     @GetMapping("/search")
     public ResponseEntity<?> searchDeans(
             @RequestParam(required = false) String faculty,
@@ -290,6 +389,11 @@ public class DeanController {
         }
     }
 
+    /**
+     * Genera estadísticas generales sobre los decanos del sistema.
+     *
+     * @return métricas de actividad, distribución y conteos
+     */
     @GetMapping("/stats")
     public ResponseEntity<?> getDeanStatistics() {
         try {
@@ -319,6 +423,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Cuenta el número de decanos por facultad.
+     *
+     * @param faculty nombre de la facultad
+     * @return cantidad de decanos registrados en la facultad
+     */
     @GetMapping("/count/faculty/{faculty}")
     public ResponseEntity<?> countByFaculty(@PathVariable String faculty) {
         try {
@@ -333,6 +443,12 @@ public class DeanController {
         }
     }
 
+    /**
+     * Cuenta los decanos por ubicación de oficina.
+     *
+     * @param officeLocation ubicación de oficina
+     * @return cantidad de decanos encontrados
+     */
     @GetMapping("/count/office/{officeLocation}")
     public ResponseEntity<?> countByOfficeLocation(@PathVariable String officeLocation) {
         try {
@@ -347,6 +463,11 @@ public class DeanController {
         }
     }
 
+    /**
+     * Obtiene la lista de todas las facultades con decanos registrados.
+     *
+     * @return lista de nombres de facultades y cantidad total
+     */
     @GetMapping("/faculties")
     public ResponseEntity<?> getAllFaculties() {
         try {
@@ -366,12 +487,22 @@ public class DeanController {
         }
     }
 
+    /**
+     * Verifica el estado de funcionamiento del controlador.
+     *
+     * @return mensaje de confirmación de funcionamiento
+     */
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("DeanController is working properly");
     }
 
-    // MÉTODOS DE CONVERSIÓN
+    /**
+     * Convierte un DTO en una entidad {@link Dean}.
+     *
+     * @param dto objeto con los datos del decano
+     * @return entidad {@link Dean}
+     */
     private Dean convertToEntity(DeanDTO dto) {
         Dean dean = new Dean();
         dean.setId(dto.getId());
@@ -379,17 +510,20 @@ public class DeanController {
         dean.setEmail(dto.getEmail());
         dean.setFaculty(dto.getFaculty());
         dean.setOfficeLocation(dto.getOfficeLocation());
-
-        // Campos con valores por defecto si son null
         if (dto.getActive() != null) {
             dean.setActive(dto.getActive());
         } else {
             dean.setActive(true);
         }
-
         return dean;
     }
 
+    /**
+     * Convierte una entidad {@link Dean} en un DTO.
+     *
+     * @param dean entidad decano
+     * @return objeto {@link DeanDTO}
+     */
     private DeanDTO convertToDTO(Dean dean) {
         DeanDTO dto = new DeanDTO();
         dto.setId(dean.getId());

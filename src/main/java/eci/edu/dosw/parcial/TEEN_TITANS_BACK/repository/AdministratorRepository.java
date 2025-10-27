@@ -18,35 +18,28 @@ import java.util.List;
 @Repository
 public interface AdministratorRepository extends MongoRepository<Administrator, String> {
 
-    // Búsquedas por atributos específicos de Administrator
     List<Administrator> findByDepartment(String department);
 
-    // Búsquedas por departamento (parciales)
     List<Administrator> findByDepartmentContainingIgnoreCase(String department);
 
-    // Búsquedas por atributos heredados de User
     List<Administrator> findByName(String name);
     List<Administrator> findByEmail(String email);
     List<Administrator> findByNameContainingIgnoreCase(String name);
     List<Administrator> findByEmailContainingIgnoreCase(String email);
     List<Administrator> findByActive(boolean active);
 
-    // Búsquedas combinadas con atributos heredados
     List<Administrator> findByDepartmentAndActive(String department, boolean active);
     List<Administrator> findByNameAndDepartment(String name, String department);
     List<Administrator> findByEmailAndDepartment(String email, String department);
 
-    // Búsquedas con ordenamiento
     List<Administrator> findByOrderByNameAsc();
     List<Administrator> findByDepartmentOrderByNameAsc(String department);
     List<Administrator> findByOrderByDepartmentAsc();
 
-    // Consultas de conteo
     long countByDepartment(String department);
     long countByDepartmentAndActive(String department, boolean active);
     long countByActive(boolean active);
 
-    // Consultas personalizadas con @Query
     @Query("{ 'department': { $regex: ?0, $options: 'i' } }")
     List<Administrator> findByDepartmentRegex(String departmentPattern);
 
@@ -56,11 +49,9 @@ public interface AdministratorRepository extends MongoRepository<Administrator, 
     @Query("{ 'department': ?0, 'active': ?1 }")
     List<Administrator> findByDepartmentAndActiveStatus(String department, boolean active);
 
-    // Verificación de existencia
     boolean existsByDepartment(String department);
     boolean existsByEmail(String email);
     boolean existsByDepartmentAndActive(String department, boolean active);
 
-    // Búsqueda por múltiples departamentos
     List<Administrator> findByDepartmentIn(List<String> departments);
 }

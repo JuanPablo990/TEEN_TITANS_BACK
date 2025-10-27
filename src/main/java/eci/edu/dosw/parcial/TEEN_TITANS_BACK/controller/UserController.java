@@ -15,6 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST que gestiona las operaciones CRUD y consultas avanzadas
+ * relacionadas con los usuarios del sistema. Proporciona endpoints para
+ * crear, actualizar, eliminar, buscar y filtrar usuarios, así como estadísticas
+ * generales y verificación de correo electrónico.
+ *
+ * @author
+ * @version 1.0
+ * @since 2025-10
+ */
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
@@ -22,11 +32,22 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Constructor del controlador que inyecta la dependencia del servicio de usuarios.
+     *
+     * @param userService servicio que maneja la lógica de negocio relacionada con usuarios.
+     */
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Crea un nuevo usuario en el sistema.
+     *
+     * @param userDTO datos del usuario a registrar.
+     * @return respuesta HTTP con el usuario creado o un mensaje de error.
+     */
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
         try {
@@ -43,6 +64,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Obtiene un usuario por su identificador único.
+     *
+     * @param id identificador del usuario.
+     * @return usuario correspondiente o mensaje de error si no existe.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         try {
@@ -59,6 +86,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Obtiene la lista completa de usuarios registrados.
+     *
+     * @return lista de usuarios, su cantidad y marca temporal.
+     */
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {
@@ -78,6 +110,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Actualiza la información de un usuario existente.
+     *
+     * @param id identificador del usuario a actualizar.
+     * @param userDTO datos actualizados del usuario.
+     * @return usuario actualizado o mensaje de error.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
         try {
@@ -94,6 +133,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Elimina un usuario por su identificador.
+     *
+     * @param id identificador del usuario a eliminar.
+     * @return mensaje de confirmación o error.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         try {
@@ -112,6 +157,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Busca un usuario por su dirección de correo electrónico.
+     *
+     * @param email correo electrónico del usuario.
+     * @return usuario correspondiente o mensaje de error.
+     */
     @GetMapping("/email/{email}")
     public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
         try {
@@ -128,6 +179,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Obtiene los usuarios filtrados por rol.
+     *
+     * @param role nombre del rol a filtrar.
+     * @return lista de usuarios con el rol especificado.
+     */
     @GetMapping("/role/{role}")
     public ResponseEntity<?> getUsersByRole(@PathVariable String role) {
         try {
@@ -151,6 +208,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Activa un usuario inactivo.
+     *
+     * @param id identificador del usuario a activar.
+     * @return usuario activado o mensaje de error.
+     */
     @PutMapping("/{id}/activate")
     public ResponseEntity<?> activateUser(@PathVariable String id) {
         try {
@@ -169,6 +232,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Desactiva un usuario activo.
+     *
+     * @param id identificador del usuario a desactivar.
+     * @return usuario desactivado o mensaje de error.
+     */
     @PutMapping("/{id}/deactivate")
     public ResponseEntity<?> deactivateUser(@PathVariable String id) {
         try {
@@ -187,12 +256,15 @@ public class UserController {
         }
     }
 
+    /**
+     * Obtiene estadísticas generales sobre los usuarios registrados.
+     *
+     * @return mapa con totales, conteo por rol, y porcentaje de usuarios activos.
+     */
     @GetMapping("/statistics")
     public ResponseEntity<?> getUserStatistics() {
         try {
             List<User> allUsers = userService.getAllUsers();
-
-            // CORREGIDO: Usa isActive() en lugar de getActive()
             long activeCount = allUsers.stream().filter(User::isActive).count();
             long inactiveCount = allUsers.size() - activeCount;
 
@@ -213,6 +285,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Busca usuarios mediante filtros opcionales de rol y estado.
+     *
+     * @param role   rol a filtrar (opcional).
+     * @param active estado activo o inactivo (opcional).
+     * @return lista de usuarios filtrados según los parámetros.
+     */
     @GetMapping("/search")
     public ResponseEntity<?> searchUsers(
             @RequestParam(required = false) String role,
@@ -222,7 +301,6 @@ public class UserController {
             List<User> allUsers = userService.getAllUsers();
             List<User> filteredUsers = allUsers.stream()
                     .filter(user -> role == null || user.getRole().name().equalsIgnoreCase(role))
-                    // CORREGIDO: Usa isActive() en lugar de getActive()
                     .filter(user -> active == null || active.equals(user.isActive()))
                     .collect(Collectors.toList());
 
@@ -244,10 +322,15 @@ public class UserController {
         }
     }
 
+    /**
+     * Verifica si un correo electrónico ya está registrado en el sistema.
+     *
+     * @param email correo a verificar.
+     * @return resultado indicando si el correo existe o está disponible.
+     */
     @GetMapping("/check-email/{email}")
     public ResponseEntity<?> checkEmailExists(@PathVariable String email) {
         try {
-            // CORREGIDO: Usa existsByEmail en lugar de findByEmail
             boolean exists = userService.existsByEmail(email);
             return ResponseEntity.ok(Map.of(
                     "email", email,
@@ -260,7 +343,12 @@ public class UserController {
         }
     }
 
-    // MÉTODOS DE CONVERSIÓN
+    /**
+     * Convierte un objeto {@link UserDTO} a un objeto de dominio {@link User}.
+     *
+     * @param userDTO objeto de transferencia.
+     * @return entidad de usuario lista para persistencia.
+     */
     private User convertToUser(UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
@@ -285,14 +373,19 @@ public class UserController {
         return user;
     }
 
+    /**
+     * Convierte una entidad {@link User} a su representación {@link UserDTO}.
+     *
+     * @param user entidad de usuario.
+     * @return objeto de transferencia de datos.
+     */
     private UserDTO convertToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
-        // No incluir password por seguridad
         userDTO.setRole(user.getRole().name());
-        userDTO.setActive(user.isActive()); // CORREGIDO: usa isActive() para primitivo boolean
+        userDTO.setActive(user.isActive());
         userDTO.setCreatedAt(user.getCreatedAt());
         userDTO.setUpdatedAt(user.getUpdatedAt());
         return userDTO;

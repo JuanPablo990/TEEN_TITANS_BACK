@@ -14,6 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para la gestión de administradores dentro del sistema universitario.
+ * Proporciona endpoints para realizar operaciones CRUD, búsquedas, conteos
+ * y estadísticas sobre los administradores registrados en la base de datos.
+ *
+ * @author Equipo Teen Titans
+ * @version 1.0
+ * @since 2025
+ */
 @RestController
 @RequestMapping("/api/administrators")
 @CrossOrigin(origins = "*")
@@ -21,11 +30,22 @@ public class AdministratorController {
 
     private final AdministratorService administratorService;
 
+    /**
+     * Constructor para inyectar la dependencia del servicio de administradores.
+     *
+     * @param administratorService servicio encargado de la lógica de negocio de administradores
+     */
     @Autowired
     public AdministratorController(AdministratorService administratorService) {
         this.administratorService = administratorService;
     }
 
+    /**
+     * Crea un nuevo administrador en el sistema.
+     *
+     * @param administratorDTO datos del administrador a registrar
+     * @return el administrador creado o un mensaje de error
+     */
     @PostMapping
     public ResponseEntity<?> createAdministrator(@RequestBody AdministratorDTO administratorDTO) {
         try {
@@ -42,6 +62,12 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Obtiene un administrador por su identificador único.
+     *
+     * @param id identificador del administrador
+     * @return el administrador correspondiente o un mensaje de error
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdministratorById(@PathVariable String id) {
         try {
@@ -57,6 +83,11 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Obtiene la lista completa de administradores.
+     *
+     * @return lista de administradores y cantidad total
+     */
     @GetMapping
     public ResponseEntity<?> getAllAdministrators() {
         try {
@@ -75,6 +106,13 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Actualiza los datos de un administrador existente.
+     *
+     * @param id identificador del administrador a actualizar
+     * @param administratorDTO datos actualizados del administrador
+     * @return el administrador actualizado o un mensaje de error
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAdministrator(@PathVariable String id, @RequestBody AdministratorDTO administratorDTO) {
         try {
@@ -91,6 +129,12 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Elimina un administrador del sistema por su identificador.
+     *
+     * @param id identificador del administrador
+     * @return mensaje de confirmación o error
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAdministrator(@PathVariable String id) {
         try {
@@ -108,6 +152,12 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Busca administradores por departamento.
+     *
+     * @param department nombre del departamento
+     * @return lista de administradores del departamento
+     */
     @GetMapping("/department/{department}")
     public ResponseEntity<?> findByDepartment(@PathVariable String department) {
         try {
@@ -127,7 +177,12 @@ public class AdministratorController {
         }
     }
 
-    // MÉTODOS ADICIONALES ÚTILES
+    /**
+     * Busca administradores cuyos departamentos coincidan parcialmente con un patrón.
+     *
+     * @param pattern patrón de búsqueda
+     * @return lista de administradores que coinciden con el patrón
+     */
     @GetMapping("/department-pattern/{pattern}")
     public ResponseEntity<?> findByDepartmentContaining(@PathVariable String pattern) {
         try {
@@ -147,6 +202,12 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Busca administradores por coincidencia parcial de nombre.
+     *
+     * @param name patrón del nombre
+     * @return lista de administradores que coinciden con el nombre
+     */
     @GetMapping("/name/{name}")
     public ResponseEntity<?> findByNameContaining(@PathVariable String name) {
         try {
@@ -166,6 +227,11 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Obtiene todos los administradores activos.
+     *
+     * @return lista de administradores activos
+     */
     @GetMapping("/active")
     public ResponseEntity<?> findActiveAdministrators() {
         try {
@@ -184,6 +250,13 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Busca administradores por departamento y estado activo.
+     *
+     * @param department nombre del departamento
+     * @param active estado del administrador
+     * @return lista de administradores filtrados
+     */
     @GetMapping("/department/{department}/active/{active}")
     public ResponseEntity<?> findByDepartmentAndActive(@PathVariable String department, @PathVariable Boolean active) {
         try {
@@ -204,6 +277,13 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Realiza una búsqueda dinámica de administradores según criterios opcionales.
+     *
+     * @param department departamento opcional
+     * @param active estado activo opcional
+     * @return lista filtrada de administradores
+     */
     @GetMapping("/search")
     public ResponseEntity<?> searchAdministrators(
             @RequestParam(required = false) String department,
@@ -234,6 +314,11 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Obtiene estadísticas generales sobre los administradores registrados.
+     *
+     * @return métricas de distribución, actividad y conteo
+     */
     @GetMapping("/stats")
     public ResponseEntity<?> getAdministratorStatistics() {
         try {
@@ -259,6 +344,12 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Cuenta el número de administradores por departamento.
+     *
+     * @param department nombre del departamento
+     * @return cantidad de administradores en el departamento
+     */
     @GetMapping("/count/department/{department}")
     public ResponseEntity<?> countByDepartment(@PathVariable String department) {
         try {
@@ -273,6 +364,13 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Cuenta el número de administradores en un departamento según su estado.
+     *
+     * @param department departamento a evaluar
+     * @param active estado activo/inactivo
+     * @return cantidad de administradores filtrados
+     */
     @GetMapping("/count/department/{department}/active/{active}")
     public ResponseEntity<?> countByDepartmentAndActive(@PathVariable String department, @PathVariable Boolean active) {
         try {
@@ -288,6 +386,11 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Obtiene la lista de todos los departamentos con administradores registrados.
+     *
+     * @return lista de nombres de departamentos y cantidad total
+     */
     @GetMapping("/departments")
     public ResponseEntity<?> getAllDepartments() {
         try {
@@ -307,6 +410,12 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Cuenta administradores que coincidan con un patrón de nombre de departamento.
+     *
+     * @param pattern patrón de búsqueda
+     * @return cantidad de administradores coincidentes
+     */
     @GetMapping("/department-pattern/{pattern}/count")
     public ResponseEntity<?> countByDepartmentPattern(@PathVariable String pattern) {
         try {
@@ -321,29 +430,42 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Endpoint de verificación del estado del controlador.
+     *
+     * @return mensaje de confirmación de funcionamiento
+     */
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("AdministratorController is working properly");
     }
 
-    // MÉTODOS DE CONVERSIÓN
+    /**
+     * Convierte un DTO en una entidad de tipo {@link Administrator}.
+     *
+     * @param dto objeto de transferencia de datos
+     * @return entidad {@link Administrator}
+     */
     private Administrator convertToEntity(AdministratorDTO dto) {
         Administrator administrator = new Administrator();
         administrator.setId(dto.getId());
         administrator.setName(dto.getName());
         administrator.setEmail(dto.getEmail());
         administrator.setDepartment(dto.getDepartment());
-
-        // Campos con valores por defecto si son null
         if (dto.getActive() != null) {
             administrator.setActive(dto.getActive());
         } else {
             administrator.setActive(true);
         }
-
         return administrator;
     }
 
+    /**
+     * Convierte una entidad {@link Administrator} a su respectivo DTO.
+     *
+     * @param administrator entidad a convertir
+     * @return objeto {@link AdministratorDTO}
+     */
     private AdministratorDTO convertToDTO(Administrator administrator) {
         AdministratorDTO dto = new AdministratorDTO();
         dto.setId(administrator.getId());
