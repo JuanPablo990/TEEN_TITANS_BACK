@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Permite crear, obtener, actualizar, eliminar y filtrar estudiantes
  * según diversos criterios como programa académico, semestre, promedio y estado activo.
  *
- * @author
+ * @author Teen Titans
  * @version 1.0
  * @since 2025
  */

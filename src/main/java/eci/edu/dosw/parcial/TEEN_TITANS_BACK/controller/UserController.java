@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * crear, actualizar, eliminar, buscar y filtrar usuarios, así como estadísticas
  * generales y verificación de correo electrónico.
  *
- * @author
+ * @author Equipo Teen Titans
  * @version 1.0
  * @since 2025-10
  */

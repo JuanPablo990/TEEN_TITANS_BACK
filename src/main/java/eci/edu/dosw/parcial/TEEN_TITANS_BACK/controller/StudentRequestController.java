@@ -29,13 +29,22 @@ public class StudentRequestController {
     private final StudentRequestService studentRequestService;
     private static final int MAX_PENDING_REQUESTS = 3;
 
+    /**
+     * Constructor del controlador de solicitudes estudiantiles.
+     *
+     * @param studentRequestService el servicio de solicitudes estudiantiles
+     */
     @Autowired
     public StudentRequestController(StudentRequestService studentRequestService) {
         this.studentRequestService = studentRequestService;
     }
 
-    // ========== ENDPOINTS DE ESTUDIANTES ==========
-
+    /**
+     * Obtiene la tasa de aprobación de un estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con la tasa de aprobación
+     */
     @GetMapping("/students/{studentId}/approval-rate")
     public ResponseEntity<?> getStudentApprovalRate(@PathVariable String studentId) {
         try {
@@ -48,6 +57,12 @@ public class StudentRequestController {
         }
     }
 
+    /**
+     * Obtiene las solicitudes pendientes de un estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con las solicitudes pendientes
+     */
     @GetMapping("/students/{studentId}/pending-requests")
     public ResponseEntity<?> getPendingRequestsStatus(@PathVariable String studentId) {
         try {
@@ -60,6 +75,12 @@ public class StudentRequestController {
         }
     }
 
+    /**
+     * Obtiene las métricas de solicitudes de un estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con las métricas del estudiante
+     */
     @GetMapping("/students/{studentId}/metrics")
     public ResponseEntity<?> getStudentRequestMetrics(@PathVariable String studentId) {
         try {
@@ -73,6 +94,13 @@ public class StudentRequestController {
         }
     }
 
+    /**
+     * Verifica la elegibilidad para nueva solicitud.
+     *
+     * @param studentId el ID del estudiante
+     * @param requestType el tipo de solicitud
+     * @return ResponseEntity con la información de elegibilidad
+     */
     @GetMapping("/students/{studentId}/new-request-eligibility")
     public ResponseEntity<?> getNewRequestEligibility(@PathVariable String studentId,
                                                       @RequestParam String requestType) {
@@ -87,8 +115,12 @@ public class StudentRequestController {
         }
     }
 
-    // ========== ENDPOINTS DE SOLICITUDES ==========
-
+    /**
+     * Obtiene la posición de prioridad de una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity con la posición de prioridad
+     */
     @GetMapping("/requests/{requestId}/priority-position")
     public ResponseEntity<?> getRequestPriorityPosition(@PathVariable String requestId) {
         try {
@@ -101,6 +133,12 @@ public class StudentRequestController {
         }
     }
 
+    /**
+     * Obtiene grupos alternativos recomendados.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity con los grupos alternativos
+     */
     @GetMapping("/requests/{requestId}/alternative-groups")
     public ResponseEntity<?> getRecommendedAlternativeGroups(@PathVariable String requestId) {
         try {
@@ -113,6 +151,12 @@ public class StudentRequestController {
         }
     }
 
+    /**
+     * Obtiene el tiempo de espera estimado de una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity con el tiempo de espera estimado
+     */
     @GetMapping("/requests/{requestId}/estimated-wait-time")
     public ResponseEntity<?> getRequestEstimatedWaitTime(@PathVariable String requestId) {
         try {
@@ -125,6 +169,12 @@ public class StudentRequestController {
         }
     }
 
+    /**
+     * Verifica si una solicitud puede ser cancelada.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity con la elegibilidad de cancelación
+     */
     @GetMapping("/requests/{requestId}/cancel-eligibility")
     public ResponseEntity<?> canCancelRequest(@PathVariable String requestId) {
         try {
@@ -137,6 +187,12 @@ public class StudentRequestController {
         }
     }
 
+    /**
+     * Obtiene los detalles del estado de una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity con los detalles del estado
+     */
     @GetMapping("/requests/{requestId}/status-details")
     public ResponseEntity<?> getRequestStatusDetails(@PathVariable String requestId) {
         try {
@@ -154,8 +210,12 @@ public class StudentRequestController {
         }
     }
 
-    // ========== ENDPOINTS GENERALES ==========
-
+    /**
+     * Obtiene los documentos requeridos para un tipo de solicitud.
+     *
+     * @param requestType el tipo de solicitud
+     * @return ResponseEntity con los documentos requeridos
+     */
     @GetMapping("/required-documents")
     public ResponseEntity<?> getRequiredDocuments(@RequestParam String requestType) {
         try {
@@ -166,8 +226,13 @@ public class StudentRequestController {
         }
     }
 
-    // ========== MÉTODOS DE CONSTRUCCIÓN DE RESPUESTAS ==========
-
+    /**
+     * Construye la respuesta de tasa de aprobación.
+     *
+     * @param studentId el ID del estudiante
+     * @param approvalRate la tasa de aprobación
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildApprovalRateResponse(String studentId, double approvalRate) {
         Map<String, Object> response = new HashMap<>();
         response.put("studentId", studentId);
@@ -176,6 +241,13 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de solicitudes pendientes.
+     *
+     * @param studentId el ID del estudiante
+     * @param pendingRequests las solicitudes pendientes
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildPendingRequestsResponse(String studentId, List<ScheduleChangeRequest> pendingRequests) {
         Map<String, Object> response = new HashMap<>();
         response.put("studentId", studentId);
@@ -184,6 +256,13 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de posición de prioridad.
+     *
+     * @param requestId el ID de la solicitud
+     * @param position la posición de prioridad
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildPriorityPositionResponse(String requestId, int position) {
         Map<String, Object> response = new HashMap<>();
         response.put("requestId", requestId);
@@ -194,6 +273,13 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de grupos alternativos.
+     *
+     * @param requestId el ID de la solicitud
+     * @param alternativeGroups los grupos alternativos
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildAlternativeGroupsResponse(String requestId, List<Group> alternativeGroups) {
         Map<String, Object> response = new HashMap<>();
         response.put("requestId", requestId);
@@ -205,6 +291,13 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de tiempo de espera.
+     *
+     * @param requestId el ID de la solicitud
+     * @param estimatedWaitTime el tiempo de espera estimado
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildWaitTimeResponse(String requestId, String estimatedWaitTime) {
         Map<String, Object> response = new HashMap<>();
         response.put("requestId", requestId);
@@ -212,6 +305,13 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de elegibilidad de cancelación.
+     *
+     * @param requestId el ID de la solicitud
+     * @param canCancel si puede ser cancelada
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildCancelEligibilityResponse(String requestId, boolean canCancel) {
         Map<String, Object> response = new HashMap<>();
         response.put("requestId", requestId);
@@ -222,6 +322,13 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de documentos requeridos.
+     *
+     * @param requestType el tipo de solicitud
+     * @param documents los documentos requeridos
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildRequiredDocumentsResponse(String requestType, List<String> documents) {
         Map<String, Object> response = new HashMap<>();
         response.put("requestType", requestType);
@@ -230,6 +337,16 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de detalles del estado.
+     *
+     * @param requestId el ID de la solicitud
+     * @param priorityPosition la posición de prioridad
+     * @param estimatedWaitTime el tiempo de espera estimado
+     * @param canCancel si puede ser cancelada
+     * @param alternativeGroups los grupos alternativos
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildStatusDetailsResponse(String requestId, int priorityPosition,
                                                            String estimatedWaitTime, boolean canCancel,
                                                            List<Group> alternativeGroups) {
@@ -244,6 +361,14 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de métricas del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @param approvalRate la tasa de aprobación
+     * @param pendingRequests las solicitudes pendientes
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildStudentMetricsResponse(String studentId, double approvalRate,
                                                             List<ScheduleChangeRequest> pendingRequests) {
         Map<String, Object> response = new HashMap<>();
@@ -257,6 +382,15 @@ public class StudentRequestController {
         return response;
     }
 
+    /**
+     * Construye la respuesta de elegibilidad.
+     *
+     * @param studentId el ID del estudiante
+     * @param requestType el tipo de solicitud
+     * @param pendingRequests las solicitudes pendientes
+     * @param requiredDocuments los documentos requeridos
+     * @return mapa con la respuesta
+     */
     private Map<String, Object> buildEligibilityResponse(String studentId, String requestType,
                                                          List<ScheduleChangeRequest> pendingRequests,
                                                          List<String> requiredDocuments) {
@@ -277,16 +411,35 @@ public class StudentRequestController {
         return response;
     }
 
-    // ========== MÉTODOS AUXILIARES ==========
-
+    /**
+     * Construye una respuesta de error 404.
+     *
+     * @param message el mensaje de error
+     * @return ResponseEntity con el error
+     */
     private ResponseEntity<Map<String, String>> buildNotFoundResponse(String message) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", message));
     }
 
+    /**
+     * Construye una respuesta de error 500.
+     *
+     * @param message el mensaje de error
+     * @return ResponseEntity con el error
+     */
     private ResponseEntity<Map<String, String>> buildErrorResponse(String message) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", message));
     }
 
+    /**
+     * Genera un resumen del estado.
+     *
+     * @param priorityPosition la posición de prioridad
+     * @param estimatedWaitTime el tiempo de espera estimado
+     * @param canCancel si puede ser cancelada
+     * @param alternativeGroupsCount el número de grupos alternativos
+     * @return el resumen del estado
+     */
     private String generateStatusSummary(int priorityPosition, String estimatedWaitTime,
                                          boolean canCancel, int alternativeGroupsCount) {
         StringBuilder summary = new StringBuilder();
@@ -304,6 +457,12 @@ public class StudentRequestController {
         return summary.toString();
     }
 
+    /**
+     * Obtiene la calificación de rendimiento.
+     *
+     * @param approvalRate la tasa de aprobación
+     * @return la calificación de rendimiento
+     */
     private String getPerformanceRating(double approvalRate) {
         if (approvalRate >= 80) return "EXCELENTE";
         else if (approvalRate >= 60) return "BUENO";
@@ -311,6 +470,13 @@ public class StudentRequestController {
         else return "BAJO";
     }
 
+    /**
+     * Genera recomendaciones para el estudiante.
+     *
+     * @param approvalRate la tasa de aprobación
+     * @param pendingCount el número de solicitudes pendientes
+     * @return lista de recomendaciones
+     */
     private List<String> generateRecommendations(double approvalRate, int pendingCount) {
         List<String> recommendations = new ArrayList<>();
 

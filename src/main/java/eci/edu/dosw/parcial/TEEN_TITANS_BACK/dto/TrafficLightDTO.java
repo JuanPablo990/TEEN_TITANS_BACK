@@ -14,12 +14,12 @@ public class TrafficLightDTO {
     private Object data;
     private LocalDateTime timestamp;
 
-    // Constructor para éxito
+
     public static TrafficLightDTO success(Object data) {
         return new TrafficLightDTO(true, "Operación exitosa", data, LocalDateTime.now());
     }
 
-    // Constructor para error
+
     public static TrafficLightDTO error(String message) {
         return new TrafficLightDTO(false, message, null, LocalDateTime.now());
     }

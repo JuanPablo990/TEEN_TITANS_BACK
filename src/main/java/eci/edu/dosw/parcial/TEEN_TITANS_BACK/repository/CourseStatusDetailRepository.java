@@ -14,10 +14,6 @@ import java.util.Optional;
  * Repositorio para manejar las operaciones CRUD y consultas personalizadas
  * sobre la colección de detalles de estado de curso (CourseStatusDetail) en MongoDB.
  *
- * Este repositorio permite realizar búsquedas basadas en semestre, estado del curso,
- * aprobación y fechas, además de las operaciones CRUD básicas proporcionadas por
- * Spring Data.
- *
  * @author Equipo Teen Titans
  * @version 1.0
  * @since 2025
@@ -25,64 +21,92 @@ import java.util.Optional;
 @Repository
 public interface CourseStatusDetailRepository extends MongoRepository<CourseStatusDetail, String> {
 
-    // Búsquedas básicas por atributos individuales
     List<CourseStatusDetail> findBySemester(String semester);
+
     List<CourseStatusDetail> findByIsApproved(Boolean isApproved);
+
     List<CourseStatusDetail> findByStatus(CourseStatus status);
+
     List<CourseStatusDetail> findByGradeGreaterThanEqual(Double grade);
+
     List<CourseStatusDetail> findByCompletionDateBefore(Date completionDate);
+
     List<CourseStatusDetail> findByEnrollmentDateAfter(Date enrollmentDate);
 
-    // Búsquedas por referencias a otras entidades
     List<CourseStatusDetail> findByCourse_CourseCode(String courseCode);
+
     List<CourseStatusDetail> findByProfessor_Id(String professorId);
+
     List<CourseStatusDetail> findByGroup_GroupId(String groupId);
 
-    // CORRECCIÓN: Método principal para buscar por studentId - ESTÁ CORRECTO porque CourseStatusDetail TIENE studentId directo
     List<CourseStatusDetail> findByStudentId(String studentId);
 
-    // Búsquedas por rangos
     List<CourseStatusDetail> findByGradeBetween(Double minGrade, Double maxGrade);
+
     List<CourseStatusDetail> findByGradeLessThanEqual(Double grade);
+
     List<CourseStatusDetail> findByEnrollmentDateBetween(Date startDate, Date endDate);
+
     List<CourseStatusDetail> findByCompletionDateBetween(Date startDate, Date endDate);
+
     List<CourseStatusDetail> findByCreditsEarnedGreaterThanEqual(Integer creditsEarned);
+
     List<CourseStatusDetail> findByCreditsEarnedBetween(Integer minCredits, Integer maxCredits);
 
-    // Búsquedas combinadas - TODOS CORRECTOS porque CourseStatusDetail tiene studentId directo
     List<CourseStatusDetail> findByStudentIdAndSemester(String studentId, String semester);
+
     List<CourseStatusDetail> findByStudentIdAndStatus(String studentId, CourseStatus status);
+
     List<CourseStatusDetail> findByStudentIdAndIsApproved(String studentId, Boolean isApproved);
+
     List<CourseStatusDetail> findByCourse_CourseCodeAndSemester(String courseCode, String semester);
+
     List<CourseStatusDetail> findByCourse_CourseCodeAndStatus(String courseCode, CourseStatus status);
+
     List<CourseStatusDetail> findByProfessor_IdAndSemester(String professorId, String semester);
+
     List<CourseStatusDetail> findBySemesterAndStatus(String semester, CourseStatus status);
+
     List<CourseStatusDetail> findBySemesterAndIsApproved(String semester, Boolean isApproved);
+
     List<CourseStatusDetail> findByStudentIdAndCourse_CourseCode(String studentId, String courseCode);
+
     List<CourseStatusDetail> findByStudentIdAndSemesterAndStatus(String studentId, String semester, CourseStatus status);
 
-    // Búsquedas con ordenamiento - TODOS CORRECTOS
     List<CourseStatusDetail> findByStudentIdOrderBySemesterDesc(String studentId);
+
     List<CourseStatusDetail> findByStudentIdOrderByGradeDesc(String studentId);
+
     List<CourseStatusDetail> findByStudentIdOrderByEnrollmentDateDesc(String studentId);
+
     List<CourseStatusDetail> findByCourse_CourseCodeOrderByGradeDesc(String courseCode);
+
     List<CourseStatusDetail> findByProfessor_IdOrderBySemesterDesc(String professorId);
+
     List<CourseStatusDetail> findBySemesterOrderByGradeDesc(String semester);
+
     List<CourseStatusDetail> findByOrderByGradeDesc();
 
-    // Consultas de conteo - TODOS CORRECTOS
     long countByStudentId(String studentId);
+
     long countByStudentIdAndStatus(String studentId, CourseStatus status);
+
     long countByStudentIdAndIsApproved(String studentId, Boolean isApproved);
+
     long countByCourse_CourseCode(String courseCode);
+
     long countByCourse_CourseCodeAndStatus(String courseCode, CourseStatus status);
+
     long countByProfessor_Id(String professorId);
+
     long countBySemester(String semester);
+
     long countBySemesterAndStatus(String semester, CourseStatus status);
+
     long countByGradeGreaterThanEqual(Double grade);
+
     long countByIsApproved(Boolean isApproved);
 
-    // Consultas de promedio y sumatorias - TODOS CORRECTOS
     @Query(value = "{ 'studentId': ?0, 'isApproved': true }", fields = "{ 'grade': 1 }")
     List<CourseStatusDetail> findApprovedGradesByStudentId(String studentId);
 
@@ -92,7 +116,6 @@ public interface CourseStatusDetailRepository extends MongoRepository<CourseStat
     @Query(value = "{ 'studentId': ?0 }", count = true)
     long countTotalCoursesByStudentId(String studentId);
 
-    // Consultas personalizadas con @Query - TODOS CORRECTOS
     @Query("{ 'semester': { $regex: ?0, $options: 'i' } }")
     List<CourseStatusDetail> findBySemesterRegex(String semesterPattern);
 
@@ -120,7 +143,6 @@ public interface CourseStatusDetailRepository extends MongoRepository<CourseStat
     @Query("{ 'studentId': ?0, 'creditsEarned': { $gt: 0 } }")
     List<CourseStatusDetail> findCoursesWithCreditsByStudentId(String studentId);
 
-    // Consultas para análisis académico - TODOS CORRECTOS
     @Query("{ 'studentId': ?0, 'status': 'FAILED' }")
     List<CourseStatusDetail> findFailedCoursesByStudentId(String studentId);
 
@@ -130,27 +152,29 @@ public interface CourseStatusDetailRepository extends MongoRepository<CourseStat
     @Query("{ 'studentId': ?0, 'status': 'INCOMPLETE' }")
     List<CourseStatusDetail> findIncompleteCoursesByStudentId(String studentId);
 
-    // Verificación de existencia - TODOS CORRECTOS
     boolean existsByStudentIdAndCourse_CourseCode(String studentId, String courseCode);
+
     boolean existsByStudentIdAndCourse_CourseCodeAndStatus(String studentId, String courseCode, CourseStatus status);
+
     boolean existsByStudentIdAndSemester(String studentId, String semester);
+
     boolean existsByCourse_CourseCodeAndProfessor_Id(String courseCode, String professorId);
 
-    // Búsqueda por múltiples valores - TODOS CORRECTOS
     List<CourseStatusDetail> findByStudentIdIn(List<String> studentIds);
+
     List<CourseStatusDetail> findByCourse_CourseCodeIn(List<String> courseCodes);
+
     List<CourseStatusDetail> findByProfessor_IdIn(List<String> professorIds);
+
     List<CourseStatusDetail> findBySemesterIn(List<String> semesters);
+
     List<CourseStatusDetail> findByStatusIn(List<CourseStatus> statuses);
 
-    // Búsqueda de cursos actuales (en progreso o matriculados)
     @Query("{ 'studentId': ?0, 'status': { $in: ['ENROLLED', 'IN_PROGRESS'] } }")
     List<CourseStatusDetail> findCurrentCoursesByStudentId(String studentId);
 
-    // Búsqueda de cursos aprobados con créditos
     @Query("{ 'studentId': ?0, 'isApproved': true, 'creditsEarned': { $gt: 0 } }")
     List<CourseStatusDetail> findApprovedCoursesWithCreditsByStudentId(String studentId);
 
-    // Búsqueda de un registro específico
     Optional<CourseStatusDetail> findByStudentIdAndCourse_CourseCodeAndSemester(String studentId, String courseCode, String semester);
 }

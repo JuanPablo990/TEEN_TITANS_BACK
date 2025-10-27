@@ -14,6 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controlador REST para gestionar el semáforo académico de los estudiantes.
+ * Proporciona endpoints para consultar el estado académico, progreso curricular
+ * y riesgo académico de los estudiantes.
+ *
+ * @author Equipo Teen Titans
+ * @version 1.0
+ * @since 2025
+ */
 @RestController
 @RequestMapping("/api/traffic-light")
 @CrossOrigin(origins = "*")
@@ -21,11 +30,22 @@ public class TrafficLightController {
 
     private final TrafficLightService trafficLightService;
 
+    /**
+     * Constructor del controlador del semáforo académico.
+     *
+     * @param trafficLightService el servicio del semáforo académico
+     */
     @Autowired
     public TrafficLightController(TrafficLightService trafficLightService) {
         this.trafficLightService = trafficLightService;
     }
 
+    /**
+     * Obtiene el estado académico completo del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el DTO del estado académico completo
+     */
     @GetMapping("/{studentId}/complete-status")
     public ResponseEntity<TrafficLightDTO> getCompleteAcademicStatus(@PathVariable String studentId) {
         try {
@@ -69,6 +89,12 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Obtiene el semáforo académico del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el DTO del semáforo académico
+     */
     @GetMapping("/{studentId}/traffic-light")
     public ResponseEntity<TrafficLightDTO> getAcademicTrafficLight(@PathVariable String studentId) {
         try {
@@ -92,6 +118,12 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Obtiene el progreso curricular del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el DTO del progreso curricular
+     */
     @GetMapping("/{studentId}/curriculum-progress")
     public ResponseEntity<TrafficLightDTO> getCurriculumProgress(@PathVariable String studentId) {
         try {
@@ -126,6 +158,12 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Obtiene el porcentaje de avance curricular del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el DTO del porcentaje de avance
+     */
     @GetMapping("/{studentId}/progress-percentage")
     public ResponseEntity<TrafficLightDTO> getCurriculumProgressPercentage(@PathVariable String studentId) {
         try {
@@ -147,6 +185,12 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Verifica si el estudiante está en riesgo académico.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el DTO del estado de riesgo académico
+     */
     @GetMapping("/{studentId}/academic-risk")
     public ResponseEntity<TrafficLightDTO> isStudentAtAcademicRisk(@PathVariable String studentId) {
         try {
@@ -168,6 +212,12 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Obtiene los estudiantes en riesgo por programa académico.
+     *
+     * @param academicProgram el programa académico
+     * @return ResponseEntity con el DTO de estudiantes en riesgo
+     */
     @GetMapping("/program/{academicProgram}/at-risk")
     public ResponseEntity<TrafficLightDTO> getStudentsAtRiskByProgram(@PathVariable String academicProgram) {
         try {
@@ -191,6 +241,12 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Obtiene la descripción del estado del semáforo académico.
+     *
+     * @param trafficLight el color del semáforo
+     * @return la descripción del estado
+     */
     private String getStatusDescription(String trafficLight) {
         switch (trafficLight) {
             case "GREEN": return "Rendimiento académico satisfactorio";
@@ -200,6 +256,12 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Obtiene la descripción del progreso académico.
+     *
+     * @param percentage el porcentaje de avance
+     * @return la descripción del progreso
+     */
     private String getProgressDescription(Double percentage) {
         if (percentage == null) return "No disponible";
         if (percentage >= 90) return "Avance excelente";

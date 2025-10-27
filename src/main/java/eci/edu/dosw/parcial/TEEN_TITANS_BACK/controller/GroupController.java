@@ -15,11 +15,8 @@ import java.util.Map;
 
 /**
  * Controlador REST para operaciones básicas de consulta de grupos académicos.
- * <p>
  * Proporciona endpoints de solo lectura para consultar información de grupos,
- * cursos, capacidades y listas de espera. Estas operaciones pueden ser utilizadas
- * por diferentes roles del sistema (estudiantes, profesores, coordinadores).
- * </p>
+ * cursos, capacidades y listas de espera.
  *
  * @author Equipo Teen Titans
  * @version 2.0
@@ -35,6 +32,9 @@ public class GroupController {
 
     /**
      * Obtiene el curso asociado a un grupo específico.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con el curso asociado al grupo
      */
     @GetMapping("/{groupId}/course")
     public ResponseEntity<?> getCourse(@PathVariable String groupId) {
@@ -55,6 +55,9 @@ public class GroupController {
 
     /**
      * Obtiene la capacidad máxima del aula asignada al grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con la capacidad máxima del aula
      */
     @GetMapping("/{groupId}/max-capacity")
     public ResponseEntity<?> getMaxCapacity(@PathVariable String groupId) {
@@ -75,6 +78,9 @@ public class GroupController {
 
     /**
      * Calcula el número actual de estudiantes matriculados en el grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con el número de estudiantes matriculados
      */
     @GetMapping("/{groupId}/current-enrollment")
     public ResponseEntity<?> getCurrentEnrollment(@PathVariable String groupId) {
@@ -95,6 +101,9 @@ public class GroupController {
 
     /**
      * Devuelve la lista de solicitudes en espera asociadas al grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con la lista de solicitudes en espera
      */
     @GetMapping("/{groupId}/waiting-list")
     public ResponseEntity<?> getWaitingList(@PathVariable String groupId) {
@@ -115,6 +124,9 @@ public class GroupController {
 
     /**
      * Obtiene un mapa con el total de estudiantes inscritos por grupo dentro de un curso específico.
+     *
+     * @param courseCode el código del curso
+     * @return ResponseEntity con el mapa de inscripciones por grupo
      */
     @GetMapping("/courses/{courseCode}/enrollment-by-group")
     public ResponseEntity<?> getTotalEnrolledByCourse(@PathVariable String courseCode) {
@@ -135,6 +147,9 @@ public class GroupController {
 
     /**
      * Calcula la disponibilidad de cupos en un grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con la información de disponibilidad del grupo
      */
     @GetMapping("/{groupId}/availability")
     public ResponseEntity<?> getGroupAvailability(@PathVariable String groupId) {
@@ -144,11 +159,10 @@ public class GroupController {
             Integer currentEnrollment = adminGroupService.getCurrentEnrollment(groupId);
             Integer availableSpots = maxCapacity - currentEnrollment;
 
-            // Cálculo seguro del porcentaje de ocupación (evita división por cero y convierte long a int)
             int occupancyRate = 0;
             if (maxCapacity != null && maxCapacity > 0) {
                 double occupancyPercentage = ((double) currentEnrollment / maxCapacity) * 100;
-                occupancyRate = (int) Math.round(occupancyPercentage); // Cast explícito de long a int
+                occupancyRate = (int) Math.round(occupancyPercentage);
             }
 
             Map<String, Object> availability = Map.of(
@@ -174,6 +188,9 @@ public class GroupController {
 
     /**
      * Verifica si un grupo tiene cupos disponibles.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con la información de disponibilidad de cupos
      */
     @GetMapping("/{groupId}/has-available-spots")
     public ResponseEntity<?> hasAvailableSpots(@PathVariable String groupId) {
@@ -204,6 +221,9 @@ public class GroupController {
 
     /**
      * Obtiene información consolidada de un grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con la información completa del grupo
      */
     @GetMapping("/{groupId}/info")
     public ResponseEntity<?> getGroupInfo(@PathVariable String groupId) {
@@ -216,7 +236,6 @@ public class GroupController {
 
             int availableSpots = maxCapacity - currentEnrollment;
 
-            // Cálculo seguro del porcentaje de ocupación (evita división por cero)
             int occupancyRate = 0;
             if (maxCapacity != null && maxCapacity > 0) {
                 double occupancyPercentage = ((double) currentEnrollment / maxCapacity) * 100;
@@ -252,6 +271,8 @@ public class GroupController {
 
     /**
      * Endpoint de salud para verificar que el controlador está funcionando.
+     *
+     * @return ResponseEntity con el mensaje de estado
      */
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {

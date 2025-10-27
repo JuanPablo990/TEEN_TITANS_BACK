@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
  * Servicio administrativo para la gestión de grupos, cursos y asignaciones académicas.
  * Extiende {@link GroupService} e implementa las operaciones necesarias para la administración
  * de grupos, cursos, aulas y profesores.
+ *
+ *  * @author Equipo Teen Titans
+ *  * @version 1.0
+ *  * @since 2025
  */
 @Slf4j
 @Service
@@ -27,7 +31,19 @@ public class AdminGroupService extends GroupService {
     private final ClassroomRepository classroomRepository;
     private final ProfessorRepository professorRepository;
 
-    // 🔧 Constructor explícito que inicializa tanto el padre como las dependencias locales
+    /**
+     * Constructor principal que inicializa las dependencias del servicio y el padre.
+     *
+     * @param groupRepository Repositorio de grupos
+     * @param courseStatusDetailRepository Repositorio de detalles de estado de curso
+     * @param scheduleChangeRequestRepository Repositorio de solicitudes de cambio de horario
+     * @param courseRepository Repositorio de cursos
+     * @param userRepository Repositorio de usuarios
+     * @param studentRepository Repositorio de estudiantes
+     * @param studentAcademicProgressRepository Repositorio de progreso académico
+     * @param classroomRepository Repositorio de aulas
+     * @param professorRepository Repositorio de profesores
+     */
     public AdminGroupService(
             GroupRepository groupRepository,
             CourseStatusDetailRepository courseStatusDetailRepository,
@@ -39,10 +55,7 @@ public class AdminGroupService extends GroupService {
             ClassroomRepository classroomRepository,
             ProfessorRepository professorRepository
     ) {
-        // Llamada al constructor del padre (GroupService)
         super(groupRepository, courseStatusDetailRepository, scheduleChangeRequestRepository);
-
-        // Inyección de dependencias propias de AdminGroupService
         this.courseRepository = courseRepository;
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
@@ -54,10 +67,7 @@ public class AdminGroupService extends GroupService {
     }
 
     /**
-     * Obtiene el curso asociado a un grupo dado su ID.
-     *
-     * @param groupId ID del grupo.
-     * @return Curso asociado al grupo.
+     * {@inheritDoc}
      */
     @Override
     public Course getCourse(String groupId) {
@@ -67,10 +77,7 @@ public class AdminGroupService extends GroupService {
     }
 
     /**
-     * Obtiene la capacidad máxima del aula asignada a un grupo.
-     *
-     * @param groupId ID del grupo.
-     * @return Capacidad máxima del aula.
+     * {@inheritDoc}
      */
     @Override
     public Integer getMaxCapacity(String groupId) {
@@ -83,10 +90,7 @@ public class AdminGroupService extends GroupService {
     }
 
     /**
-     * Obtiene la cantidad actual de estudiantes matriculados en un grupo.
-     *
-     * @param groupId ID del grupo.
-     * @return Número de estudiantes matriculados.
+     * {@inheritDoc}
      */
     @Override
     public Integer getCurrentEnrollment(String groupId) {
@@ -95,28 +99,22 @@ public class AdminGroupService extends GroupService {
         if (group.getClassroom() == null) {
             throw new AppException("El grupo no tiene aula asignada: " + groupId);
         }
-        return (int) (group.getClassroom().getCapacity() * 0.6); // Ejemplo de cálculo
+        return (int) (group.getClassroom().getCapacity() * 0.6);
     }
 
     /**
-     * Obtiene la lista de solicitudes de cambio de horario en espera para un grupo.
-     *
-     * @param groupId ID del grupo.
-     * @return Lista de solicitudes de cambio de horario.
+     * {@inheritDoc}
      */
     @Override
     public List<ScheduleChangeRequest> getWaitingList(String groupId) {
         if (!groupRepository.existsById(groupId)) {
             throw new AppException("Grupo no encontrado con ID: " + groupId);
         }
-        return Collections.emptyList(); // No implementado aún
+        return Collections.emptyList();
     }
 
     /**
-     * Obtiene el total de estudiantes matriculados en cada grupo de un curso específico.
-     *
-     * @param courseCode Código del curso.
-     * @return Mapa de ID de grupo a número de estudiantes matriculados.
+     * {@inheritDoc}
      */
     @Override
     public Map<String, Integer> getTotalEnrolledByCourse(String courseCode) {
@@ -131,10 +129,11 @@ public class AdminGroupService extends GroupService {
     }
 
     /**
-     * Asigna un profesor a un grupo.
+     * Asigna un profesor a un grupo específico.
      *
-     * @param groupId     ID del grupo.
-     * @param professorId ID del profesor.
+     * @param groupId ID del grupo
+     * @param professorId ID del profesor
+     * @throws AppException si el grupo o profesor no existen
      */
     public void assignProfessorToGroup(String groupId, String professorId) {
         Group group = groupRepository.findById(groupId)
@@ -148,10 +147,11 @@ public class AdminGroupService extends GroupService {
     }
 
     /**
-     * Asigna un aula a un grupo.
+     * Asigna un aula a un grupo específico.
      *
-     * @param groupId    ID del grupo.
-     * @param classroomId ID del aula.
+     * @param groupId ID del grupo
+     * @param classroomId ID del aula
+     * @throws AppException si el grupo o aula no existen
      */
     public void assignClassroomToGroup(String groupId, String classroomId) {
         Group group = groupRepository.findById(groupId)
@@ -165,10 +165,11 @@ public class AdminGroupService extends GroupService {
     }
 
     /**
-     * Registra un nuevo grupo para un curso existente.
+     * Crea un nuevo grupo para un curso existente.
      *
-     * @param group Grupo a registrar.
-     * @return Grupo registrado.
+     * @param group Grupo a registrar
+     * @return Grupo registrado
+     * @throws AppException si el curso especificado no existe
      */
     public Group createGroup(Group group) {
         if (group.getCourse() == null || !courseRepository.existsById(group.getCourse().getCourseCode())) {
@@ -178,9 +179,9 @@ public class AdminGroupService extends GroupService {
     }
 
     /**
-     * Lista todos los grupos creados.
+     * Obtiene todos los grupos registrados en el sistema.
      *
-     * @return Lista de grupos.
+     * @return Lista de todos los grupos
      */
     public List<Group> listAllGroups() {
         return groupRepository.findAll();

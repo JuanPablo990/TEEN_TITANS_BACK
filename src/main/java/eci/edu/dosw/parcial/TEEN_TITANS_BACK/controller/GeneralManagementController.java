@@ -2,8 +2,6 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.controller;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.service.GeneralManagementService;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.*;
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.RoomType;
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,8 +28,12 @@ public class GeneralManagementController {
 
     private final GeneralManagementService generalManagementService;
 
-    // ========== ENDPOINTS DE ACADEMIC PERIOD ==========
-
+    /**
+     * Crea un nuevo período académico.
+     *
+     * @param academicPeriod el período académico a crear
+     * @return ResponseEntity con el período académico creado
+     */
     @PostMapping("/academic-periods")
     public ResponseEntity<AcademicPeriod> createAcademicPeriod(@RequestBody AcademicPeriod academicPeriod) {
         try {
@@ -44,6 +46,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene todos los períodos académicos.
+     *
+     * @return ResponseEntity con la lista de períodos académicos
+     */
     @GetMapping("/academic-periods")
     public ResponseEntity<List<AcademicPeriod>> getAllAcademicPeriods() {
         try {
@@ -56,6 +63,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene un período académico por su ID.
+     *
+     * @param periodId el ID del período académico
+     * @return ResponseEntity con el período académico encontrado
+     */
     @GetMapping("/academic-periods/{periodId}")
     public ResponseEntity<AcademicPeriod> getAcademicPeriodById(@PathVariable String periodId) {
         try {
@@ -68,6 +81,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene el período académico actual.
+     *
+     * @return ResponseEntity con el período académico actual
+     */
     @GetMapping("/academic-periods/current")
     public ResponseEntity<AcademicPeriod> getCurrentAcademicPeriod() {
         try {
@@ -80,6 +98,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Actualiza un período académico existente.
+     *
+     * @param periodId el ID del período académico a actualizar
+     * @param academicPeriod los nuevos datos del período académico
+     * @return ResponseEntity con el período académico actualizado
+     */
     @PutMapping("/academic-periods/{periodId}")
     public ResponseEntity<AcademicPeriod> updateAcademicPeriod(
             @PathVariable String periodId,
@@ -94,6 +119,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Elimina un período académico.
+     *
+     * @param periodId el ID del período académico a eliminar
+     * @return ResponseEntity sin contenido
+     */
     @DeleteMapping("/academic-periods/{periodId}")
     public ResponseEntity<Void> deleteAcademicPeriod(@PathVariable String periodId) {
         try {
@@ -106,6 +137,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Activa un período académico.
+     *
+     * @param periodId el ID del período académico a activar
+     * @return ResponseEntity con el período académico activado
+     */
     @PutMapping("/academic-periods/{periodId}/activate")
     public ResponseEntity<AcademicPeriod> activateAcademicPeriod(@PathVariable String periodId) {
         try {
@@ -118,8 +155,12 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE CLASSROOM ==========
-
+    /**
+     * Crea un nuevo aula.
+     *
+     * @param classroom el aula a crear
+     * @return ResponseEntity con el aula creada
+     */
     @PostMapping("/classrooms")
     public ResponseEntity<Classroom> createClassroom(@RequestBody Classroom classroom) {
         try {
@@ -132,6 +173,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene todas las aulas.
+     *
+     * @return ResponseEntity con la lista de aulas
+     */
     @GetMapping("/classrooms")
     public ResponseEntity<List<Classroom>> getAllClassrooms() {
         try {
@@ -144,6 +190,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene un aula por su ID.
+     *
+     * @param classroomId el ID del aula
+     * @return ResponseEntity con el aula encontrada
+     */
     @GetMapping("/classrooms/{classroomId}")
     public ResponseEntity<Classroom> getClassroomById(@PathVariable String classroomId) {
         try {
@@ -156,6 +208,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene aulas por tipo.
+     *
+     * @param roomType el tipo de aula
+     * @return ResponseEntity con la lista de aulas del tipo especificado
+     */
     @GetMapping("/classrooms/type/{roomType}")
     public ResponseEntity<List<Classroom>> getClassroomsByType(@PathVariable String roomType) {
         try {
@@ -168,6 +226,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene aulas por edificio.
+     *
+     * @param building el edificio
+     * @return ResponseEntity con la lista de aulas del edificio especificado
+     */
     @GetMapping("/classrooms/building/{building}")
     public ResponseEntity<List<Classroom>> getClassroomsByBuilding(@PathVariable String building) {
         try {
@@ -180,6 +244,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene aulas con capacidad mínima.
+     *
+     * @param minCapacity la capacidad mínima
+     * @return ResponseEntity con la lista de aulas que cumplen con la capacidad mínima
+     */
     @GetMapping("/classrooms/capacity/{minCapacity}")
     public ResponseEntity<List<Classroom>> getClassroomsWithMinCapacity(@PathVariable Integer minCapacity) {
         try {
@@ -192,6 +262,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Actualiza un aula existente.
+     *
+     * @param classroomId el ID del aula a actualizar
+     * @param classroom los nuevos datos del aula
+     * @return ResponseEntity con el aula actualizada
+     */
     @PutMapping("/classrooms/{classroomId}")
     public ResponseEntity<Classroom> updateClassroom(
             @PathVariable String classroomId,
@@ -206,6 +283,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Elimina un aula.
+     *
+     * @param classroomId el ID del aula a eliminar
+     * @return ResponseEntity sin contenido
+     */
     @DeleteMapping("/classrooms/{classroomId}")
     public ResponseEntity<Void> deleteClassroom(@PathVariable String classroomId) {
         try {
@@ -218,8 +301,12 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE COURSE ==========
-
+    /**
+     * Crea un nuevo curso.
+     *
+     * @param course el curso a crear
+     * @return ResponseEntity con el curso creado
+     */
     @PostMapping("/courses")
     public ResponseEntity<Course> createCourse(@RequestBody Course course) {
         try {
@@ -232,6 +319,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene todos los cursos.
+     *
+     * @return ResponseEntity con la lista de cursos
+     */
     @GetMapping("/courses")
     public ResponseEntity<List<Course>> getAllCourses() {
         try {
@@ -244,6 +336,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene un curso por su código.
+     *
+     * @param courseCode el código del curso
+     * @return ResponseEntity con el curso encontrado
+     */
     @GetMapping("/courses/{courseCode}")
     public ResponseEntity<Course> getCourseByCode(@PathVariable String courseCode) {
         try {
@@ -256,6 +354,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene los cursos activos.
+     *
+     * @return ResponseEntity con la lista de cursos activos
+     */
     @GetMapping("/courses/active")
     public ResponseEntity<List<Course>> getActiveCourses() {
         try {
@@ -268,6 +371,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene cursos por programa académico.
+     *
+     * @param academicProgram el programa académico
+     * @return ResponseEntity con la lista de cursos del programa especificado
+     */
     @GetMapping("/courses/program/{academicProgram}")
     public ResponseEntity<List<Course>> getCoursesByProgram(@PathVariable String academicProgram) {
         try {
@@ -280,6 +389,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Actualiza un curso existente.
+     *
+     * @param courseCode el código del curso a actualizar
+     * @param course los nuevos datos del curso
+     * @return ResponseEntity con el curso actualizado
+     */
     @PutMapping("/courses/{courseCode}")
     public ResponseEntity<Course> updateCourse(
             @PathVariable String courseCode,
@@ -294,6 +410,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Elimina un curso.
+     *
+     * @param courseCode el código del curso a eliminar
+     * @return ResponseEntity sin contenido
+     */
     @DeleteMapping("/courses/{courseCode}")
     public ResponseEntity<Void> deleteCourse(@PathVariable String courseCode) {
         try {
@@ -306,6 +428,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Cambia el estado de un curso.
+     *
+     * @param courseCode el código del curso
+     * @param active true para activar, false para desactivar
+     * @return ResponseEntity con el curso actualizado
+     */
     @PutMapping("/courses/{courseCode}/status")
     public ResponseEntity<Course> toggleCourseStatus(
             @PathVariable String courseCode,
@@ -320,8 +449,12 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE COURSE STATUS DETAIL ==========
-
+    /**
+     * Crea un nuevo detalle de estado de curso.
+     *
+     * @param courseStatusDetail el detalle de estado de curso a crear
+     * @return ResponseEntity con el detalle creado
+     */
     @PostMapping("/course-status-details")
     public ResponseEntity<CourseStatusDetail> createCourseStatusDetail(@RequestBody CourseStatusDetail courseStatusDetail) {
         try {
@@ -335,6 +468,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene todos los detalles de estado de curso.
+     *
+     * @return ResponseEntity con la lista de detalles de estado de curso
+     */
     @GetMapping("/course-status-details")
     public ResponseEntity<List<CourseStatusDetail>> getAllCourseStatusDetails() {
         try {
@@ -347,6 +485,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene un detalle de estado de curso por su ID.
+     *
+     * @param id el ID del detalle
+     * @return ResponseEntity con el detalle encontrado
+     */
     @GetMapping("/course-status-details/{id}")
     public ResponseEntity<CourseStatusDetail> getCourseStatusDetailById(@PathVariable String id) {
         try {
@@ -359,6 +503,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene detalles de estado de curso por estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con la lista de detalles del estudiante
+     */
     @GetMapping("/course-status-details/student/{studentId}")
     public ResponseEntity<List<CourseStatusDetail>> getCourseStatusDetailsByStudent(@PathVariable String studentId) {
         try {
@@ -371,6 +521,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene detalles de estado de curso por curso.
+     *
+     * @param courseCode el código del curso
+     * @return ResponseEntity con la lista de detalles del curso
+     */
     @GetMapping("/course-status-details/course/{courseCode}")
     public ResponseEntity<List<CourseStatusDetail>> getCourseStatusDetailsByCourse(@PathVariable String courseCode) {
         try {
@@ -383,6 +539,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene detalles de estado de curso por semestre.
+     *
+     * @param semester el semestre
+     * @return ResponseEntity con la lista de detalles del semestre
+     */
     @GetMapping("/course-status-details/semester/{semester}")
     public ResponseEntity<List<CourseStatusDetail>> getCourseStatusDetailsBySemester(@PathVariable String semester) {
         try {
@@ -395,6 +557,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Actualiza un detalle de estado de curso existente.
+     *
+     * @param id el ID del detalle a actualizar
+     * @param courseStatusDetail los nuevos datos del detalle
+     * @return ResponseEntity con el detalle actualizado
+     */
     @PutMapping("/course-status-details/{id}")
     public ResponseEntity<CourseStatusDetail> updateCourseStatusDetail(
             @PathVariable String id,
@@ -409,6 +578,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Elimina un detalle de estado de curso.
+     *
+     * @param id el ID del detalle a eliminar
+     * @return ResponseEntity sin contenido
+     */
     @DeleteMapping("/course-status-details/{id}")
     public ResponseEntity<Void> deleteCourseStatusDetail(@PathVariable String id) {
         try {
@@ -421,8 +596,12 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE GROUP ==========
-
+    /**
+     * Elimina un grupo.
+     *
+     * @param groupId el ID del grupo a eliminar
+     * @return ResponseEntity sin contenido
+     */
     @DeleteMapping("/groups/{groupId}")
     public ResponseEntity<Void> deleteGroup(@PathVariable String groupId) {
         try {
@@ -435,8 +614,12 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE REVIEW STEP ==========
-
+    /**
+     * Crea un nuevo paso de revisión.
+     *
+     * @param reviewStep el paso de revisión a crear
+     * @return ResponseEntity con el paso de revisión creado
+     */
     @PostMapping("/review-steps")
     public ResponseEntity<ReviewStep> createReviewStep(@RequestBody ReviewStep reviewStep) {
         try {
@@ -449,6 +632,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene todos los pasos de revisión.
+     *
+     * @return ResponseEntity con la lista de pasos de revisión
+     */
     @GetMapping("/review-steps")
     public ResponseEntity<List<ReviewStep>> getAllReviewSteps() {
         try {
@@ -461,6 +649,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene un paso de revisión por su ID.
+     *
+     * @param id el ID del paso de revisión
+     * @return ResponseEntity con el paso de revisión encontrado
+     */
     @GetMapping("/review-steps/{id}")
     public ResponseEntity<ReviewStep> getReviewStepById(@PathVariable String id) {
         try {
@@ -473,6 +667,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene pasos de revisión por usuario.
+     *
+     * @param userId el ID del usuario
+     * @return ResponseEntity con la lista de pasos de revisión del usuario
+     */
     @GetMapping("/review-steps/user/{userId}")
     public ResponseEntity<List<ReviewStep>> getReviewStepsByUser(@PathVariable String userId) {
         try {
@@ -485,6 +685,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene pasos de revisión por rol de usuario.
+     *
+     * @param userRole el rol del usuario
+     * @return ResponseEntity con la lista de pasos de revisión del rol
+     */
     @GetMapping("/review-steps/role/{userRole}")
     public ResponseEntity<List<ReviewStep>> getReviewStepsByUserRole(@PathVariable String userRole) {
         try {
@@ -497,8 +703,12 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE SCHEDULE ==========
-
+    /**
+     * Crea un nuevo horario.
+     *
+     * @param schedule el horario a crear
+     * @return ResponseEntity con el horario creado
+     */
     @PostMapping("/schedules")
     public ResponseEntity<Schedule> createSchedule(@RequestBody Schedule schedule) {
         try {
@@ -512,6 +722,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene todos los horarios.
+     *
+     * @return ResponseEntity con la lista de horarios
+     */
     @GetMapping("/schedules")
     public ResponseEntity<List<Schedule>> getAllSchedules() {
         try {
@@ -524,6 +739,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene un horario por su ID.
+     *
+     * @param scheduleId el ID del horario
+     * @return ResponseEntity con el horario encontrado
+     */
     @GetMapping("/schedules/{scheduleId}")
     public ResponseEntity<Schedule> getScheduleById(@PathVariable String scheduleId) {
         try {
@@ -536,6 +757,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene horarios por día de la semana.
+     *
+     * @param dayOfWeek el día de la semana
+     * @return ResponseEntity con la lista de horarios del día especificado
+     */
     @GetMapping("/schedules/day/{dayOfWeek}")
     public ResponseEntity<List<Schedule>> getSchedulesByDay(@PathVariable String dayOfWeek) {
         try {
@@ -548,6 +775,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Actualiza un horario existente.
+     *
+     * @param scheduleId el ID del horario a actualizar
+     * @param schedule los nuevos datos del horario
+     * @return ResponseEntity con el horario actualizado
+     */
     @PutMapping("/schedules/{scheduleId}")
     public ResponseEntity<Schedule> updateSchedule(
             @PathVariable String scheduleId,
@@ -562,6 +796,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Elimina un horario.
+     *
+     * @param scheduleId el ID del horario a eliminar
+     * @return ResponseEntity sin contenido
+     */
     @DeleteMapping("/schedules/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(@PathVariable String scheduleId) {
         try {
@@ -574,8 +814,12 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE STUDENT ACADEMIC PROGRESS ==========
-
+    /**
+     * Crea un nuevo progreso académico de estudiante.
+     *
+     * @param progress el progreso académico a crear
+     * @return ResponseEntity con el progreso académico creado
+     */
     @PostMapping("/student-academic-progress")
     public ResponseEntity<StudentAcademicProgress> createStudentAcademicProgress(@RequestBody StudentAcademicProgress progress) {
         try {
@@ -589,6 +833,11 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene todos los progresos académicos de estudiantes.
+     *
+     * @return ResponseEntity con la lista de progresos académicos
+     */
     @GetMapping("/student-academic-progress")
     public ResponseEntity<List<StudentAcademicProgress>> getAllStudentAcademicProgress() {
         try {
@@ -601,6 +850,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene un progreso académico por su ID.
+     *
+     * @param id el ID del progreso académico
+     * @return ResponseEntity con el progreso académico encontrado
+     */
     @GetMapping("/student-academic-progress/{id}")
     public ResponseEntity<StudentAcademicProgress> getStudentAcademicProgressById(@PathVariable String id) {
         try {
@@ -613,6 +868,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene el progreso académico por ID de estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el progreso académico del estudiante
+     */
     @GetMapping("/student-academic-progress/student/{studentId}")
     public ResponseEntity<StudentAcademicProgress> getStudentAcademicProgressByStudentId(@PathVariable String studentId) {
         try {
@@ -625,6 +886,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene progresos académicos por facultad.
+     *
+     * @param faculty la facultad
+     * @return ResponseEntity con la lista de progresos académicos de la facultad
+     */
     @GetMapping("/student-academic-progress/faculty/{faculty}")
     public ResponseEntity<List<StudentAcademicProgress>> getStudentAcademicProgressByFaculty(@PathVariable String faculty) {
         try {
@@ -637,6 +904,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Obtiene progresos académicos por programa académico.
+     *
+     * @param academicProgram el programa académico
+     * @return ResponseEntity con la lista de progresos académicos del programa
+     */
     @GetMapping("/student-academic-progress/program/{academicProgram}")
     public ResponseEntity<List<StudentAcademicProgress>> getStudentAcademicProgressByProgram(@PathVariable String academicProgram) {
         try {
@@ -649,6 +922,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Actualiza un progreso académico existente.
+     *
+     * @param id el ID del progreso académico a actualizar
+     * @param progress los nuevos datos del progreso académico
+     * @return ResponseEntity con el progreso académico actualizado
+     */
     @PutMapping("/student-academic-progress/{id}")
     public ResponseEntity<StudentAcademicProgress> updateStudentAcademicProgress(
             @PathVariable String id,
@@ -663,6 +943,12 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Elimina un progreso académico.
+     *
+     * @param id el ID del progreso académico a eliminar
+     * @return ResponseEntity sin contenido
+     */
     @DeleteMapping("/student-academic-progress/{id}")
     public ResponseEntity<Void> deleteStudentAcademicProgress(@PathVariable String id) {
         try {
@@ -675,8 +961,11 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE UTILIDAD ==========
-
+    /**
+     * Obtiene estadísticas del sistema.
+     *
+     * @return ResponseEntity con las estadísticas del sistema
+     */
     @GetMapping("/statistics")
     public ResponseEntity<GeneralManagementService.SystemStatistics> getSystemStatistics() {
         try {
@@ -689,6 +978,13 @@ public class GeneralManagementController {
         }
     }
 
+    /**
+     * Verifica la integridad referencial de una entidad.
+     *
+     * @param entityType el tipo de entidad
+     * @param entityId el ID de la entidad
+     * @return ResponseEntity con el resultado de la verificación
+     */
     @GetMapping("/integrity-check/{entityType}/{entityId}")
     public ResponseEntity<Boolean> checkReferentialIntegrity(
             @PathVariable String entityType,
@@ -703,8 +999,11 @@ public class GeneralManagementController {
         }
     }
 
-    // ========== ENDPOINTS DE HEALTH CHECK ==========
-
+    /**
+     * Verifica el estado del controlador.
+     *
+     * @return ResponseEntity con el mensaje de estado
+     */
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         log.info("Health check - General Management Controller está funcionando");

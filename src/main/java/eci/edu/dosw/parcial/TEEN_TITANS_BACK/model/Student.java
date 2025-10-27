@@ -22,21 +22,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Student extends User {
-
-    /**
-     * Programa académico al que pertenece el estudiante.
-     */
     private String academicProgram;
-
-    /**
-     * Semestre actual del estudiante.
-     */
     private Integer semester;
-
-    /**
-     * Promedio de calificaciones del estudiante.
-     * Por defecto, se inicializa en 0.0.
-     */
     private Double gradeAverage = 0.0;
 
     /**

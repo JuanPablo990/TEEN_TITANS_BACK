@@ -17,11 +17,10 @@ import java.util.Map;
 
 /**
  * Controlador REST para gestionar las solicitudes de cambio de horario académico.
+ * Permite crear, consultar, actualizar, eliminar y revisar solicitudes relacionadas
+ * con cambios de grupo o curso, así como obtener estadísticas e historial.
  *
- * <p>Permite crear, consultar, actualizar, eliminar y revisar solicitudes relacionadas
- * con cambios de grupo o curso, así como obtener estadísticas e historial.</p>
- *
- * @author Equipo Teen Titans
+ * @author C
  * @version 1.0
  * @since 2025
  */
@@ -34,8 +33,12 @@ public class RequestController {
 
     private final RequestService requestService;
 
-    // --- Creación de Solicitudes ---
-
+    /**
+     * Crea una solicitud de cambio de grupo.
+     *
+     * @param request la solicitud de cambio de grupo
+     * @return ResponseEntity con la solicitud creada
+     */
     @PostMapping("/group-change")
     public ResponseEntity<?> createGroupChangeRequest(@RequestBody GroupChangeRequest request) {
         try {
@@ -56,6 +59,12 @@ public class RequestController {
         }
     }
 
+    /**
+     * Crea una solicitud de cambio de curso.
+     *
+     * @param request la solicitud de cambio de curso
+     * @return ResponseEntity con la solicitud creada
+     */
     @PostMapping("/course-change")
     public ResponseEntity<?> createCourseChangeRequest(@RequestBody CourseChangeRequest request) {
         try {
@@ -76,8 +85,12 @@ public class RequestController {
         }
     }
 
-    // --- Consultas de Solicitudes ---
-
+    /**
+     * Obtiene el estado de una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity con el estado de la solicitud
+     */
     @GetMapping("/{requestId}/status")
     public ResponseEntity<?> getRequestStatus(@PathVariable String requestId) {
         try {
@@ -89,6 +102,12 @@ public class RequestController {
         }
     }
 
+    /**
+     * Obtiene el historial de solicitudes de un estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el historial de solicitudes
+     */
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getRequestHistory(@PathVariable String studentId) {
         try {
@@ -100,6 +119,12 @@ public class RequestController {
         }
     }
 
+    /**
+     * Obtiene el historial de decisiones de una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity con el historial de decisiones
+     */
     @GetMapping("/{requestId}/decision-history")
     public ResponseEntity<?> getDecisionHistory(@PathVariable String requestId) {
         try {
@@ -111,6 +136,12 @@ public class RequestController {
         }
     }
 
+    /**
+     * Verifica si hay alerta de capacidad para un grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con el estado de la alerta de capacidad
+     */
     @GetMapping("/groups/{groupId}/capacity-alert")
     public ResponseEntity<?> getGroupCapacityAlert(@PathVariable String groupId) {
         try {
@@ -122,6 +153,12 @@ public class RequestController {
         }
     }
 
+    /**
+     * Obtiene estadísticas de solicitudes de un estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con las estadísticas de solicitudes
+     */
     @GetMapping("/student/{studentId}/statistics")
     public ResponseEntity<?> getRequestStatistics(@PathVariable String studentId) {
         try {
@@ -133,8 +170,13 @@ public class RequestController {
         }
     }
 
-    // --- Acciones sobre Solicitudes ---
-
+    /**
+     * Actualiza una solicitud existente.
+     *
+     * @param requestId el ID de la solicitud
+     * @param updates los campos a actualizar
+     * @return ResponseEntity con la solicitud actualizada
+     */
     @PutMapping("/{requestId}")
     public ResponseEntity<?> updateRequest(@PathVariable String requestId,
                                            @RequestBody Map<String, Object> updates) {
@@ -147,6 +189,12 @@ public class RequestController {
         }
     }
 
+    /**
+     * Elimina una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @return ResponseEntity sin contenido si se elimina correctamente
+     */
     @DeleteMapping("/{requestId}")
     public ResponseEntity<?> deleteRequest(@PathVariable String requestId) {
         try {
@@ -162,6 +210,13 @@ public class RequestController {
         }
     }
 
+    /**
+     * Aprueba una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @param reviewRequest la información de la revisión
+     * @return ResponseEntity con la solicitud aprobada
+     */
     @PostMapping("/{requestId}/approve")
     public ResponseEntity<?> approveRequest(@PathVariable String requestId,
                                             @RequestBody ReviewActionRequest reviewRequest) {
@@ -179,6 +234,13 @@ public class RequestController {
         }
     }
 
+    /**
+     * Rechaza una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @param reviewRequest la información de la revisión
+     * @return ResponseEntity con la solicitud rechazada
+     */
     @PostMapping("/{requestId}/reject")
     public ResponseEntity<?> rejectRequest(@PathVariable String requestId,
                                            @RequestBody ReviewActionRequest reviewRequest) {
@@ -196,6 +258,13 @@ public class RequestController {
         }
     }
 
+    /**
+     * Cancela una solicitud.
+     *
+     * @param requestId el ID de la solicitud
+     * @param cancelRequest la información de cancelación
+     * @return ResponseEntity con la solicitud cancelada
+     */
     @PostMapping("/{requestId}/cancel")
     public ResponseEntity<?> cancelRequest(@PathVariable String requestId,
                                            @RequestBody CancelRequest cancelRequest) {
@@ -211,8 +280,9 @@ public class RequestController {
         }
     }
 
-    // --- DTOs Internos ---
-
+    /**
+     * DTO para solicitud de cambio de grupo.
+     */
     @Data
     public static class GroupChangeRequest {
         private String studentId;
@@ -221,6 +291,9 @@ public class RequestController {
         private String reason;
     }
 
+    /**
+     * DTO para solicitud de cambio de curso.
+     */
     @Data
     public static class CourseChangeRequest {
         private String studentId;
@@ -229,6 +302,9 @@ public class RequestController {
         private String reason;
     }
 
+    /**
+     * DTO para acción de revisión.
+     */
     @Data
     public static class ReviewActionRequest {
         private String reviewerId;
@@ -236,6 +312,9 @@ public class RequestController {
         private String comments;
     }
 
+    /**
+     * DTO para cancelación de solicitud.
+     */
     @Data
     public static class CancelRequest {
         private String studentId;

@@ -12,12 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controlador REST para operaciones administrativas de grupos, cursos y asignaciones académicas.
- * <p>
- * Proporciona endpoints para la gestión completa de grupos, cursos, profesores y estudiantes.
- * </p>
+ * Controlador REST para la gestión administrativa de grupos, cursos, profesores y aulas.
+ * Proporciona endpoints para crear grupos, asignar profesores o aulas, y consultar información
+ * académica relacionada.
  *
- * @author Equipo Teen Titans
+ * @author
  * @version 1.0
  */
 @RestController
@@ -28,12 +27,16 @@ public class AdminGroupController {
     @Autowired
     private AdminGroupService adminGroupService;
 
-    // Constantes para mensajes
     private static final String INTERNAL_SERVER_ERROR = "Error interno del servidor";
     private static final String NOT_FOUND = "Recurso no encontrado";
     private static final String SUCCESS = "Operación exitosa";
 
-    // --- Gestión de Grupos ---
+    /**
+     * Crea un nuevo grupo académico.
+     *
+     * @param group objeto {@link Group} con los datos del grupo a crear.
+     * @return respuesta con el grupo creado o un mensaje de error.
+     */
     @PostMapping("/groups")
     public ResponseEntity<?> createGroup(@RequestBody Group group) {
         try {
@@ -46,6 +49,11 @@ public class AdminGroupController {
         }
     }
 
+    /**
+     * Obtiene todos los grupos registrados.
+     *
+     * @return lista de grupos o mensaje de error.
+     */
     @GetMapping("/groups")
     public ResponseEntity<?> getAllGroups() {
         try {
@@ -56,7 +64,13 @@ public class AdminGroupController {
         }
     }
 
-    // --- Asignación de Profesores ---
+    /**
+     * Asigna un profesor a un grupo.
+     *
+     * @param groupId     identificador del grupo.
+     * @param professorId identificador del profesor.
+     * @return mensaje de éxito o error.
+     */
     @PutMapping("/groups/{groupId}/professor/{professorId}")
     public ResponseEntity<?> assignProfessorToGroup(@PathVariable String groupId,
                                                     @PathVariable String professorId) {
@@ -70,7 +84,13 @@ public class AdminGroupController {
         }
     }
 
-    // --- Asignación de Aulas ---
+    /**
+     * Asigna un aula a un grupo.
+     *
+     * @param groupId     identificador del grupo.
+     * @param classroomId identificador del aula.
+     * @return mensaje de éxito o error.
+     */
     @PutMapping("/groups/{groupId}/classroom/{classroomId}")
     public ResponseEntity<?> assignClassroomToGroup(@PathVariable String groupId,
                                                     @PathVariable String classroomId) {
@@ -84,7 +104,12 @@ public class AdminGroupController {
         }
     }
 
-    // --- Consultas de Grupos ---
+    /**
+     * Obtiene el curso asociado a un grupo.
+     *
+     * @param groupId identificador del grupo.
+     * @return objeto {@link Course} o mensaje de error.
+     */
     @GetMapping("/groups/{groupId}/course")
     public ResponseEntity<?> getCourse(@PathVariable String groupId) {
         try {
@@ -97,6 +122,12 @@ public class AdminGroupController {
         }
     }
 
+    /**
+     * Obtiene la capacidad máxima permitida de un grupo.
+     *
+     * @param groupId identificador del grupo.
+     * @return capacidad máxima o mensaje de error.
+     */
     @GetMapping("/groups/{groupId}/max-capacity")
     public ResponseEntity<?> getMaxCapacity(@PathVariable String groupId) {
         try {
@@ -109,6 +140,12 @@ public class AdminGroupController {
         }
     }
 
+    /**
+     * Obtiene la cantidad actual de estudiantes inscritos en un grupo.
+     *
+     * @param groupId identificador del grupo.
+     * @return número de inscripciones actuales o mensaje de error.
+     */
     @GetMapping("/groups/{groupId}/current-enrollment")
     public ResponseEntity<?> getCurrentEnrollment(@PathVariable String groupId) {
         try {
@@ -121,6 +158,12 @@ public class AdminGroupController {
         }
     }
 
+    /**
+     * Obtiene la lista de solicitudes en espera para un grupo.
+     *
+     * @param groupId identificador del grupo.
+     * @return lista de {@link ScheduleChangeRequest} o mensaje de error.
+     */
     @GetMapping("/groups/{groupId}/waiting-list")
     public ResponseEntity<?> getWaitingList(@PathVariable String groupId) {
         try {
@@ -133,6 +176,12 @@ public class AdminGroupController {
         }
     }
 
+    /**
+     * Obtiene el total de estudiantes inscritos en cada grupo de un curso.
+     *
+     * @param courseCode código del curso.
+     * @return mapa con el ID del grupo y su número de inscritos, o mensaje de error.
+     */
     @GetMapping("/courses/{courseCode}/enrollment-by-group")
     public ResponseEntity<?> getTotalEnrolledByCourse(@PathVariable String courseCode) {
         try {
@@ -145,12 +194,23 @@ public class AdminGroupController {
         }
     }
 
-    // --- Métodos auxiliares para respuestas de error ---
+    /**
+     * Genera una respuesta de error interno del servidor.
+     *
+     * @param operation descripción de la operación que falló.
+     * @return respuesta con código HTTP 500.
+     */
     private ResponseEntity<String> errorResponse(String operation) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(INTERNAL_SERVER_ERROR + " " + operation);
     }
 
+    /**
+     * Genera una respuesta de recurso no encontrado.
+     *
+     * @param message mensaje de error a mostrar.
+     * @return respuesta con código HTTP 404.
+     */
     private ResponseEntity<String> notFoundResponse(String message) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }

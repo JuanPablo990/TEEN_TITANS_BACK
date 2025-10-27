@@ -9,12 +9,23 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Servicio para la gestión de profesores del sistema.
+ * Proporciona operaciones CRUD y métodos de búsqueda para profesores.
+ */
 @Service
 public class ProfessorService {
 
     @Autowired
     private ProfessorRepository professorRepository;
 
+    /**
+     * Crea un nuevo profesor en el sistema.
+     *
+     * @param professor Profesor a crear
+     * @return Profesor creado
+     * @throws AppException si el email ya está registrado
+     */
     public Professor createProfessor(Professor professor) {
         if (professorRepository.existsByEmail(professor.getEmail())) {
             throw new AppException("El email ya está registrado: " + professor.getEmail());
@@ -24,15 +35,35 @@ public class ProfessorService {
         return professorRepository.save(professor);
     }
 
+    /**
+     * Obtiene un profesor por su ID.
+     *
+     * @param id ID del profesor
+     * @return Profesor encontrado
+     * @throws AppException si no se encuentra el profesor
+     */
     public Professor getProfessorById(String id) {
         return professorRepository.findById(id)
                 .orElseThrow(() -> new AppException("Profesor no encontrado con ID: " + id));
     }
 
+    /**
+     * Obtiene todos los profesores del sistema.
+     *
+     * @return Lista de todos los profesores
+     */
     public List<Professor> getAllProfessors() {
         return professorRepository.findAll();
     }
 
+    /**
+     * Actualiza la información de un profesor existente.
+     *
+     * @param id ID del profesor a actualizar
+     * @param professor Nuevos datos del profesor
+     * @return Profesor actualizado
+     * @throws AppException si el profesor no existe o el email está en uso
+     */
     public Professor updateProfessor(String id, Professor professor) {
         Professor existingProfessor = professorRepository.findById(id)
                 .orElseThrow(() -> new AppException("Profesor no encontrado con ID: " + id));
@@ -50,6 +81,12 @@ public class ProfessorService {
         return professorRepository.save(professor);
     }
 
+    /**
+     * Elimina un profesor del sistema.
+     *
+     * @param id ID del profesor a eliminar
+     * @throws AppException si el profesor no existe
+     */
     public void deleteProfessor(String id) {
         if (!professorRepository.existsById(id)) {
             throw new AppException("Profesor no encontrado con ID: " + id);
@@ -57,48 +94,102 @@ public class ProfessorService {
         professorRepository.deleteById(id);
     }
 
+    /**
+     * Busca profesores por departamento.
+     *
+     * @param department Departamento a buscar
+     * @return Lista de profesores del departamento
+     */
     public List<Professor> findByDepartment(String department) {
         return professorRepository.findByDepartment(department);
     }
 
+    /**
+     * Busca profesores por tipo de nombramiento (titular o no).
+     *
+     * @param isTenured Estado de titularidad
+     * @return Lista de profesores según titularidad
+     */
     public List<Professor> findByTenured(Boolean isTenured) {
         return professorRepository.findByIsTenured(isTenured);
     }
 
+    /**
+     * Busca profesores por área de especialización.
+     *
+     * @param area Área de especialización
+     * @return Lista de profesores con la especialización
+     */
     public List<Professor> findByAreaOfExpertise(String area) {
         return professorRepository.findByAreasOfExpertiseContaining(area);
     }
 
+    /**
+     * Busca profesores activos.
+     *
+     * @return Lista de profesores activos
+     */
     public List<Professor> findActiveProfessors() {
         return professorRepository.findByActive(true);
     }
 
+    /**
+     * Busca profesores por departamento y titularidad.
+     *
+     * @param department Departamento
+     * @param isTenured Titularidad
+     * @return Lista de profesores que cumplen ambos criterios
+     */
     public List<Professor> findByDepartmentAndTenured(String department, Boolean isTenured) {
         return professorRepository.findByDepartmentAndIsTenured(department, isTenured);
     }
 
+    /**
+     * Busca profesores por múltiples áreas de especialización.
+     *
+     * @param areas Lista de áreas de especialización
+     * @return Lista de profesores que tienen alguna de las especializaciones
+     */
     public List<Professor> findByAreasOfExpertiseIn(List<String> areas) {
         return professorRepository.findByAreasOfExpertiseIn(areas);
     }
 
+    /**
+     * Busca profesores por nombre (búsqueda parcial sin distinguir mayúsculas/minúsculas).
+     *
+     * @param name Texto del nombre a buscar
+     * @return Lista de profesores que coinciden con el nombre
+     */
     public List<Professor> findByNameContaining(String name) {
         return professorRepository.findByNameContainingIgnoreCase(name);
     }
 
-    // MÉTODO ELIMINADO porque no existe en el Repository
-    // public List<Professor> findByDepartmentContaining(String department) {
-    //     return professorRepository.findByDepartmentContainingIgnoreCase(department);
-    // }
-
-    // EN SU LUGAR, puedes usar este método con el Regex que SÍ existe:
+    /**
+     * Busca profesores por patrón de departamento usando regex.
+     *
+     * @param departmentPattern Patrón del departamento
+     * @return Lista de profesores que coinciden con el patrón
+     */
     public List<Professor> findByDepartmentPattern(String departmentPattern) {
         return professorRepository.findByDepartmentRegex(departmentPattern);
     }
 
+    /**
+     * Cuenta profesores por departamento.
+     *
+     * @param department Departamento a contar
+     * @return Número de profesores en el departamento
+     */
     public long countByDepartment(String department) {
         return professorRepository.countByDepartment(department);
     }
 
+    /**
+     * Cuenta profesores por titularidad.
+     *
+     * @param isTenured Titularidad a contar
+     * @return Número de profesores con la titularidad especificada
+     */
     public long countByTenured(Boolean isTenured) {
         return professorRepository.countByIsTenured(isTenured);
     }

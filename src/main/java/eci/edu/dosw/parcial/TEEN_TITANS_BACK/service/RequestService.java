@@ -13,7 +13,7 @@ import java.util.*;
 
 /**
  * Servicio para gestionar solicitudes de cambio de horario académico.
- * Refactorizado para mejor separación de responsabilidades y mantenibilidad.
+ * Proporciona funcionalidades para crear, aprobar, rechazar y consultar solicitudes de cambio.
  *
  * @author Equipo Teen Titans
  * @version 2.0
@@ -34,6 +34,15 @@ public class RequestService {
     private final RequestValidator requestValidator;
     private final RequestIdGenerator requestIdGenerator;
 
+    /**
+     * Constructor para la inyección de dependencias.
+     *
+     * @param scheduleChangeRequestRepository Repositorio de solicitudes de cambio
+     * @param reviewStepRepository Repositorio de pasos de revisión
+     * @param groupRepository Repositorio de grupos
+     * @param studentRepository Repositorio de estudiantes
+     * @param courseRepository Repositorio de cursos
+     */
     @Autowired
     public RequestService(ScheduleChangeRequestRepository scheduleChangeRequestRepository,
                           ReviewStepRepository reviewStepRepository,
@@ -49,10 +58,15 @@ public class RequestService {
         this.requestIdGenerator = new RequestIdGenerator();
     }
 
-    // ========== MÉTODOS PÚBLICOS PRINCIPALES ==========
-
     /**
      * Crea una solicitud de cambio de grupo para un estudiante.
+     *
+     * @param studentId ID del estudiante
+     * @param currentGroupId ID del grupo actual
+     * @param requestedGroupId ID del grupo solicitado
+     * @param reason Razón del cambio
+     * @return Solicitud de cambio creada
+     * @throws AppException si las validaciones fallan
      */
     public ScheduleChangeRequest createGroupChangeRequest(String studentId, String currentGroupId,
                                                           String requestedGroupId, String reason) {
@@ -72,6 +86,13 @@ public class RequestService {
 
     /**
      * Crea una solicitud de cambio de curso para un estudiante.
+     *
+     * @param studentId ID del estudiante
+     * @param currentCourseCode Código del curso actual
+     * @param requestedCourseCode Código del curso solicitado
+     * @param reason Razón del cambio
+     * @return Solicitud de cambio creada
+     * @throws AppException si las validaciones fallan
      */
     public ScheduleChangeRequest createCourseChangeRequest(String studentId, String currentCourseCode,
                                                            String requestedCourseCode, String reason) {
@@ -93,6 +114,13 @@ public class RequestService {
 
     /**
      * Aprueba una solicitud de cambio.
+     *
+     * @param requestId ID de la solicitud
+     * @param reviewerId ID del revisor
+     * @param reviewerRole Rol del revisor
+     * @param comments Comentarios de la aprobación
+     * @return Solicitud aprobada
+     * @throws AppException si no se puede aprobar por capacidad
      */
     public ScheduleChangeRequest approveRequest(String requestId, String reviewerId,
                                                 UserRole reviewerRole, String comments) {
@@ -112,6 +140,12 @@ public class RequestService {
 
     /**
      * Rechaza una solicitud de cambio.
+     *
+     * @param requestId ID de la solicitud
+     * @param reviewerId ID del revisor
+     * @param reviewerRole Rol del revisor
+     * @param comments Comentarios del rechazo
+     * @return Solicitud rechazada
      */
     public ScheduleChangeRequest rejectRequest(String requestId, String reviewerId,
                                                UserRole reviewerRole, String comments) {
@@ -126,6 +160,11 @@ public class RequestService {
 
     /**
      * Cancela una solicitud por parte del estudiante.
+     *
+     * @param requestId ID de la solicitud
+     * @param studentId ID del estudiante
+     * @return Solicitud cancelada
+     * @throws AppException si el estudiante no es el propietario o el estado no es cancelable
      */
     public ScheduleChangeRequest cancelRequest(String requestId, String studentId) {
         ScheduleChangeRequest request = findRequestById(requestId);
@@ -144,21 +183,43 @@ public class RequestService {
         return scheduleChangeRequestRepository.save(request);
     }
 
-    // ========== MÉTODOS DE CONSULTA ==========
-
+    /**
+     * Obtiene el estado de una solicitud.
+     *
+     * @param requestId ID de la solicitud
+     * @return Estado de la solicitud
+     */
     public RequestStatus getRequestStatus(String requestId) {
         return findRequestById(requestId).getStatus();
     }
 
+    /**
+     * Obtiene el historial de solicitudes de un estudiante.
+     *
+     * @param studentId ID del estudiante
+     * @return Lista de solicitudes ordenadas por fecha descendente
+     */
     public List<ScheduleChangeRequest> getRequestHistory(String studentId) {
         validateStudent(studentId);
         return scheduleChangeRequestRepository.findByStudentIdOrderBySubmissionDateDesc(studentId);
     }
 
+    /**
+     * Obtiene el historial de decisiones de una solicitud.
+     *
+     * @param requestId ID de la solicitud
+     * @return Lista de pasos de revisión
+     */
     public List<ReviewStep> getDecisionHistory(String requestId) {
         return findRequestById(requestId).getReviewHistory();
     }
 
+    /**
+     * Obtiene estadísticas de solicitudes de un estudiante.
+     *
+     * @param studentId ID del estudiante
+     * @return Mapa con estadísticas de solicitudes
+     */
     public Map<String, Object> getRequestStatistics(String studentId) {
         validateStudent(studentId);
         List<ScheduleChangeRequest> allRequests = scheduleChangeRequestRepository.findByStudentId(studentId);
@@ -174,6 +235,12 @@ public class RequestService {
         return stats;
     }
 
+    /**
+     * Verifica si un grupo tiene alerta de capacidad.
+     *
+     * @param groupId ID del grupo
+     * @return true si el grupo está cerca de su capacidad máxima
+     */
     public boolean getGroupCapacityAlert(String groupId) {
         Group group = validateGroup(groupId);
         Classroom classroom = group.getClassroom();
@@ -189,8 +256,14 @@ public class RequestService {
         return occupancyRate >= CAPACITY_ALERT_THRESHOLD;
     }
 
-    // ========== MÉTODOS DE ACTUALIZACIÓN ==========
-
+    /**
+     * Actualiza una solicitud existente.
+     *
+     * @param requestId ID de la solicitud
+     * @param updates Mapa con los campos a actualizar
+     * @return Solicitud actualizada
+     * @throws AppException si la solicitud está en estado final
+     */
     public ScheduleChangeRequest updateRequest(String requestId, Map<String, Object> updates) {
         ScheduleChangeRequest request = findRequestById(requestId);
 
@@ -205,6 +278,13 @@ public class RequestService {
         return scheduleChangeRequestRepository.save(request);
     }
 
+    /**
+     * Elimina una solicitud.
+     *
+     * @param requestId ID de la solicitud
+     * @return true si la eliminación fue exitosa
+     * @throws AppException si la solicitud no está en estado PENDING
+     */
     public boolean deleteRequest(String requestId) {
         ScheduleChangeRequest request = findRequestById(requestId);
 
@@ -216,8 +296,6 @@ public class RequestService {
         return true;
     }
 
-    // ========== MÉTODOS PRIVADOS DE APOYO ==========
-
     private ScheduleChangeRequest findRequestById(String requestId) {
         return scheduleChangeRequestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException("Solicitud no encontrada: " + requestId));
@@ -225,7 +303,7 @@ public class RequestService {
 
     private Student validateStudent(String studentId) {
         return studentRepository.findById(studentId)
-                .filter(Student::isActive) // CORREGIDO: Cambiado de getActive() a isActive()
+                .filter(Student::isActive)
                 .orElseThrow(() -> new AppException("Estudiante no válido o inactivo: " + studentId));
     }
 
@@ -324,40 +402,48 @@ public class RequestService {
     }
 
     private int getCurrentStudentCountInGroup(String groupId) {
-        // TODO: Implementar lógica real de conteo de estudiantes en grupo
-        // Por ahora, simulación con datos de ejemplo
         List<ScheduleChangeRequest> approvedRequests = scheduleChangeRequestRepository.findByRequestedGroupId(groupId);
         long approvedCount = approvedRequests.stream()
                 .filter(request -> request.getStatus() == RequestStatus.APPROVED)
                 .count();
-        return 20 + (int) approvedCount; // 20 estudiantes base + aprobados recientes
+        return 20 + (int) approvedCount;
     }
-
-    // ========== CLASES INTERNAS PARA SEPARACIÓN DE RESPONSABILIDADES ==========
 
     /**
      * Clase para validaciones de solicitudes.
      */
     private class RequestValidator {
 
+        /**
+         * Valida que el cambio de grupo sea válido.
+         */
         void validateGroupChange(String studentId, String currentGroupId, String requestedGroupId) {
             if (currentGroupId.equals(requestedGroupId)) {
                 throw new AppException("El grupo actual y el solicitado no pueden ser el mismo");
             }
         }
 
+        /**
+         * Valida que el cambio de curso sea válido.
+         */
         void validateCourseChange(String studentId, String currentCourseCode, String requestedCourseCode) {
             if (currentCourseCode.equals(requestedCourseCode)) {
                 throw new AppException("El curso actual y el solicitado no pueden ser el mismo");
             }
         }
 
+        /**
+         * Valida la capacidad del grupo solicitado.
+         */
         void validateGroupCapacity(String groupId) {
             if (RequestService.this.getGroupCapacityAlert(groupId)) {
                 throw new AppException("El grupo solicitado está cerca de su capacidad máxima");
             }
         }
 
+        /**
+         * Valida el límite de solicitudes pendientes del estudiante.
+         */
         void validatePendingRequestsLimit(String studentId,
                                           ScheduleChangeRequestRepository repository) {
             long pendingCount = repository.countByStudentIdAndStatus(studentId, RequestStatus.PENDING);
@@ -372,6 +458,11 @@ public class RequestService {
      */
     private static class RequestIdGenerator {
 
+        /**
+         * Genera un ID único para la solicitud.
+         *
+         * @return ID de solicitud generado
+         */
         String generate() {
             return "REQ-" + System.currentTimeMillis() + "-" +
                     UUID.randomUUID().toString().substring(0, 8);

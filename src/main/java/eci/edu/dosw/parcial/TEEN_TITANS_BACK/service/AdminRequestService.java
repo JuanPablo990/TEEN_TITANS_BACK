@@ -12,6 +12,14 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para la gestión administrativa de solicitudes de cambio de horario.
+ * Proporciona funcionalidades para revisar, aprobar, rechazar y generar reportes de solicitudes.
+ *
+ ** @author Equipo Teen Titans
+ *  * @version 1.0
+ *  * @since 2025
+ */
 @Service
 public class AdminRequestService {
 
@@ -21,6 +29,15 @@ public class AdminRequestService {
     private final CourseRepository courseRepository;
     private final StudentAcademicProgressRepository studentAcademicProgressRepository;
 
+    /**
+     * Constructor para la inyección de dependencias.
+     *
+     * @param scheduleChangeRequestRepository Repositorio de solicitudes de cambio de horario
+     * @param studentRepository Repositorio de estudiantes
+     * @param groupRepository Repositorio de grupos
+     * @param courseRepository Repositorio de cursos
+     * @param studentAcademicProgressRepository Repositorio de progreso académico
+     */
     @Autowired
     public AdminRequestService(ScheduleChangeRequestRepository scheduleChangeRequestRepository,
                                StudentRepository studentRepository,
@@ -34,13 +51,15 @@ public class AdminRequestService {
         this.studentAcademicProgressRepository = studentAcademicProgressRepository;
     }
 
-    // ========== MÉTODOS PRINCIPALES SIMPLIFICADOS ==========
-
+    /**
+     * Obtiene las solicitudes de cambio de horario por facultad.
+     *
+     * @param faculty Facultad a filtrar
+     * @return Lista de solicitudes ordenadas por fecha descendente
+     */
     public List<ScheduleChangeRequest> getRequestsByFaculty(String faculty) {
-        // Obtener todos los progresos académicos de la facultad
         List<StudentAcademicProgress> facultyProgress = studentAcademicProgressRepository.findByFaculty(faculty);
 
-        // Extraer los IDs de estudiantes de manera simple
         List<String> facultyStudentIds = new ArrayList<>();
         for (StudentAcademicProgress progress : facultyProgress) {
             if (progress.getStudent() != null && progress.getStudent().getId() != null) {
@@ -48,7 +67,6 @@ public class AdminRequestService {
             }
         }
 
-        // Buscar solicitudes de estos estudiantes
         List<ScheduleChangeRequest> allRequests = scheduleChangeRequestRepository.findAll();
         List<ScheduleChangeRequest> facultyRequests = new ArrayList<>();
 
@@ -58,11 +76,19 @@ public class AdminRequestService {
             }
         }
 
-        // Ordenar por fecha
         facultyRequests.sort((r1, r2) -> r2.getSubmissionDate().compareTo(r1.getSubmissionDate()));
         return facultyRequests;
     }
 
+    /**
+     * Responde a una solicitud con una decisión de aprobación o rechazo.
+     *
+     * @param requestId ID de la solicitud
+     * @param decision Decisión (APPROVED o REJECTED)
+     * @param comments Comentarios de la decisión
+     * @return Solicitud actualizada
+     * @throws AppException si la decisión no es válida
+     */
     public ScheduleChangeRequest respondToRequest(String requestId, RequestStatus decision, String comments) {
         ScheduleChangeRequest request = findRequestById(requestId);
 
@@ -73,7 +99,6 @@ public class AdminRequestService {
         request.setStatus(decision);
         request.setResolutionDate(new Date());
 
-        // Crear paso de revisión simple
         ReviewStep decisionStep = new ReviewStep();
         decisionStep.setUserId("ADMIN_SYSTEM");
         decisionStep.setUserRole(UserRole.ADMINISTRATOR);
@@ -86,6 +111,13 @@ public class AdminRequestService {
         return scheduleChangeRequestRepository.save(request);
     }
 
+    /**
+     * Solicita información adicional para una solicitud.
+     *
+     * @param requestId ID de la solicitud
+     * @param comments Comentarios sobre la información requerida
+     * @return Solicitud actualizada
+     */
     public ScheduleChangeRequest requestAdditionalInfo(String requestId, String comments) {
         ScheduleChangeRequest request = findRequestById(requestId);
         request.setStatus(RequestStatus.UNDER_REVIEW);
@@ -102,12 +134,24 @@ public class AdminRequestService {
         return scheduleChangeRequestRepository.save(request);
     }
 
+    /**
+     * Obtiene todas las solicitudes del sistema.
+     *
+     * @return Lista de todas las solicitudes ordenadas por fecha descendente
+     */
     public List<ScheduleChangeRequest> getGlobalRequests() {
         List<ScheduleChangeRequest> allRequests = scheduleChangeRequestRepository.findAll();
         allRequests.sort((r1, r2) -> r2.getSubmissionDate().compareTo(r1.getSubmissionDate()));
         return allRequests;
     }
 
+    /**
+     * Aprueba un caso especial con comentarios específicos.
+     *
+     * @param requestId ID de la solicitud
+     * @param comments Comentarios de la aprobación especial
+     * @return Solicitud aprobada
+     */
     public ScheduleChangeRequest approveSpecialCase(String requestId, String comments) {
         ScheduleChangeRequest request = findRequestById(requestId);
         request.setStatus(RequestStatus.APPROVED);
@@ -125,6 +169,11 @@ public class AdminRequestService {
         return scheduleChangeRequestRepository.save(request);
     }
 
+    /**
+     * Obtiene los casos especiales del sistema.
+     *
+     * @return Lista de casos especiales ordenados por fecha descendente
+     */
     public List<ScheduleChangeRequest> getSpecialCases() {
         List<ScheduleChangeRequest> allRequests = scheduleChangeRequestRepository.findAll();
         List<ScheduleChangeRequest> specialCases = new ArrayList<>();
@@ -139,18 +188,32 @@ public class AdminRequestService {
         return specialCases;
     }
 
-    // ========== MÉTODOS DE ESTADÍSTICAS SIMPLIFICADOS ==========
-
+    /**
+     * Obtiene estadísticas de aprobación por facultad.
+     *
+     * @param faculty Facultad a consultar
+     * @return Estadísticas de aprobación
+     */
     public ApprovalStats getApprovalRateByFaculty(String faculty) {
         List<ScheduleChangeRequest> facultyRequests = getRequestsByFaculty(faculty);
         return calculateApprovalStats(facultyRequests);
     }
 
+    /**
+     * Obtiene estadísticas de aprobación globales.
+     *
+     * @return Estadísticas de aprobación globales
+     */
     public ApprovalStats getGlobalApprovalRate() {
         List<ScheduleChangeRequest> allRequests = scheduleChangeRequestRepository.findAll();
         return calculateApprovalStats(allRequests);
     }
 
+    /**
+     * Genera un reporte global del sistema.
+     *
+     * @return Estadísticas globales
+     */
     public GlobalStats generateGlobalReport() {
         List<ScheduleChangeRequest> allRequests = scheduleChangeRequestRepository.findAll();
         ApprovalStats globalApproval = getGlobalApprovalRate();
@@ -166,6 +229,12 @@ public class AdminRequestService {
         return stats;
     }
 
+    /**
+     * Genera un reporte específico por facultad.
+     *
+     * @param faculty Facultad a reportar
+     * @return Estadísticas de la facultad
+     */
     public FacultyStats generateFacultyReport(String faculty) {
         List<StudentAcademicProgress> facultyStudents = studentAcademicProgressRepository.findByFaculty(faculty);
         List<ScheduleChangeRequest> facultyRequests = getRequestsByFaculty(faculty);
@@ -180,33 +249,47 @@ public class AdminRequestService {
         return stats;
     }
 
-    // ========== MÉTODOS PRIVADOS SIMPLIFICADOS ==========
-
+    /**
+     * Busca una solicitud por ID.
+     *
+     * @param requestId ID de la solicitud
+     * @return Solicitud encontrada
+     * @throws AppException si no se encuentra la solicitud
+     */
     private ScheduleChangeRequest findRequestById(String requestId) {
         return scheduleChangeRequestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException("Solicitud no encontrada: " + requestId));
     }
 
+    /**
+     * Determina si una solicitud es un caso especial.
+     *
+     * @param request Solicitud a evaluar
+     * @return true si es un caso especial, false en caso contrario
+     */
     private boolean isSpecialCase(ScheduleChangeRequest request) {
-        // Casos con muchas revisiones
         if (request.getReviewHistory().size() > 3) {
             return true;
         }
 
-        // Casos médicos o de emergencia
         if (request.getReason() != null &&
                 (request.getReason().toLowerCase().contains("médico") ||
                         request.getReason().toLowerCase().contains("emergencia"))) {
             return true;
         }
 
-        // Casos pendientes por mucho tiempo
         long daysPending = TimeUnit.MILLISECONDS.toDays(
                 System.currentTimeMillis() - request.getSubmissionDate().getTime()
         );
         return daysPending > 14;
     }
 
+    /**
+     * Calcula estadísticas de aprobación a partir de una lista de solicitudes.
+     *
+     * @param requests Lista de solicitudes
+     * @return Estadísticas de aprobación
+     */
     private ApprovalStats calculateApprovalStats(List<ScheduleChangeRequest> requests) {
         ApprovalStats stats = new ApprovalStats();
 
@@ -234,6 +317,12 @@ public class AdminRequestService {
         return stats;
     }
 
+    /**
+     * Calcula la distribución de solicitudes por estado.
+     *
+     * @param requests Lista de solicitudes
+     * @return Mapa con el conteo por estado
+     */
     private Map<String, Integer> calculateRequestsByStatus(List<ScheduleChangeRequest> requests) {
         Map<String, Integer> requestsByStatus = new HashMap<>();
 
@@ -245,8 +334,9 @@ public class AdminRequestService {
         return requestsByStatus;
     }
 
-    // ========== CLASES DE ESTADÍSTICAS ==========
-
+    /**
+     * Clase para representar estadísticas de aprobación.
+     */
     public static class ApprovalStats {
         private double approvalRate;
         private int totalRequests;
@@ -266,6 +356,9 @@ public class AdminRequestService {
         public void setPendingRequests(int pendingRequests) { this.pendingRequests = pendingRequests; }
     }
 
+    /**
+     * Clase para representar estadísticas por facultad.
+     */
     public static class FacultyStats {
         private String faculty;
         private int totalStudents;
@@ -282,6 +375,9 @@ public class AdminRequestService {
         public void setApprovalRate(double approvalRate) { this.approvalRate = approvalRate; }
     }
 
+    /**
+     * Clase para representar estadísticas globales.
+     */
     public static class GlobalStats {
         private int totalRequests;
         private int totalApproved;

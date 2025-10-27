@@ -2,7 +2,6 @@ package eci.edu.dosw.parcial.TEEN_TITANS_BACK.controller;
 
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dto.AdministratorDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Administrator;
-import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.service.AdministratorService;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,9 @@ import java.util.stream.Collectors;
 /**
  * Controlador REST para la gestión de administradores dentro del sistema universitario.
  * Proporciona endpoints para realizar operaciones CRUD, búsquedas, conteos
- * y estadísticas sobre los administradores registrados en la base de datos.
+ * y estadísticas sobre los administradores registrados.
  *
- * @author Equipo Teen Titans
+ * @author
  * @version 1.0
  * @since 2025
  */
@@ -31,7 +30,7 @@ public class AdministratorController {
     private final AdministratorService administratorService;
 
     /**
-     * Constructor para inyectar la dependencia del servicio de administradores.
+     * Constructor para inyectar el servicio de administradores.
      *
      * @param administratorService servicio encargado de la lógica de negocio de administradores
      */
@@ -41,10 +40,10 @@ public class AdministratorController {
     }
 
     /**
-     * Crea un nuevo administrador en el sistema.
+     * Crea un nuevo administrador.
      *
      * @param administratorDTO datos del administrador a registrar
-     * @return el administrador creado o un mensaje de error
+     * @return administrador creado o mensaje de error
      */
     @PostMapping
     public ResponseEntity<?> createAdministrator(@RequestBody AdministratorDTO administratorDTO) {
@@ -58,22 +57,21 @@ public class AdministratorController {
                     .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al crear el administrador: " + e.getMessage()));
+                    .body(Map.of("error", "Error al crear el administrador"));
         }
     }
 
     /**
-     * Obtiene un administrador por su identificador único.
+     * Obtiene un administrador por su ID.
      *
      * @param id identificador del administrador
-     * @return el administrador correspondiente o un mensaje de error
+     * @return administrador encontrado o mensaje de error
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdministratorById(@PathVariable String id) {
         try {
             Administrator administrator = administratorService.getAdministratorById(id);
-            AdministratorDTO administratorDTO = convertToDTO(administrator);
-            return ResponseEntity.ok(administratorDTO);
+            return ResponseEntity.ok(convertToDTO(administrator));
         } catch (AppException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage()));
@@ -84,42 +82,41 @@ public class AdministratorController {
     }
 
     /**
-     * Obtiene la lista completa de administradores.
+     * Obtiene todos los administradores registrados.
      *
-     * @return lista de administradores y cantidad total
+     * @return lista de administradores
      */
     @GetMapping
     public ResponseEntity<?> getAllAdministrators() {
         try {
-            List<Administrator> administrators = administratorService.getAllAdministrators();
-            List<AdministratorDTO> administratorDTOs = administrators.stream()
+            List<AdministratorDTO> administrators = administratorService.getAllAdministrators()
+                    .stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(Map.of(
-                    "administrators", administratorDTOs,
-                    "count", administratorDTOs.size()
+                    "administrators", administrators,
+                    "count", administrators.size()
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al obtener la lista de administradores"));
+                    .body(Map.of("error", "Error al obtener los administradores"));
         }
     }
 
     /**
-     * Actualiza los datos de un administrador existente.
+     * Actualiza un administrador existente.
      *
-     * @param id identificador del administrador a actualizar
-     * @param administratorDTO datos actualizados del administrador
-     * @return el administrador actualizado o un mensaje de error
+     * @param id identificador del administrador
+     * @param administratorDTO datos actualizados
+     * @return administrador actualizado o mensaje de error
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAdministrator(@PathVariable String id, @RequestBody AdministratorDTO administratorDTO) {
         try {
             Administrator administrator = convertToEntity(administratorDTO);
             Administrator updatedAdmin = administratorService.updateAdministrator(id, administrator);
-            AdministratorDTO responseDTO = convertToDTO(updatedAdmin);
-            return ResponseEntity.ok(responseDTO);
+            return ResponseEntity.ok(convertToDTO(updatedAdmin));
         } catch (AppException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage()));
@@ -130,10 +127,10 @@ public class AdministratorController {
     }
 
     /**
-     * Elimina un administrador del sistema por su identificador.
+     * Elimina un administrador.
      *
      * @param id identificador del administrador
-     * @return mensaje de confirmación o error
+     * @return mensaje de confirmación
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAdministrator(@PathVariable String id) {
@@ -161,15 +158,15 @@ public class AdministratorController {
     @GetMapping("/department/{department}")
     public ResponseEntity<?> findByDepartment(@PathVariable String department) {
         try {
-            List<Administrator> administrators = administratorService.findByDepartment(department);
-            List<AdministratorDTO> administratorDTOs = administrators.stream()
+            List<AdministratorDTO> administrators = administratorService.findByDepartment(department)
+                    .stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(Map.of(
                     "department", department,
-                    "administrators", administratorDTOs,
-                    "count", administratorDTOs.size()
+                    "administrators", administrators,
+                    "count", administrators.size()
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -178,48 +175,48 @@ public class AdministratorController {
     }
 
     /**
-     * Busca administradores cuyos departamentos coincidan parcialmente con un patrón.
+     * Busca administradores por coincidencia parcial en el nombre del departamento.
      *
      * @param pattern patrón de búsqueda
-     * @return lista de administradores que coinciden con el patrón
+     * @return lista de administradores coincidentes
      */
     @GetMapping("/department-pattern/{pattern}")
     public ResponseEntity<?> findByDepartmentContaining(@PathVariable String pattern) {
         try {
-            List<Administrator> administrators = administratorService.findByDepartmentContaining(pattern);
-            List<AdministratorDTO> administratorDTOs = administrators.stream()
+            List<AdministratorDTO> administrators = administratorService.findByDepartmentContaining(pattern)
+                    .stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(Map.of(
                     "pattern", pattern,
-                    "administrators", administratorDTOs,
-                    "count", administratorDTOs.size()
+                    "administrators", administrators,
+                    "count", administrators.size()
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al buscar administradores por patrón de departamento"));
+                    .body(Map.of("error", "Error al buscar administradores por patrón"));
         }
     }
 
     /**
      * Busca administradores por coincidencia parcial de nombre.
      *
-     * @param name patrón del nombre
-     * @return lista de administradores que coinciden con el nombre
+     * @param name nombre o parte del nombre
+     * @return lista de administradores
      */
     @GetMapping("/name/{name}")
     public ResponseEntity<?> findByNameContaining(@PathVariable String name) {
         try {
-            List<Administrator> administrators = administratorService.findByNameContaining(name);
-            List<AdministratorDTO> administratorDTOs = administrators.stream()
+            List<AdministratorDTO> administrators = administratorService.findByNameContaining(name)
+                    .stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(Map.of(
                     "name", name,
-                    "administrators", administratorDTOs,
-                    "count", administratorDTOs.size()
+                    "administrators", administrators,
+                    "count", administrators.size()
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -228,212 +225,32 @@ public class AdministratorController {
     }
 
     /**
-     * Obtiene todos los administradores activos.
+     * Obtiene administradores activos.
      *
      * @return lista de administradores activos
      */
     @GetMapping("/active")
     public ResponseEntity<?> findActiveAdministrators() {
         try {
-            List<Administrator> activeAdministrators = administratorService.findActiveAdministrators();
-            List<AdministratorDTO> administratorDTOs = activeAdministrators.stream()
+            List<AdministratorDTO> administrators = administratorService.findActiveAdministrators()
+                    .stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(Map.of(
-                    "activeAdministrators", administratorDTOs,
-                    "count", administratorDTOs.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al obtener los administradores activos"));
-        }
-    }
-
-    /**
-     * Busca administradores por departamento y estado activo.
-     *
-     * @param department nombre del departamento
-     * @param active estado del administrador
-     * @return lista de administradores filtrados
-     */
-    @GetMapping("/department/{department}/active/{active}")
-    public ResponseEntity<?> findByDepartmentAndActive(@PathVariable String department, @PathVariable Boolean active) {
-        try {
-            List<Administrator> administrators = administratorService.findByDepartmentAndActive(department, active);
-            List<AdministratorDTO> administratorDTOs = administrators.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(Map.of(
-                    "department", department,
-                    "active", active,
-                    "administrators", administratorDTOs,
-                    "count", administratorDTOs.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al buscar administradores por departamento y estado activo"));
-        }
-    }
-
-    /**
-     * Realiza una búsqueda dinámica de administradores según criterios opcionales.
-     *
-     * @param department departamento opcional
-     * @param active estado activo opcional
-     * @return lista filtrada de administradores
-     */
-    @GetMapping("/search")
-    public ResponseEntity<?> searchAdministrators(
-            @RequestParam(required = false) String department,
-            @RequestParam(required = false) Boolean active) {
-
-        try {
-            List<Administrator> allAdministrators = administratorService.getAllAdministrators();
-            List<Administrator> filteredAdministrators = allAdministrators.stream()
-                    .filter(admin -> department == null || department.equals(admin.getDepartment()))
-                    .filter(admin -> active == null || active.equals(admin.isActive()))
-                    .collect(Collectors.toList());
-
-            List<AdministratorDTO> administratorDTOs = filteredAdministrators.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(Map.of(
-                    "searchCriteria", Map.of(
-                            "department", department,
-                            "active", active
-                    ),
-                    "administrators", administratorDTOs,
-                    "count", administratorDTOs.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error en la búsqueda de administradores"));
-        }
-    }
-
-    /**
-     * Obtiene estadísticas generales sobre los administradores registrados.
-     *
-     * @return métricas de distribución, actividad y conteo
-     */
-    @GetMapping("/stats")
-    public ResponseEntity<?> getAdministratorStatistics() {
-        try {
-            List<Administrator> allAdministrators = administratorService.getAllAdministrators();
-
-            long activeCount = allAdministrators.stream().filter(Administrator::isActive).count();
-            long inactiveCount = allAdministrators.size() - activeCount;
-
-            Map<String, Long> administratorsByDepartment = allAdministrators.stream()
-                    .collect(Collectors.groupingBy(Administrator::getDepartment, Collectors.counting()));
-
-            return ResponseEntity.ok(Map.of(
-                    "totalAdministrators", allAdministrators.size(),
-                    "activeAdministrators", activeCount,
-                    "inactiveAdministrators", inactiveCount,
-                    "administratorsByDepartment", administratorsByDepartment,
-                    "activePercentage", allAdministrators.isEmpty() ?
-                            0 : Math.round((double) activeCount / allAdministrators.size() * 100 * 100.0) / 100.0
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al obtener estadísticas de administradores"));
-        }
-    }
-
-    /**
-     * Cuenta el número de administradores por departamento.
-     *
-     * @param department nombre del departamento
-     * @return cantidad de administradores en el departamento
-     */
-    @GetMapping("/count/department/{department}")
-    public ResponseEntity<?> countByDepartment(@PathVariable String department) {
-        try {
-            long count = administratorService.countByDepartment(department);
-            return ResponseEntity.ok(Map.of(
-                    "department", department,
-                    "count", count
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al contar administradores por departamento"));
-        }
-    }
-
-    /**
-     * Cuenta el número de administradores en un departamento según su estado.
-     *
-     * @param department departamento a evaluar
-     * @param active estado activo/inactivo
-     * @return cantidad de administradores filtrados
-     */
-    @GetMapping("/count/department/{department}/active/{active}")
-    public ResponseEntity<?> countByDepartmentAndActive(@PathVariable String department, @PathVariable Boolean active) {
-        try {
-            long count = administratorService.countByDepartmentAndActive(department, active);
-            return ResponseEntity.ok(Map.of(
-                    "department", department,
-                    "active", active,
-                    "count", count
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al contar administradores por departamento y estado activo"));
-        }
-    }
-
-    /**
-     * Obtiene la lista de todos los departamentos con administradores registrados.
-     *
-     * @return lista de nombres de departamentos y cantidad total
-     */
-    @GetMapping("/departments")
-    public ResponseEntity<?> getAllDepartments() {
-        try {
-            List<Administrator> allAdministrators = administratorService.getAllAdministrators();
-            List<String> departments = allAdministrators.stream()
-                    .map(Administrator::getDepartment)
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(Map.of(
-                    "departments", departments,
-                    "count", departments.size()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al obtener la lista de departamentos"));
-        }
-    }
-
-    /**
-     * Cuenta administradores que coincidan con un patrón de nombre de departamento.
-     *
-     * @param pattern patrón de búsqueda
-     * @return cantidad de administradores coincidentes
-     */
-    @GetMapping("/department-pattern/{pattern}/count")
-    public ResponseEntity<?> countByDepartmentPattern(@PathVariable String pattern) {
-        try {
-            List<Administrator> administrators = administratorService.findByDepartmentPattern(pattern);
-            return ResponseEntity.ok(Map.of(
-                    "pattern", pattern,
+                    "activeAdministrators", administrators,
                     "count", administrators.size()
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al contar administradores por patrón de departamento"));
+                    .body(Map.of("error", "Error al obtener administradores activos"));
         }
     }
 
     /**
-     * Endpoint de verificación del estado del controlador.
+     * Endpoint de prueba para verificar el estado del controlador.
      *
-     * @return mensaje de confirmación de funcionamiento
+     * @return mensaje de estado
      */
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
@@ -441,10 +258,10 @@ public class AdministratorController {
     }
 
     /**
-     * Convierte un DTO en una entidad de tipo {@link Administrator}.
+     * Convierte un DTO en una entidad {@link Administrator}.
      *
      * @param dto objeto de transferencia de datos
-     * @return entidad {@link Administrator}
+     * @return entidad convertida
      */
     private Administrator convertToEntity(AdministratorDTO dto) {
         Administrator administrator = new Administrator();
@@ -452,19 +269,15 @@ public class AdministratorController {
         administrator.setName(dto.getName());
         administrator.setEmail(dto.getEmail());
         administrator.setDepartment(dto.getDepartment());
-        if (dto.getActive() != null) {
-            administrator.setActive(dto.getActive());
-        } else {
-            administrator.setActive(true);
-        }
+        administrator.setActive(dto.getActive() != null ? dto.getActive() : true);
         return administrator;
     }
 
     /**
-     * Convierte una entidad {@link Administrator} a su respectivo DTO.
+     * Convierte una entidad {@link Administrator} a un DTO.
      *
      * @param administrator entidad a convertir
-     * @return objeto {@link AdministratorDTO}
+     * @return DTO correspondiente
      */
     private AdministratorDTO convertToDTO(Administrator administrator) {
         AdministratorDTO dto = new AdministratorDTO();

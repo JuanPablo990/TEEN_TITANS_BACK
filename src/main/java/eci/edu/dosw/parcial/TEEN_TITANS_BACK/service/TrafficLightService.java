@@ -15,6 +15,8 @@ import java.util.Optional;
 
 /**
  * Servicio para gestionar el semáforo académico de los estudiantes.
+ * Evalúa el rendimiento académico y asigna colores (VERDE, AMARILLO, ROJO)
+ * según el progreso curricular del estudiante.
  *
  * @author Equipo Teen Titans
  * @version 1.0
@@ -45,10 +47,6 @@ public class TrafficLightService {
 
     /**
      * Obtiene el semáforo académico del estudiante.
-     * El semáforo indica el estado académico del estudiante:
-     * - VERDE: Buen rendimiento académico
-     * - AMARILLO: Rendimiento académico regular (necesita mejorar)
-     * - ROJO: Bajo rendimiento académico (en riesgo académico)
      *
      * @param studentId ID del estudiante
      * @return String que representa el color del semáforo ("GREEN", "YELLOW", "RED")
@@ -58,7 +56,7 @@ public class TrafficLightService {
         Student student = getStudentInformation(studentId);
 
         if (!student.isActive()) {
-            return "RED"; // Estudiante inactivo
+            return "RED";
         }
 
         Optional<StudentAcademicProgress> progressOptional =
@@ -113,62 +111,7 @@ public class TrafficLightService {
     }
 
     /**
-     * Calcula el color del semáforo académico basado en el progreso del estudiante.
-     */
-    private String calculateTrafficLight(StudentAcademicProgress progress, Student student) {
-        Double gpa = progress.getCumulativeGPA() != null ? progress.getCumulativeGPA() : 0.0;
-        Integer completedCredits = progress.getCompletedCredits() != null ? progress.getCompletedCredits() : 0;
-        Integer currentSemester = progress.getCurrentSemester() != null ? progress.getCurrentSemester() : 1;
-        Integer totalCreditsRequired = progress.getTotalCreditsRequired() != null ? progress.getTotalCreditsRequired() : 1;
-        Integer totalSemesters = progress.getTotalSemesters() != null ? progress.getTotalSemesters() : 1;
-
-        int expectedCreditsPerSemester = totalCreditsRequired / totalSemesters;
-        int expectedCredits = currentSemester * expectedCreditsPerSemester;
-
-        long failedCoursesCount = getFailedCoursesCount(student.getId());
-
-        boolean hasExcellentGPA = gpa >= 4.0; // Escala de 5.0
-        boolean hasGoodGPA = gpa >= 3.0;
-        boolean hasMinimumGPA = gpa >= 2.5;
-        boolean hasGoodCreditProgress = completedCredits >= expectedCredits;
-        boolean hasMinimumCreditProgress = completedCredits >= (int) (expectedCredits * 0.7);
-        boolean hasNoRecentFailures = failedCoursesCount == 0;
-        boolean hasFewFailures = failedCoursesCount <= 1;
-
-        if (hasExcellentGPA && hasGoodCreditProgress && hasNoRecentFailures) {
-            return "GREEN";
-        } else if (hasGoodGPA && hasMinimumCreditProgress && hasFewFailures) {
-            return "GREEN";
-        } else if (hasMinimumGPA && hasMinimumCreditProgress) {
-            return "YELLOW";
-        } else {
-            return "RED";
-        }
-    }
-
-    /**
-     * Obtiene el número de cursos reprobados en el último semestre.
-     */
-    private long getFailedCoursesCount(String studentId) {
-        Optional<Student> student = studentRepository.findById(studentId);
-        if (student.isEmpty()) return 0;
-
-        Integer currentSemester = student.get().getSemester();
-        if (currentSemester == null) return 0;
-
-        String currentSemesterStr = currentSemester.toString();
-
-        // Usar métodos que SÍ existen en el repositorio
-        List<CourseStatusDetail> currentSemesterCourses =
-                courseStatusDetailRepository.findByStudentIdAndSemester(studentId, currentSemesterStr);
-
-        return currentSemesterCourses.stream()
-                .filter(course -> !course.getIsApproved()) // Usar getIsApproved() en lugar de isApproved()
-                .count();
-    }
-
-    /**
-     * Método adicional: Obtiene el porcentaje de avance curricular.
+     * Obtiene el porcentaje de avance curricular.
      *
      * @param studentId ID del estudiante
      * @return Porcentaje de avance (0.0 a 100.0)
@@ -181,11 +124,11 @@ public class TrafficLightService {
         }
 
         double percentage = ((double) progress.getCompletedCredits() / progress.getTotalCreditsRequired()) * 100;
-        return Math.min(100.0, Math.round(percentage * 100.0) / 100.0); // Redondear a 2 decimales
+        return Math.min(100.0, Math.round(percentage * 100.0) / 100.0);
     }
 
     /**
-     * Método adicional: Verifica si el estudiante está en riesgo académico.
+     * Verifica si el estudiante está en riesgo académico.
      *
      * @param studentId ID del estudiante
      * @return true si el estudiante está en riesgo académico
@@ -196,7 +139,7 @@ public class TrafficLightService {
     }
 
     /**
-     * Método adicional: Obtiene un resumen completo del estado académico del estudiante.
+     * Obtiene un resumen completo del estado académico del estudiante.
      *
      * @param studentId ID del estudiante
      * @return String con el resumen del estado académico
@@ -228,23 +171,7 @@ public class TrafficLightService {
     }
 
     /**
-     * Obtiene la descripción del estado basado en el color del semáforo.
-     */
-    private String getStatusDescription(String trafficLight) {
-        switch (trafficLight) {
-            case "GREEN":
-                return "Rendimiento académico satisfactorio";
-            case "YELLOW":
-                return "Rendimiento regular - necesita mejorar";
-            case "RED":
-                return "En riesgo académico - requiere atención inmediata";
-            default:
-                return "Estado desconocido";
-        }
-    }
-
-    /**
-     * Método adicional: Obtiene estudiantes en riesgo académico por programa.
+     * Obtiene estudiantes en riesgo académico por programa.
      *
      * @param academicProgram Programa académico
      * @return Lista de estudiantes en riesgo
@@ -258,7 +185,7 @@ public class TrafficLightService {
     }
 
     /**
-     * Método adicional: Obtiene estadísticas del semáforo académico por programa.
+     * Obtiene estadísticas del semáforo académico por programa.
      *
      * @param academicProgram Programa académico
      * @return Array con [verde, amarillo, rojo] counts
@@ -277,7 +204,6 @@ public class TrafficLightService {
                     case "RED": red++; break;
                 }
             } catch (AppException e) {
-                // Si hay error, contar como rojo por seguridad
                 red++;
             }
         }
@@ -286,7 +212,7 @@ public class TrafficLightService {
     }
 
     /**
-     * Método adicional: Obtiene el progreso académico con información del estudiante.
+     * Obtiene el progreso académico con información del estudiante.
      *
      * @param studentId ID del estudiante
      * @return Objeto combinado con información del estudiante y progreso
@@ -301,6 +227,86 @@ public class TrafficLightService {
     }
 
     /**
+     * Calcula el color del semáforo académico basado en el progreso del estudiante.
+     *
+     * @param progress Progreso académico del estudiante
+     * @param student Información del estudiante
+     * @return Color del semáforo ("GREEN", "YELLOW", "RED")
+     */
+    private String calculateTrafficLight(StudentAcademicProgress progress, Student student) {
+        Double gpa = progress.getCumulativeGPA() != null ? progress.getCumulativeGPA() : 0.0;
+        Integer completedCredits = progress.getCompletedCredits() != null ? progress.getCompletedCredits() : 0;
+        Integer currentSemester = progress.getCurrentSemester() != null ? progress.getCurrentSemester() : 1;
+        Integer totalCreditsRequired = progress.getTotalCreditsRequired() != null ? progress.getTotalCreditsRequired() : 1;
+        Integer totalSemesters = progress.getTotalSemesters() != null ? progress.getTotalSemesters() : 1;
+
+        int expectedCreditsPerSemester = totalCreditsRequired / totalSemesters;
+        int expectedCredits = currentSemester * expectedCreditsPerSemester;
+
+        long failedCoursesCount = getFailedCoursesCount(student.getId());
+
+        boolean hasExcellentGPA = gpa >= 4.0;
+        boolean hasGoodGPA = gpa >= 3.0;
+        boolean hasMinimumGPA = gpa >= 2.5;
+        boolean hasGoodCreditProgress = completedCredits >= expectedCredits;
+        boolean hasMinimumCreditProgress = completedCredits >= (int) (expectedCredits * 0.7);
+        boolean hasNoRecentFailures = failedCoursesCount == 0;
+        boolean hasFewFailures = failedCoursesCount <= 1;
+
+        if (hasExcellentGPA && hasGoodCreditProgress && hasNoRecentFailures) {
+            return "GREEN";
+        } else if (hasGoodGPA && hasMinimumCreditProgress && hasFewFailures) {
+            return "GREEN";
+        } else if (hasMinimumGPA && hasMinimumCreditProgress) {
+            return "YELLOW";
+        } else {
+            return "RED";
+        }
+    }
+
+    /**
+     * Obtiene el número de cursos reprobados en el último semestre.
+     *
+     * @param studentId ID del estudiante
+     * @return Número de cursos reprobados
+     */
+    private long getFailedCoursesCount(String studentId) {
+        Optional<Student> student = studentRepository.findById(studentId);
+        if (student.isEmpty()) return 0;
+
+        Integer currentSemester = student.get().getSemester();
+        if (currentSemester == null) return 0;
+
+        String currentSemesterStr = currentSemester.toString();
+
+        List<CourseStatusDetail> currentSemesterCourses =
+                courseStatusDetailRepository.findByStudentIdAndSemester(studentId, currentSemesterStr);
+
+        return currentSemesterCourses.stream()
+                .filter(course -> !course.getIsApproved())
+                .count();
+    }
+
+    /**
+     * Obtiene la descripción del estado basado en el color del semáforo.
+     *
+     * @param trafficLight Color del semáforo
+     * @return Descripción del estado
+     */
+    private String getStatusDescription(String trafficLight) {
+        switch (trafficLight) {
+            case "GREEN":
+                return "Rendimiento académico satisfactorio";
+            case "YELLOW":
+                return "Rendimiento regular - necesita mejorar";
+            case "RED":
+                return "En riesgo académico - requiere atención inmediata";
+            default:
+                return "Estado desconocido";
+        }
+    }
+
+    /**
      * Clase interna para contener información combinada del estudiante y progreso.
      */
     public static class StudentProgressInfo {
@@ -309,6 +315,14 @@ public class TrafficLightService {
         private final String trafficLight;
         private final Double progressPercentage;
 
+        /**
+         * Constructor para StudentProgressInfo.
+         *
+         * @param student Información del estudiante
+         * @param progress Progreso académico
+         * @param trafficLight Color del semáforo
+         * @param progressPercentage Porcentaje de progreso
+         */
         public StudentProgressInfo(Student student, StudentAcademicProgress progress,
                                    String trafficLight, Double progressPercentage) {
             this.student = student;
@@ -317,7 +331,6 @@ public class TrafficLightService {
             this.progressPercentage = progressPercentage;
         }
 
-        // Getters
         public Student getStudent() { return student; }
         public StudentAcademicProgress getProgress() { return progress; }
         public String getTrafficLight() { return trafficLight; }

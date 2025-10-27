@@ -26,47 +26,14 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-
-    /**
-     * Identificador único del usuario en la base de datos.
-     */
     @Id
     private String id;
-
-    /**
-     * Nombre completo del usuario.
-     */
     private String name;
-
-    /**
-     * Correo electrónico institucional del usuario.
-     */
     private String email;
-
-    /**
-     * Contraseña utilizada para acceder al sistema.
-     */
     private String password;
-
-    /**
-     * Rol del usuario dentro del sistema (por ejemplo, STUDENT, PROFESSOR, ADMINISTRATOR, DEAN).
-     */
     private UserRole role;
-
-    /**
-     * Indica si el usuario se encuentra activo en el sistema.
-     * Por defecto, se establece en {@code true}.
-     */
     private boolean active = true;
-
-    /**
-     * Fecha en la que el usuario fue creado en el sistema.
-     */
     private Date createdAt = new Date();
-
-    /**
-     * Fecha de la última actualización de los datos del usuario.
-     */
     private Date updatedAt = new Date();
 
     /**

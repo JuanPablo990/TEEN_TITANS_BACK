@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Servicio general para gestionar todas las entidades que no tienen CRUD completo en otros servicios.
@@ -26,7 +25,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GeneralManagementService {
 
-    // Repositorios para todas las entidades sin CRUD completo
     private final AcademicPeriodRepository academicPeriodRepository;
     private final ClassroomRepository classroomRepository;
     private final CourseRepository courseRepository;
@@ -36,10 +34,12 @@ public class GeneralManagementService {
     private final ScheduleRepository scheduleRepository;
     private final StudentAcademicProgressRepository studentAcademicProgressRepository;
 
-    // ========== ACADEMIC PERIOD CRUD ==========
-
     /**
      * Crea un nuevo período académico.
+     *
+     * @param academicPeriod Período académico a crear
+     * @return Período académico creado
+     * @throws AppException si ya existe un período con el mismo ID
      */
     public AcademicPeriod createAcademicPeriod(AcademicPeriod academicPeriod) {
         log.info("Creando nuevo período académico: {}", academicPeriod.getName());
@@ -48,7 +48,6 @@ public class GeneralManagementService {
             throw new AppException("Ya existe un período académico con ID: " + academicPeriod.getPeriodId());
         }
 
-        // Si se está creando un período activo, desactivar otros períodos activos
         if (academicPeriod.isActive()) {
             deactivateOtherAcademicPeriods();
         }
@@ -58,6 +57,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene todos los períodos académicos.
+     *
+     * @return Lista de todos los períodos académicos
      */
     public List<AcademicPeriod> getAllAcademicPeriods() {
         log.debug("Obteniendo todos los períodos académicos");
@@ -66,6 +67,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene un período académico por ID.
+     *
+     * @param periodId ID del período académico
+     * @return Período académico encontrado
+     * @throws AppException si no se encuentra el período
      */
     public AcademicPeriod getAcademicPeriodById(String periodId) {
         log.debug("Obteniendo período académico con ID: {}", periodId);
@@ -75,6 +80,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene el período académico activo actual.
+     *
+     * @return Período académico activo
+     * @throws AppException si no hay período activo
      */
     public AcademicPeriod getCurrentAcademicPeriod() {
         log.debug("Obteniendo período académico activo actual");
@@ -84,6 +92,11 @@ public class GeneralManagementService {
 
     /**
      * Actualiza un período académico existente.
+     *
+     * @param periodId ID del período a actualizar
+     * @param academicPeriod Nuevos datos del período
+     * @return Período actualizado
+     * @throws AppException si no se encuentra el período
      */
     public AcademicPeriod updateAcademicPeriod(String periodId, AcademicPeriod academicPeriod) {
         log.info("Actualizando período académico con ID: {}", periodId);
@@ -92,7 +105,6 @@ public class GeneralManagementService {
             throw new AppException("Período académico no encontrado con ID: " + periodId);
         }
 
-        // Si se está activando este período, desactivar otros
         if (academicPeriod.isActive()) {
             deactivateOtherAcademicPeriods();
         }
@@ -103,6 +115,9 @@ public class GeneralManagementService {
 
     /**
      * Elimina un período académico.
+     *
+     * @param periodId ID del período a eliminar
+     * @throws AppException si no se encuentra el período o está activo
      */
     public void deleteAcademicPeriod(String periodId) {
         log.info("Eliminando período académico con ID: {}", periodId);
@@ -119,6 +134,10 @@ public class GeneralManagementService {
 
     /**
      * Activa un período académico y desactiva los demás.
+     *
+     * @param periodId ID del período a activar
+     * @return Período activado
+     * @throws AppException si no se encuentra el período
      */
     public AcademicPeriod activateAcademicPeriod(String periodId) {
         log.info("Activando período académico con ID: {}", periodId);
@@ -141,10 +160,11 @@ public class GeneralManagementService {
         }
     }
 
-    // ========== CLASSROOM CRUD ==========
-
     /**
      * Crea un nuevo aula.
+     *
+     * @param classroom Aula a crear
+     * @return Aula creada
      */
     public Classroom createClassroom(Classroom classroom) {
         log.info("Creando nueva aula: {} {}", classroom.getBuilding(), classroom.getRoomNumber());
@@ -153,6 +173,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene todas las aulas.
+     *
+     * @return Lista de todas las aulas
      */
     public List<Classroom> getAllClassrooms() {
         log.debug("Obteniendo todas las aulas");
@@ -161,6 +183,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene un aula por ID.
+     *
+     * @param classroomId ID del aula
+     * @return Aula encontrada
+     * @throws AppException si no se encuentra el aula
      */
     public Classroom getClassroomById(String classroomId) {
         log.debug("Obteniendo aula con ID: {}", classroomId);
@@ -170,6 +196,11 @@ public class GeneralManagementService {
 
     /**
      * Actualiza un aula existente.
+     *
+     * @param classroomId ID del aula a actualizar
+     * @param classroom Nuevos datos del aula
+     * @return Aula actualizada
+     * @throws AppException si no se encuentra el aula
      */
     public Classroom updateClassroom(String classroomId, Classroom classroom) {
         log.info("Actualizando aula con ID: {}", classroomId);
@@ -184,6 +215,9 @@ public class GeneralManagementService {
 
     /**
      * Elimina un aula.
+     *
+     * @param classroomId ID del aula a eliminar
+     * @throws AppException si no se encuentra el aula o está en uso
      */
     public void deleteClassroom(String classroomId) {
         log.info("Eliminando aula con ID: {}", classroomId);
@@ -192,7 +226,6 @@ public class GeneralManagementService {
             throw new AppException("Aula no encontrada con ID: " + classroomId);
         }
 
-        // Verificar si el aula está siendo usada por algún grupo
         List<Group> groupsUsingClassroom = groupRepository.findByClassroom_ClassroomId(classroomId);
         if (!groupsUsingClassroom.isEmpty()) {
             throw new AppException("No se puede eliminar el aula porque está siendo utilizada por " +
@@ -203,7 +236,10 @@ public class GeneralManagementService {
     }
 
     /**
-     * Obtiene aulas por tipo (usando el enum RoomType).
+     * Obtiene aulas por tipo.
+     *
+     * @param roomType Tipo de aula
+     * @return Lista de aulas del tipo especificado
      */
     public List<Classroom> getClassroomsByType(RoomType roomType) {
         log.debug("Obteniendo aulas por tipo: {}", roomType);
@@ -211,7 +247,11 @@ public class GeneralManagementService {
     }
 
     /**
-     * Obtiene aulas por tipo usando String (conversión automática a enum).
+     * Obtiene aulas por tipo usando String.
+     *
+     * @param roomTypeString Tipo de aula como String
+     * @return Lista de aulas del tipo especificado
+     * @throws AppException si el tipo no es válido
      */
     public List<Classroom> getClassroomsByType(String roomTypeString) {
         log.debug("Obteniendo aulas por tipo: {}", roomTypeString);
@@ -225,6 +265,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene aulas por edificio.
+     *
+     * @param building Edificio a buscar
+     * @return Lista de aulas en el edificio
      */
     public List<Classroom> getClassroomsByBuilding(String building) {
         log.debug("Obteniendo aulas por edificio: {}", building);
@@ -233,16 +276,21 @@ public class GeneralManagementService {
 
     /**
      * Obtiene aulas con capacidad mayor o igual a la especificada.
+     *
+     * @param minCapacity Capacidad mínima
+     * @return Lista de aulas con capacidad suficiente
      */
     public List<Classroom> getClassroomsWithMinCapacity(Integer minCapacity) {
         log.debug("Obteniendo aulas con capacidad mínima: {}", minCapacity);
         return classroomRepository.findByCapacityGreaterThanEqual(minCapacity);
     }
 
-    // ========== COURSE CRUD ==========
-
     /**
      * Crea un nuevo curso.
+     *
+     * @param course Curso a crear
+     * @return Curso creado
+     * @throws AppException si ya existe un curso con el mismo código
      */
     public Course createCourse(Course course) {
         log.info("Creando nuevo curso: {} - {}", course.getCourseCode(), course.getName());
@@ -256,6 +304,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene todos los cursos.
+     *
+     * @return Lista de todos los cursos
      */
     public List<Course> getAllCourses() {
         log.debug("Obteniendo todos los cursos");
@@ -264,6 +314,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene un curso por código.
+     *
+     * @param courseCode Código del curso
+     * @return Curso encontrado
+     * @throws AppException si no se encuentra el curso
      */
     public Course getCourseByCode(String courseCode) {
         log.debug("Obteniendo curso con código: {}", courseCode);
@@ -273,6 +327,11 @@ public class GeneralManagementService {
 
     /**
      * Actualiza un curso existente.
+     *
+     * @param courseCode Código del curso a actualizar
+     * @param course Nuevos datos del curso
+     * @return Curso actualizado
+     * @throws AppException si no se encuentra el curso
      */
     public Course updateCourse(String courseCode, Course course) {
         log.info("Actualizando curso con código: {}", courseCode);
@@ -287,6 +346,9 @@ public class GeneralManagementService {
 
     /**
      * Elimina un curso.
+     *
+     * @param courseCode Código del curso a eliminar
+     * @throws AppException si no se encuentra el curso o está en uso
      */
     public void deleteCourse(String courseCode) {
         log.info("Eliminando curso con código: {}", courseCode);
@@ -295,7 +357,6 @@ public class GeneralManagementService {
             throw new AppException("Curso no encontrado con código: " + courseCode);
         }
 
-        // Verificar si el curso está siendo usado por algún grupo
         List<Group> groupsUsingCourse = groupRepository.findByCourse_CourseCode(courseCode);
         if (!groupsUsingCourse.isEmpty()) {
             throw new AppException("No se puede eliminar el curso porque está siendo utilizado por " +
@@ -307,6 +368,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene cursos activos.
+     *
+     * @return Lista de cursos activos
      */
     public List<Course> getActiveCourses() {
         log.debug("Obteniendo cursos activos");
@@ -315,6 +378,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene cursos por programa académico.
+     *
+     * @param academicProgram Programa académico
+     * @return Lista de cursos del programa
      */
     public List<Course> getCoursesByProgram(String academicProgram) {
         log.debug("Obteniendo cursos por programa académico: {}", academicProgram);
@@ -322,7 +388,12 @@ public class GeneralManagementService {
     }
 
     /**
-     * Activa/desactiva un curso.
+     * Activa o desactiva un curso.
+     *
+     * @param courseCode Código del curso
+     * @param isActive Estado a establecer
+     * @return Curso actualizado
+     * @throws AppException si no se encuentra el curso
      */
     public Course toggleCourseStatus(String courseCode, boolean isActive) {
         log.info("{} curso con código: {}", isActive ? "Activando" : "Desactivando", courseCode);
@@ -334,10 +405,11 @@ public class GeneralManagementService {
         return courseRepository.save(course);
     }
 
-    // ========== COURSE STATUS DETAIL CRUD ==========
-
     /**
      * Crea un nuevo detalle de estado de curso.
+     *
+     * @param courseStatusDetail Detalle a crear
+     * @return Detalle creado
      */
     public CourseStatusDetail createCourseStatusDetail(CourseStatusDetail courseStatusDetail) {
         log.info("Creando nuevo detalle de estado de curso para estudiante: {}",
@@ -347,6 +419,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene todos los detalles de estado de curso.
+     *
+     * @return Lista de todos los detalles
      */
     public List<CourseStatusDetail> getAllCourseStatusDetails() {
         log.debug("Obteniendo todos los detalles de estado de curso");
@@ -355,6 +429,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene un detalle de estado de curso por ID.
+     *
+     * @param id ID del detalle
+     * @return Detalle encontrado
+     * @throws AppException si no se encuentra el detalle
      */
     public CourseStatusDetail getCourseStatusDetailById(String id) {
         log.debug("Obteniendo detalle de estado de curso con ID: {}", id);
@@ -364,6 +442,11 @@ public class GeneralManagementService {
 
     /**
      * Actualiza un detalle de estado de curso existente.
+     *
+     * @param id ID del detalle a actualizar
+     * @param courseStatusDetail Nuevos datos del detalle
+     * @return Detalle actualizado
+     * @throws AppException si no se encuentra el detalle
      */
     public CourseStatusDetail updateCourseStatusDetail(String id, CourseStatusDetail courseStatusDetail) {
         log.info("Actualizando detalle de estado de curso con ID: {}", id);
@@ -378,6 +461,9 @@ public class GeneralManagementService {
 
     /**
      * Elimina un detalle de estado de curso.
+     *
+     * @param id ID del detalle a eliminar
+     * @throws AppException si no se encuentra el detalle
      */
     public void deleteCourseStatusDetail(String id) {
         log.info("Eliminando detalle de estado de curso con ID: {}", id);
@@ -391,6 +477,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene detalles de estado de curso por estudiante.
+     *
+     * @param studentId ID del estudiante
+     * @return Lista de detalles del estudiante
      */
     public List<CourseStatusDetail> getCourseStatusDetailsByStudent(String studentId) {
         log.debug("Obteniendo detalles de estado de curso para estudiante: {}", studentId);
@@ -399,6 +488,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene detalles de estado de curso por curso.
+     *
+     * @param courseCode Código del curso
+     * @return Lista de detalles del curso
      */
     public List<CourseStatusDetail> getCourseStatusDetailsByCourse(String courseCode) {
         log.debug("Obteniendo detalles de estado de curso para curso: {}", courseCode);
@@ -407,16 +499,20 @@ public class GeneralManagementService {
 
     /**
      * Obtiene detalles de estado de curso por semestre.
+     *
+     * @param semester Semestre
+     * @return Lista de detalles del semestre
      */
     public List<CourseStatusDetail> getCourseStatusDetailsBySemester(String semester) {
         log.debug("Obteniendo detalles de estado de curso para semestre: {}", semester);
         return courseStatusDetailRepository.findBySemester(semester);
     }
 
-    // ========== GROUP CRUD ==========
-
     /**
-     * Elimina un grupo (completando el CRUD que faltaba en AdminGroupService).
+     * Elimina un grupo.
+     *
+     * @param groupId ID del grupo a eliminar
+     * @throws AppException si no se encuentra el grupo o está en uso
      */
     public void deleteGroup(String groupId) {
         log.info("Eliminando grupo con ID: {}", groupId);
@@ -424,7 +520,6 @@ public class GeneralManagementService {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new AppException("Grupo no encontrado con ID: " + groupId));
 
-        // Verificar si el grupo está siendo usado en CourseStatusDetail
         List<CourseStatusDetail> courseStatusDetails = courseStatusDetailRepository.findByGroup_GroupId(groupId);
         if (!courseStatusDetails.isEmpty()) {
             throw new AppException("No se puede eliminar el grupo porque está siendo utilizado en " +
@@ -434,10 +529,11 @@ public class GeneralManagementService {
         groupRepository.deleteById(groupId);
     }
 
-    // ========== REVIEW STEP CRUD ==========
-
     /**
      * Crea un nuevo paso de revisión.
+     *
+     * @param reviewStep Paso de revisión a crear
+     * @return Paso de revisión creado
      */
     public ReviewStep createReviewStep(ReviewStep reviewStep) {
         log.info("Creando nuevo paso de revisión para usuario: {}", reviewStep.getUserId());
@@ -446,6 +542,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene todos los pasos de revisión.
+     *
+     * @return Lista de todos los pasos de revisión
      */
     public List<ReviewStep> getAllReviewSteps() {
         log.debug("Obteniendo todos los pasos de revisión");
@@ -454,6 +552,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene un paso de revisión por ID.
+     *
+     * @param id ID del paso de revisión
+     * @return Paso de revisión encontrado
+     * @throws AppException si no se encuentra el paso
      */
     public ReviewStep getReviewStepById(String id) {
         log.debug("Obteniendo paso de revisión con ID: {}", id);
@@ -463,6 +565,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene pasos de revisión por usuario.
+     *
+     * @param userId ID del usuario
+     * @return Lista de pasos del usuario
      */
     public List<ReviewStep> getReviewStepsByUser(String userId) {
         log.debug("Obteniendo pasos de revisión para usuario: {}", userId);
@@ -470,7 +575,10 @@ public class GeneralManagementService {
     }
 
     /**
-     * Obtiene pasos de revisión por rol de usuario (usando enum UserRole).
+     * Obtiene pasos de revisión por rol de usuario.
+     *
+     * @param userRole Rol del usuario
+     * @return Lista de pasos del rol
      */
     public List<ReviewStep> getReviewStepsByUserRole(UserRole userRole) {
         log.debug("Obteniendo pasos de revisión por rol: {}", userRole);
@@ -478,7 +586,11 @@ public class GeneralManagementService {
     }
 
     /**
-     * Obtiene pasos de revisión por rol de usuario (usando String).
+     * Obtiene pasos de revisión por rol de usuario usando String.
+     *
+     * @param userRoleString Rol del usuario como String
+     * @return Lista de pasos del rol
+     * @throws AppException si el rol no es válido
      */
     public List<ReviewStep> getReviewStepsByUserRole(String userRoleString) {
         log.debug("Obteniendo pasos de revisión por rol: {}", userRoleString);
@@ -490,10 +602,11 @@ public class GeneralManagementService {
         }
     }
 
-    // ========== SCHEDULE CRUD ==========
-
     /**
      * Crea un nuevo horario.
+     *
+     * @param schedule Horario a crear
+     * @return Horario creado
      */
     public Schedule createSchedule(Schedule schedule) {
         log.info("Creando nuevo horario: {} {} {}",
@@ -503,6 +616,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene todos los horarios.
+     *
+     * @return Lista de todos los horarios
      */
     public List<Schedule> getAllSchedules() {
         log.debug("Obteniendo todos los horarios");
@@ -511,6 +626,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene un horario por ID.
+     *
+     * @param scheduleId ID del horario
+     * @return Horario encontrado
+     * @throws AppException si no se encuentra el horario
      */
     public Schedule getScheduleById(String scheduleId) {
         log.debug("Obteniendo horario con ID: {}", scheduleId);
@@ -520,6 +639,11 @@ public class GeneralManagementService {
 
     /**
      * Actualiza un horario existente.
+     *
+     * @param scheduleId ID del horario a actualizar
+     * @param schedule Nuevos datos del horario
+     * @return Horario actualizado
+     * @throws AppException si no se encuentra el horario
      */
     public Schedule updateSchedule(String scheduleId, Schedule schedule) {
         log.info("Actualizando horario con ID: {}", scheduleId);
@@ -534,6 +658,9 @@ public class GeneralManagementService {
 
     /**
      * Elimina un horario.
+     *
+     * @param scheduleId ID del horario a eliminar
+     * @throws AppException si no se encuentra el horario o está en uso
      */
     public void deleteSchedule(String scheduleId) {
         log.info("Eliminando horario con ID: {}", scheduleId);
@@ -542,7 +669,6 @@ public class GeneralManagementService {
             throw new AppException("Horario no encontrado con ID: " + scheduleId);
         }
 
-        // Verificar si el horario está siendo usado por algún grupo
         List<Group> groupsUsingSchedule = groupRepository.findBySchedule_ScheduleId(scheduleId);
         if (!groupsUsingSchedule.isEmpty()) {
             throw new AppException("No se puede eliminar el horario porque está siendo utilizado por " +
@@ -554,16 +680,20 @@ public class GeneralManagementService {
 
     /**
      * Obtiene horarios por día de la semana.
+     *
+     * @param dayOfWeek Día de la semana
+     * @return Lista de horarios del día
      */
     public List<Schedule> getSchedulesByDay(String dayOfWeek) {
         log.debug("Obteniendo horarios por día: {}", dayOfWeek);
         return scheduleRepository.findByDayOfWeek(dayOfWeek);
     }
 
-    // ========== STUDENT ACADEMIC PROGRESS CRUD ==========
-
     /**
      * Crea un nuevo progreso académico de estudiante.
+     *
+     * @param progress Progreso académico a crear
+     * @return Progreso académico creado
      */
     public StudentAcademicProgress createStudentAcademicProgress(StudentAcademicProgress progress) {
         log.info("Creando nuevo progreso académico para estudiante: {}",
@@ -573,6 +703,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene todos los progresos académicos.
+     *
+     * @return Lista de todos los progresos académicos
      */
     public List<StudentAcademicProgress> getAllStudentAcademicProgress() {
         log.debug("Obteniendo todos los progresos académicos");
@@ -581,6 +713,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene un progreso académico por ID.
+     *
+     * @param id ID del progreso académico
+     * @return Progreso académico encontrado
+     * @throws AppException si no se encuentra el progreso
      */
     public StudentAcademicProgress getStudentAcademicProgressById(String id) {
         log.debug("Obteniendo progreso académico con ID: {}", id);
@@ -590,6 +726,11 @@ public class GeneralManagementService {
 
     /**
      * Actualiza un progreso académico existente.
+     *
+     * @param id ID del progreso a actualizar
+     * @param progress Nuevos datos del progreso
+     * @return Progreso actualizado
+     * @throws AppException si no se encuentra el progreso
      */
     public StudentAcademicProgress updateStudentAcademicProgress(String id, StudentAcademicProgress progress) {
         log.info("Actualizando progreso académico con ID: {}", id);
@@ -604,6 +745,9 @@ public class GeneralManagementService {
 
     /**
      * Elimina un progreso académico.
+     *
+     * @param id ID del progreso a eliminar
+     * @throws AppException si no se encuentra el progreso
      */
     public void deleteStudentAcademicProgress(String id) {
         log.info("Eliminando progreso académico con ID: {}", id);
@@ -617,6 +761,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene progresos académicos por facultad.
+     *
+     * @param faculty Facultad
+     * @return Lista de progresos de la facultad
      */
     public List<StudentAcademicProgress> getStudentAcademicProgressByFaculty(String faculty) {
         log.debug("Obteniendo progresos académicos por facultad: {}", faculty);
@@ -625,6 +772,9 @@ public class GeneralManagementService {
 
     /**
      * Obtiene progresos académicos por programa académico.
+     *
+     * @param academicProgram Programa académico
+     * @return Lista de progresos del programa
      */
     public List<StudentAcademicProgress> getStudentAcademicProgressByProgram(String academicProgram) {
         log.debug("Obteniendo progresos académicos por programa: {}", academicProgram);
@@ -633,6 +783,10 @@ public class GeneralManagementService {
 
     /**
      * Obtiene el progreso académico de un estudiante específico.
+     *
+     * @param studentId ID del estudiante
+     * @return Progreso académico del estudiante
+     * @throws AppException si no se encuentra el progreso
      */
     public StudentAcademicProgress getStudentAcademicProgressByStudentId(String studentId) {
         log.debug("Obteniendo progreso académico para estudiante: {}", studentId);
@@ -640,10 +794,12 @@ public class GeneralManagementService {
                 .orElseThrow(() -> new AppException("Progreso académico no encontrado para el estudiante: " + studentId));
     }
 
-    // ========== MÉTODOS DE UTILIDAD ==========
-
     /**
      * Verifica la integridad referencial antes de eliminar entidades.
+     *
+     * @param entityType Tipo de entidad
+     * @param entityId ID de la entidad
+     * @return true si no hay referencias, false en caso contrario
      */
     public boolean checkReferentialIntegrity(String entityType, String entityId) {
         log.debug("Verificando integridad referencial para {} con ID: {}", entityType, entityId);
@@ -668,6 +824,8 @@ public class GeneralManagementService {
 
     /**
      * Obtiene estadísticas generales del sistema.
+     *
+     * @return Estadísticas del sistema
      */
     public SystemStatistics getSystemStatistics() {
         log.debug("Generando estadísticas del sistema");
@@ -679,7 +837,6 @@ public class GeneralManagementService {
         stats.setTotalSchedules(scheduleRepository.count());
         stats.setTotalAcademicPeriods(academicPeriodRepository.count());
 
-        // Contar períodos académicos activos usando el método existente
         List<AcademicPeriod> activePeriods = academicPeriodRepository.findByIsActive(true);
         stats.setActiveAcademicPeriods((long) activePeriods.size());
 
@@ -697,7 +854,6 @@ public class GeneralManagementService {
         private long totalAcademicPeriods;
         private long activeAcademicPeriods;
 
-        // Getters y Setters
         public long getTotalClassrooms() { return totalClassrooms; }
         public void setTotalClassrooms(long totalClassrooms) { this.totalClassrooms = totalClassrooms; }
         public long getTotalCourses() { return totalCourses; }

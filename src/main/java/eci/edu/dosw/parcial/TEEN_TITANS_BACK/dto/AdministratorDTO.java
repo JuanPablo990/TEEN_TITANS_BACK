@@ -19,26 +19,12 @@ import java.util.Date;
  */
 @Data
 public class AdministratorDTO {
-
-    /** Identificador único del administrador. */
     private String id;
-
-    /** Nombre completo del administrador. */
     private String name;
-
-    /** Correo electrónico institucional del administrador. */
     private String email;
-
-    /** Departamento al que pertenece el administrador. */
     private String department;
-
-    /** Estado de actividad del administrador (activo o inactivo). */
     private Boolean active;
-
-    /** Fecha de creación del registro del administrador. */
     private Date createdAt;
-
-    /** Fecha de la última actualización del registro del administrador. */
     private Date updatedAt;
 
 }

@@ -18,28 +18,12 @@ import java.util.Date;
  */
 @Data
 public class UserDTO {
-
-    /** Identificador único del usuario. */
     private String id;
-
-    /** Nombre completo del usuario. */
     private String name;
-
-    /** Correo electrónico institucional del usuario. */
     private String email;
-
-    /** Contraseña del usuario (solo para creación o actualización). */
-    private String password; // Solo para creación/actualización
-
-    /** Rol asignado al usuario dentro del sistema (por ejemplo, STUDENT, PROFESSOR, ADMIN). */
+    private String password;
     private String role;
-
-    /** Indica si el usuario se encuentra activo en el sistema. */
     private Boolean active;
-
-    /** Fecha de creación del registro del usuario. */
     private Date createdAt;
-
-    /** Fecha de la última actualización del registro del usuario. */
     private Date updatedAt;
 }

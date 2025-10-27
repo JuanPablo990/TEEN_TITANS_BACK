@@ -29,11 +29,22 @@ public class StudentPortalController {
 
     private final StudentPortalService studentPortalService;
 
+    /**
+     * Constructor del controlador del portal estudiantil.
+     *
+     * @param studentPortalService el servicio del portal estudiantil
+     */
     @Autowired
     public StudentPortalController(StudentPortalService studentPortalService) {
         this.studentPortalService = studentPortalService;
     }
 
+    /**
+     * Obtiene el horario actual del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con la lista de grupos del horario actual
+     */
     @GetMapping("/{studentId}/current-schedule")
     public ResponseEntity<?> getCurrentSchedule(@PathVariable String studentId) {
         try {
@@ -47,6 +58,12 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Obtiene los grupos disponibles para un curso.
+     *
+     * @param courseCode el código del curso
+     * @return ResponseEntity con la lista de grupos disponibles
+     */
     @GetMapping("/courses/{courseCode}/available-groups")
     public ResponseEntity<?> getAvailableGroups(@PathVariable String courseCode) {
         try {
@@ -60,6 +77,12 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Obtiene el progreso académico del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el DTO de progreso académico
+     */
     @GetMapping("/{studentId}/academic-progress")
     public ResponseEntity<?> getAcademicProgress(@PathVariable String studentId) {
         try {
@@ -74,6 +97,12 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Verifica la disponibilidad de un grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con el estado de disponibilidad
+     */
     @GetMapping("/groups/{groupId}/availability")
     public ResponseEntity<?> checkGroupAvailability(@PathVariable String groupId) {
         try {
@@ -87,6 +116,12 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Obtiene recomendaciones de cursos para el estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con la lista de cursos recomendados
+     */
     @GetMapping("/{studentId}/course-recommendations")
     public ResponseEntity<?> getCourseRecommendations(@PathVariable String studentId) {
         try {
@@ -100,6 +135,11 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Obtiene las fechas límite de inscripción.
+     *
+     * @return ResponseEntity con el período académico y fechas límite
+     */
     @GetMapping("/enrollment-deadlines")
     public ResponseEntity<?> getEnrollmentDeadlines() {
         try {
@@ -113,6 +153,12 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Obtiene las alertas académicas del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con la lista de alertas académicas
+     */
     @GetMapping("/{studentId}/academic-alerts")
     public ResponseEntity<?> getAcademicAlerts(@PathVariable String studentId) {
         try {
@@ -126,6 +172,12 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Obtiene información de capacidad de un grupo.
+     *
+     * @param groupId el ID del grupo
+     * @return ResponseEntity con la información de capacidad del grupo
+     */
     @GetMapping("/groups/{groupId}/capacity")
     public ResponseEntity<?> getGroupCapacityInfo(@PathVariable String groupId) {
         try {
@@ -149,6 +201,12 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Obtiene estadísticas de inscripción por grupo para un curso.
+     *
+     * @param courseCode el código del curso
+     * @return ResponseEntity con las estadísticas de inscripción
+     */
     @GetMapping("/courses/{courseCode}/enrollment-stats")
     public ResponseEntity<?> getCourseEnrollmentStats(@PathVariable String courseCode) {
         try {
@@ -163,84 +221,11 @@ public class StudentPortalController {
     }
 
     /**
-     * Convierte un objeto StudentAcademicProgress a StudentProgressDTO
+     * Obtiene un resumen académico del estudiante.
+     *
+     * @param studentId el ID del estudiante
+     * @return ResponseEntity con el resumen académico
      */
-    private StudentProgressDTO convertToProgressDTO(StudentAcademicProgress progress) {
-        StudentProgressDTO dto = new StudentProgressDTO();
-        Student student = progress.getStudent();
-
-        dto.setId(progress.getId());
-        dto.setStudentId(student.getId());
-        dto.setStudentName(student.getName());
-        dto.setAcademicProgram(progress.getAcademicProgram());
-        dto.setFaculty(progress.getFaculty());
-        dto.setCurriculumType(progress.getCurriculumType());
-        dto.setCurrentSemester(progress.getCurrentSemester());
-        dto.setTotalSemesters(progress.getTotalSemesters());
-        dto.setCompletedCredits(progress.getCompletedCredits());
-        dto.setTotalCreditsRequired(progress.getTotalCreditsRequired());
-        dto.setCumulativeGPA(progress.getCumulativeGPA());
-
-        // Convertir coursesStatus
-        if (progress.getCoursesStatus() != null) {
-            List<CourseStatusDetailDTO> courseDTOs = progress.getCoursesStatus().stream()
-                    .map(this::convertToCourseStatusDetailDTO)
-                    .collect(Collectors.toList());
-            dto.setCoursesStatus(courseDTOs);
-        }
-
-        // Calcular campos adicionales
-        if (progress.getTotalCreditsRequired() != null && progress.getTotalCreditsRequired() > 0) {
-            dto.setProgressPercentage((double) progress.getCompletedCredits() / progress.getTotalCreditsRequired() * 100);
-        }
-        dto.setRemainingCredits(progress.getTotalCreditsRequired() - progress.getCompletedCredits());
-        dto.setRemainingSemesters(progress.getTotalSemesters() - progress.getCurrentSemester());
-
-        return dto;
-    }
-
-    /**
-     * Convierte CourseStatusDetail a CourseStatusDetailDTO
-     */
-    private CourseStatusDetailDTO convertToCourseStatusDetailDTO(CourseStatusDetail courseStatus) {
-        CourseStatusDetailDTO dto = new CourseStatusDetailDTO();
-
-        dto.setId(courseStatus.getId());
-        dto.setStudentId(courseStatus.getStudentId());
-        dto.setStatus(courseStatus.getStatus());
-        dto.setGrade(courseStatus.getGrade());
-        dto.setSemester(courseStatus.getSemester());
-        dto.setEnrollmentDate(courseStatus.getEnrollmentDate());
-        dto.setCompletionDate(courseStatus.getCompletionDate());
-        dto.setCreditsEarned(courseStatus.getCreditsEarned());
-        dto.setIsApproved(courseStatus.getIsApproved());
-        dto.setComments(courseStatus.getComments());
-
-        // Información del curso
-        if (courseStatus.getCourse() != null) {
-            // Usar getCourseCode() en lugar de getId() para Course
-            dto.setCourseId(courseStatus.getCourse().getCourseCode());
-            dto.setCourseCode(courseStatus.getCourse().getCourseCode());
-            dto.setCourseName(courseStatus.getCourse().getName());
-        }
-
-        // Información del grupo - CORREGIDO
-        if (courseStatus.getGroup() != null) {
-            // Usar getGroupId() en lugar de getId() para Group
-            dto.setGroupId(courseStatus.getGroup().getGroupId());
-            // Usar getSection() en lugar de getCode() para Group
-            dto.setGroupCode(courseStatus.getGroup().getSection());
-        }
-
-        // Información del profesor
-        if (courseStatus.getProfessor() != null) {
-            dto.setProfessorId(courseStatus.getProfessor().getId());
-            dto.setProfessorName(courseStatus.getProfessor().getName());
-        }
-
-        return dto;
-    }
-
     @GetMapping("/{studentId}/academic-summary")
     public ResponseEntity<?> getAcademicSummary(@PathVariable String studentId) {
         try {
@@ -270,6 +255,13 @@ public class StudentPortalController {
         }
     }
 
+    /**
+     * Verifica la elegibilidad de inscripción para un curso.
+     *
+     * @param studentId el ID del estudiante
+     * @param courseCode el código del curso
+     * @return ResponseEntity con la información de elegibilidad
+     */
     @GetMapping("/{studentId}/courses/{courseCode}/enrollment-eligibility")
     public ResponseEntity<?> checkEnrollmentEligibility(@PathVariable String studentId,
                                                         @PathVariable String courseCode) {
@@ -304,5 +296,82 @@ public class StudentPortalController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Error al verificar elegibilidad de inscripción"));
         }
+    }
+
+    /**
+     * Convierte un objeto StudentAcademicProgress a StudentProgressDTO.
+     *
+     * @param progress el progreso académico a convertir
+     * @return el DTO de progreso del estudiante
+     */
+    private StudentProgressDTO convertToProgressDTO(StudentAcademicProgress progress) {
+        StudentProgressDTO dto = new StudentProgressDTO();
+        Student student = progress.getStudent();
+
+        dto.setId(progress.getId());
+        dto.setStudentId(student.getId());
+        dto.setStudentName(student.getName());
+        dto.setAcademicProgram(progress.getAcademicProgram());
+        dto.setFaculty(progress.getFaculty());
+        dto.setCurriculumType(progress.getCurriculumType());
+        dto.setCurrentSemester(progress.getCurrentSemester());
+        dto.setTotalSemesters(progress.getTotalSemesters());
+        dto.setCompletedCredits(progress.getCompletedCredits());
+        dto.setTotalCreditsRequired(progress.getTotalCreditsRequired());
+        dto.setCumulativeGPA(progress.getCumulativeGPA());
+
+        if (progress.getCoursesStatus() != null) {
+            List<CourseStatusDetailDTO> courseDTOs = progress.getCoursesStatus().stream()
+                    .map(this::convertToCourseStatusDetailDTO)
+                    .collect(Collectors.toList());
+            dto.setCoursesStatus(courseDTOs);
+        }
+
+        if (progress.getTotalCreditsRequired() != null && progress.getTotalCreditsRequired() > 0) {
+            dto.setProgressPercentage((double) progress.getCompletedCredits() / progress.getTotalCreditsRequired() * 100);
+        }
+        dto.setRemainingCredits(progress.getTotalCreditsRequired() - progress.getCompletedCredits());
+        dto.setRemainingSemesters(progress.getTotalSemesters() - progress.getCurrentSemester());
+
+        return dto;
+    }
+
+    /**
+     * Convierte CourseStatusDetail a CourseStatusDetailDTO.
+     *
+     * @param courseStatus el detalle del estado del curso a convertir
+     * @return el DTO de detalle del estado del curso
+     */
+    private CourseStatusDetailDTO convertToCourseStatusDetailDTO(CourseStatusDetail courseStatus) {
+        CourseStatusDetailDTO dto = new CourseStatusDetailDTO();
+
+        dto.setId(courseStatus.getId());
+        dto.setStudentId(courseStatus.getStudentId());
+        dto.setStatus(courseStatus.getStatus());
+        dto.setGrade(courseStatus.getGrade());
+        dto.setSemester(courseStatus.getSemester());
+        dto.setEnrollmentDate(courseStatus.getEnrollmentDate());
+        dto.setCompletionDate(courseStatus.getCompletionDate());
+        dto.setCreditsEarned(courseStatus.getCreditsEarned());
+        dto.setIsApproved(courseStatus.getIsApproved());
+        dto.setComments(courseStatus.getComments());
+
+        if (courseStatus.getCourse() != null) {
+            dto.setCourseId(courseStatus.getCourse().getCourseCode());
+            dto.setCourseCode(courseStatus.getCourse().getCourseCode());
+            dto.setCourseName(courseStatus.getCourse().getName());
+        }
+
+        if (courseStatus.getGroup() != null) {
+            dto.setGroupId(courseStatus.getGroup().getGroupId());
+            dto.setGroupCode(courseStatus.getGroup().getSection());
+        }
+
+        if (courseStatus.getProfessor() != null) {
+            dto.setProfessorId(courseStatus.getProfessor().getId());
+            dto.setProfessorName(courseStatus.getProfessor().getName());
+        }
+
+        return dto;
     }
 }

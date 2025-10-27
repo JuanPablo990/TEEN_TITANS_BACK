@@ -24,19 +24,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class Professor extends User {
 
-    /**
-     * Departamento al que pertenece el profesor.
-     */
     private String department;
-
-    /**
-     * Indica si el profesor es titular.
-     */
     private Boolean isTenured;
-
-    /**
-     * Lista de áreas de especialización del profesor.
-     */
     private List<String> areasOfExpertise;
 
     /**

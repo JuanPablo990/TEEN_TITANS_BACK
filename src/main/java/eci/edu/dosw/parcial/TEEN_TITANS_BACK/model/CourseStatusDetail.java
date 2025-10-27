@@ -30,13 +30,10 @@ import lombok.AllArgsConstructor;
 public class CourseStatusDetail {
 
     @Id
-    private String id; // Identificador único del documento en MongoDB
-
+    private String id;
     @DBRef
-    private Course course; // Referencia al curso asociado
-
-    // SOLUCIÓN DEFINITIVA: Usar solo studentId como String, no ambas propiedades
-    private String studentId; // ID del estudiante
+    private Course course;
+    private String studentId;
 
     private CourseStatus status;
     private Double grade;
@@ -45,10 +42,10 @@ public class CourseStatusDetail {
     private Date completionDate;
 
     @DBRef
-    private Group group; // Referencia al grupo donde se cursó
+    private Group group;
 
     @DBRef
-    private Professor professor; // Referencia al profesor que impartió el curso
+    private Professor professor;
 
     private Integer creditsEarned;
     private Boolean isApproved;

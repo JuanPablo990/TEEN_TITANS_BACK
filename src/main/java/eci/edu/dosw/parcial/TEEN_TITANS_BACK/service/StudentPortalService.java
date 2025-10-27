@@ -12,10 +12,11 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio que gestiona la información académica y el portal estudiantil.
- * <p>
  * Permite a los estudiantes consultar su horario actual, progreso académico,
  * grupos disponibles, recomendaciones de cursos y alertas académicas.
- * </p>
+ *  * @author Equipo Teen Titans
+ *  * @version 2.0
+ *  * @since 2025
  */
 @Slf4j
 @Service
@@ -178,7 +179,7 @@ public class StudentPortalService {
      * Obtiene el progreso académico completo de un estudiante.
      *
      * @param studentId identificador del estudiante
-     * @return objeto {@link StudentAcademicProgress}
+     * @return objeto StudentAcademicProgress
      * @throws AppException si no se encuentra el progreso académico
      */
     public StudentAcademicProgress getAcademicProgress(String studentId) {
@@ -194,7 +195,7 @@ public class StudentPortalService {
      * Verifica si un grupo tiene disponibilidad de cupos.
      *
      * @param groupId identificador del grupo
-     * @return {@code true} si hay cupos disponibles, {@code false} en caso contrario
+     * @return true si hay cupos disponibles, false en caso contrario
      * @throws AppException si no se encuentra el grupo
      */
     public boolean checkGroupAvailability(String groupId) {
@@ -275,10 +276,10 @@ public class StudentPortalService {
     }
 
     /**
-     * Verifica si un curso está actualmente en progreso (inscrito y no finalizado).
+     * Verifica si un curso está actualmente en progreso.
      *
-     * @param courseStatus objeto {@link CourseStatusDetail}
-     * @return {@code true} si el curso está en progreso, {@code false} en caso contrario
+     * @param courseStatus objeto CourseStatusDetail
+     * @return true si el curso está en progreso, false en caso contrario
      */
     private boolean isCourseCurrentlyEnrolled(CourseStatusDetail courseStatus) {
         boolean isEnrolled = courseStatus.getIsApproved() == null ||
@@ -291,9 +292,9 @@ public class StudentPortalService {
     /**
      * Determina si un curso es recomendado para un estudiante según su programa académico.
      *
-     * @param course   curso a evaluar
+     * @param course curso a evaluar
      * @param progress progreso académico del estudiante
-     * @return {@code true} si el curso pertenece al mismo programa y está activo
+     * @return true si el curso pertenece al mismo programa y está activo
      */
     private boolean isCourseRecommended(Course course, StudentAcademicProgress progress) {
         boolean isRecommended = course.getIsActive() &&
@@ -303,10 +304,9 @@ public class StudentPortalService {
     }
 
     /**
-     * Genera alertas académicas basadas en el progreso del estudiante,
-     * incluyendo GPA bajo, avance de créditos y materias reprobadas.
+     * Genera alertas académicas basadas en el progreso del estudiante.
      *
-     * @param progress objeto {@link StudentAcademicProgress} del estudiante
+     * @param progress objeto StudentAcademicProgress del estudiante
      * @return lista de mensajes de alerta académica
      */
     private List<String> generateAcademicAlerts(StudentAcademicProgress progress) {
@@ -348,8 +348,8 @@ public class StudentPortalService {
      * Calcula el progreso esperado en créditos según el semestre actual.
      *
      * @param currentSemester número de semestre actual
-     * @param totalSemesters  número total de semestres del programa
-     * @return progreso esperado expresado como porcentaje (0 a 1)
+     * @param totalSemesters número total de semestres del programa
+     * @return progreso esperado expresado como porcentaje
      */
     private double getExpectedProgress(int currentSemester, int totalSemesters) {
         double expectedProgress = (double) currentSemester / totalSemesters;

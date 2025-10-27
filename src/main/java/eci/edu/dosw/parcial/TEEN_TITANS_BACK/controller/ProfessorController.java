@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 /**
  * Controlador REST para gestionar las operaciones relacionadas con los profesores.
  * Proporciona endpoints para crear, consultar, actualizar, eliminar y filtrar profesores.
+
+ * @author Equipo Teen Titans
+ * @version 2.0
  */
 @RestController
 @RequestMapping("/api/professors")

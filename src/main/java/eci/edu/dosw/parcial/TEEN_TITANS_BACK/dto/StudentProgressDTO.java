@@ -25,8 +25,6 @@ public class StudentProgressDTO {
     private Integer totalCreditsRequired;
     private Double cumulativeGPA;
     private List<CourseStatusDetailDTO> coursesStatus;
-
-    // Campos calculados útiles para el frontend
     private Double progressPercentage;
     private Integer remainingCredits;
     private Integer remainingSemesters;

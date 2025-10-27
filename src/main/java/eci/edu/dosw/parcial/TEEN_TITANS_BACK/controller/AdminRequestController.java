@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controlador REST para la gestión avanzada de solicitudes y reportes estadísticos.
- * <p>
- * Proporciona endpoints para la gestión de solicitudes de cambio de horario,
- * análisis de datos y generación de reportes estadísticos.
- * </p>
+ * Controlador REST para la gestión de solicitudes administrativas y generación de reportes.
+ * Proporciona endpoints para manejar solicitudes, estadísticas y reportes globales y por facultad.
  *
- * @author Equipo Teen Titans
+ * @author
+ * Equipo Teen Titans
  * @version 1.0
  * @since 2025
  */
@@ -33,12 +31,13 @@ public class AdminRequestController {
 
     private final AdminRequestService adminRequestService;
 
-    // Constantes para mensajes
     private static final String INTERNAL_SERVER_ERROR = "Error interno del servidor";
     private static final String NOT_FOUND = "Recurso no encontrado";
 
-    // --- Gestión Básica de Solicitudes ---
-
+    /**
+     * Obtiene todas las solicitudes globales.
+     * @return Lista de solicitudes registradas.
+     */
     @GetMapping
     public ResponseEntity<?> getGlobalRequests() {
         try {
@@ -50,6 +49,11 @@ public class AdminRequestController {
         }
     }
 
+    /**
+     * Obtiene las solicitudes de una facultad específica.
+     * @param faculty nombre de la facultad.
+     * @return Lista de solicitudes por facultad.
+     */
     @GetMapping("/faculty/{faculty}")
     public ResponseEntity<?> getRequestsByFaculty(@PathVariable String faculty) {
         try {
@@ -61,6 +65,10 @@ public class AdminRequestController {
         }
     }
 
+    /**
+     * Obtiene los casos especiales de solicitudes.
+     * @return Lista de casos especiales.
+     */
     @GetMapping("/special-cases")
     public ResponseEntity<?> getSpecialCases() {
         try {
@@ -72,16 +80,21 @@ public class AdminRequestController {
         }
     }
 
-    // --- Acciones sobre Solicitudes ---
-
+    /**
+     * Responde a una solicitud con una decisión administrativa.
+     * @param requestId ID de la solicitud.
+     * @param requestBody cuerpo con la decisión y comentarios.
+     * @return Solicitud actualizada.
+     */
     @PutMapping("/{requestId}/respond")
-    public ResponseEntity<?> respondToRequest(@PathVariable String requestId,
-                                              @RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> respondToRequest(
+            @PathVariable String requestId,
+            @RequestBody Map<String, String> requestBody) {
         try {
             String decisionStr = requestBody.get("decision");
             String comments = requestBody.get("comments");
 
-            if (decisionStr == null) {
+            if (decisionStr == null || decisionStr.isBlank()) {
                 return badRequestResponse("El campo 'decision' es requerido");
             }
 
@@ -101,12 +114,19 @@ public class AdminRequestController {
         }
     }
 
+    /**
+     * Solicita información adicional sobre una solicitud.
+     * @param requestId ID de la solicitud.
+     * @param requestBody cuerpo con los comentarios.
+     * @return Solicitud actualizada.
+     */
     @PutMapping("/{requestId}/request-info")
-    public ResponseEntity<?> requestAdditionalInfo(@PathVariable String requestId,
-                                                   @RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> requestAdditionalInfo(
+            @PathVariable String requestId,
+            @RequestBody Map<String, String> requestBody) {
         try {
             String comments = requestBody.get("comments");
-            if (comments == null) {
+            if (comments == null || comments.isBlank()) {
                 return badRequestResponse("El campo 'comments' es requerido");
             }
 
@@ -121,12 +141,19 @@ public class AdminRequestController {
         }
     }
 
+    /**
+     * Aprueba un caso especial.
+     * @param requestId ID de la solicitud.
+     * @param requestBody cuerpo con los comentarios.
+     * @return Solicitud actualizada.
+     */
     @PutMapping("/{requestId}/approve-special")
-    public ResponseEntity<?> approveSpecialCase(@PathVariable String requestId,
-                                                @RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> approveSpecialCase(
+            @PathVariable String requestId,
+            @RequestBody Map<String, String> requestBody) {
         try {
             String comments = requestBody.get("comments");
-            if (comments == null) {
+            if (comments == null || comments.isBlank()) {
                 return badRequestResponse("El campo 'comments' es requerido");
             }
 
@@ -141,8 +168,11 @@ public class AdminRequestController {
         }
     }
 
-    // --- Estadísticas de Aprobación ---
-
+    /**
+     * Obtiene las estadísticas de aprobación por facultad.
+     * @param faculty nombre de la facultad.
+     * @return Estadísticas de aprobación.
+     */
     @GetMapping("/stats/approval/faculty/{faculty}")
     public ResponseEntity<?> getApprovalRateByFaculty(@PathVariable String faculty) {
         try {
@@ -154,6 +184,10 @@ public class AdminRequestController {
         }
     }
 
+    /**
+     * Obtiene las estadísticas globales de aprobación.
+     * @return Estadísticas globales.
+     */
     @GetMapping("/stats/approval/global")
     public ResponseEntity<?> getGlobalApprovalRate() {
         try {
@@ -165,8 +199,11 @@ public class AdminRequestController {
         }
     }
 
-    // --- Reportes Estadísticos ---
-
+    /**
+     * Genera un reporte de estadísticas por facultad.
+     * @param faculty nombre de la facultad.
+     * @return Reporte con estadísticas detalladas.
+     */
     @GetMapping("/stats/faculty/{faculty}")
     public ResponseEntity<?> generateFacultyReport(@PathVariable String faculty) {
         try {
@@ -178,6 +215,10 @@ public class AdminRequestController {
         }
     }
 
+    /**
+     * Genera un reporte global con estadísticas de solicitudes.
+     * @return Reporte global.
+     */
     @GetMapping("/stats/global")
     public ResponseEntity<?> generateGlobalReport() {
         try {
@@ -189,15 +230,15 @@ public class AdminRequestController {
         }
     }
 
-    // --- Endpoints de Salud ---
-
+    /**
+     * Verifica el estado del controlador.
+     * @return Mensaje de confirmación del estado del servicio.
+     */
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         log.info("Health check realizado exitosamente");
         return ResponseEntity.ok("AdminRequestController is working properly");
     }
-
-    // --- Métodos Auxiliares Privados ---
 
     private ResponseEntity<String> errorResponse(String operation) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -205,7 +246,7 @@ public class AdminRequestController {
     }
 
     private ResponseEntity<String> notFoundResponse(String message) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message != null ? message : NOT_FOUND);
     }
 
     private ResponseEntity<String> badRequestResponse(String message) {

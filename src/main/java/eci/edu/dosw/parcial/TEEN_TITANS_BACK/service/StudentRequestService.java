@@ -34,7 +34,6 @@ public class StudentRequestService {
     private final ReviewStepRepository reviewStepRepository;
     private final StudentAcademicProgressRepository studentAcademicProgressRepository;
 
-    // Constantes para configuraciones
     private static final double GPA_WEIGHT = 0.4;
     private static final double SEMESTER_WEIGHT = 0.2;
     private static final double URGENCY_WEIGHT = 0.2;
@@ -46,6 +45,10 @@ public class StudentRequestService {
 
     /**
      * Calcula la tasa de aprobación histórica de un estudiante.
+     *
+     * @param studentId ID del estudiante
+     * @return Tasa de aprobación en porcentaje
+     * @throws AppException si el estudiante no existe
      */
     public double getStudentApprovalRate(String studentId) {
         validateStudentExists(studentId);
@@ -68,6 +71,10 @@ public class StudentRequestService {
 
     /**
      * Obtiene todas las solicitudes pendientes de un estudiante.
+     *
+     * @param studentId ID del estudiante
+     * @return Lista de solicitudes pendientes y en revisión
+     * @throws AppException si el estudiante no existe
      */
     public List<ScheduleChangeRequest> getPendingRequestsStatus(String studentId) {
         validateStudentExists(studentId);
@@ -83,6 +90,10 @@ public class StudentRequestService {
 
     /**
      * Calcula la posición de prioridad de una solicitud en la cola de procesamiento.
+     *
+     * @param requestId ID de la solicitud
+     * @return Posición en la cola de prioridad
+     * @throws AppException si no se encuentra la solicitud
      */
     public int getRequestPriorityPosition(String requestId) {
         ScheduleChangeRequest request = findRequestById(requestId);
@@ -95,6 +106,10 @@ public class StudentRequestService {
 
     /**
      * Obtiene grupos alternativos recomendados para una solicitud.
+     *
+     * @param requestId ID de la solicitud
+     * @return Lista de grupos alternativos recomendados
+     * @throws AppException si no se encuentra la solicitud
      */
     public List<Group> getRecommendedAlternativeGroups(String requestId) {
         ScheduleChangeRequest request = findRequestById(requestId);
@@ -114,6 +129,10 @@ public class StudentRequestService {
 
     /**
      * Calcula el tiempo de espera estimado para una solicitud.
+     *
+     * @param requestId ID de la solicitud
+     * @return Tiempo de espera estimado en formato legible
+     * @throws AppException si no se encuentra la solicitud
      */
     public String getRequestEstimatedWaitTime(String requestId) {
         ScheduleChangeRequest request = findRequestById(requestId);
@@ -130,6 +149,10 @@ public class StudentRequestService {
 
     /**
      * Determina si una solicitud puede ser cancelada según su estado y tiempo en revisión.
+     *
+     * @param requestId ID de la solicitud
+     * @return true si la solicitud puede ser cancelada, false en caso contrario
+     * @throws AppException si no se encuentra la solicitud
      */
     public boolean canCancelRequest(String requestId) {
         ScheduleChangeRequest request = findRequestById(requestId);
@@ -147,13 +170,15 @@ public class StudentRequestService {
 
     /**
      * Obtiene la lista de documentos requeridos según el tipo de solicitud.
+     *
+     * @param requestType Tipo de solicitud
+     * @return Lista de documentos requeridos
      */
     public List<String> getRequiredDocuments(String requestType) {
         RequestDocumentType documentType = RequestDocumentType.fromString(requestType);
         return documentType.getRequiredDocuments();
     }
 
-    // Métodos privados de validación
     private void validateStudentExists(String studentId) {
         if (!studentRepository.existsById(studentId)) {
             throw new AppException("El estudiante con ID " + studentId + " no existe.");
@@ -165,7 +190,6 @@ public class StudentRequestService {
                 .orElseThrow(() -> new AppException("No se encontró la solicitud con ID: " + requestId));
     }
 
-    // Métodos privados de filtrado y cálculo
     private List<ScheduleChangeRequest> filterResolvedRequests(List<ScheduleChangeRequest> requests) {
         return requests.stream()
                 .filter(request -> request.getStatus() == RequestStatus.APPROVED ||
@@ -194,7 +218,6 @@ public class StudentRequestService {
         return allRequests;
     }
 
-    // Métodos de cálculo de prioridad
     private RequestPriority calculateRequestPriority(ScheduleChangeRequest request) {
         Student student = request.getStudent();
         StudentAcademicProgress progress = getStudentAcademicProgress(student);
@@ -273,7 +296,6 @@ public class StudentRequestService {
         return p1.submissionDate.compareTo(p2.submissionDate);
     }
 
-    // Métodos de validación de grupos
     private boolean isGroupAvailable(Group group) {
         return !getGroupCapacityAlert(group.getGroupId());
     }
@@ -295,7 +317,7 @@ public class StudentRequestService {
         long approvedCount = groupRequests.stream()
                 .filter(req -> req.getStatus() == RequestStatus.APPROVED)
                 .count();
-        return 20 + (int) approvedCount; // Base de 20 estudiantes más los aprobados
+        return 20 + (int) approvedCount;
     }
 
     private boolean isScheduleCompatible(Schedule currentSchedule, Schedule newSchedule) {
@@ -310,7 +332,6 @@ public class StudentRequestService {
         return Integer.compare(capacity2, capacity1);
     }
 
-    // Métodos de cálculo de tiempo
     private boolean isRequestPendingOrUnderReview(ScheduleChangeRequest request) {
         return request.getStatus() == RequestStatus.PENDING ||
                 request.getStatus() == RequestStatus.UNDER_REVIEW;
@@ -364,7 +385,9 @@ public class StudentRequestService {
         return count > 0 ? totalDays / count : DEFAULT_AVERAGE_PROCESSING_DAYS;
     }
 
-    // Clases internas y enums auxiliares
+    /**
+     * Clase para representar la prioridad de una solicitud.
+     */
     private static class RequestPriority {
         final String requestId;
         final double score;
@@ -377,6 +400,9 @@ public class StudentRequestService {
         }
     }
 
+    /**
+     * Enum para los tipos de documentos requeridos por tipo de solicitud.
+     */
     private enum RequestDocumentType {
         GROUP_CHANGE(Arrays.asList("Formulario de cambio de grupo", "Justificación escrita",
                 "Horario actual", "Horario solicitado")),
@@ -396,10 +422,21 @@ public class StudentRequestService {
             this.requiredDocuments = requiredDocuments;
         }
 
+        /**
+         * Obtiene la lista de documentos requeridos.
+         *
+         * @return Lista de documentos requeridos
+         */
         public List<String> getRequiredDocuments() {
             return new ArrayList<>(requiredDocuments);
         }
 
+        /**
+         * Convierte un string a tipo de documento de solicitud.
+         *
+         * @param requestType Tipo de solicitud como string
+         * @return Tipo de documento correspondiente
+         */
         public static RequestDocumentType fromString(String requestType) {
             if (!StringUtils.hasText(requestType)) {
                 return DEFAULT;

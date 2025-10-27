@@ -22,10 +22,6 @@ import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Administrator extends User {
-
-    /**
-     * Departamento al que pertenece el administrador.
-     */
     private String department;
 
     /**
