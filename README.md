@@ -265,4 +265,8 @@ La arquitectura mantiene un flujo unidireccional donde los controladores interac
 
 ### Modelo de Base de Datos
 
-![bases de datos.png](docs/uml/bases%20de%20datos.png)
+![img_1.png](docs/uml/datos.png)
+
+### Diagrama de despliegue
+
+![img_1.png](docs/uml/desp.png)
