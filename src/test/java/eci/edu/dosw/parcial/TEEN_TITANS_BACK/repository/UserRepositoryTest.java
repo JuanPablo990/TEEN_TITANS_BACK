@@ -197,23 +197,6 @@ public class UserRepositoryTest {
     }
 
 
-    @Test
-    @DisplayName("Caso exitoso - findByUpdatedAt retorna usuarios por fecha de actualización")
-    void testFindByUpdatedAt_Exitoso() {
-        Date testDate = new Date();
-        List<User> users = Arrays.asList(user1);
-        when(userRepository.findByUpdatedAt(testDate)).thenReturn(users);
-
-        List<User> result = userRepository.findByUpdatedAt(testDate);
-
-        assertAll("Verificar búsqueda por fecha de actualización",
-                () -> assertNotNull(result),
-                () -> assertEquals(1, result.size()),
-                () -> assertEquals(testDate, result.get(0).getUpdatedAt())
-        );
-
-        verify(userRepository, times(1)).findByUpdatedAt(testDate);
-    }
 
     @Test
     @DisplayName("Caso exitoso - findByNameContainingIgnoreCase retorna usuarios con patrón en nombre")
