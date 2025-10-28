@@ -441,4 +441,212 @@ class DeanControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(deanService, times(1)).createDean(any(Dean.class));
     }
+
+
+    @Test
+    @DisplayName("Caso error - Obtener estadísticas de decanos con excepción")
+    void testGetDeanStatistics_ConExcepcion() {
+        when(deanService.getAllDeans()).thenThrow(new RuntimeException("Error inesperado"));
+
+        ResponseEntity<?> response = deanController.getDeanStatistics();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al obtener estadísticas de decanos", errorResponse.get("error"));
+        verify(deanService, times(1)).getAllDeans();
+    }
+
+    @Test
+    @DisplayName("Caso exitoso - Migrar roles de decanos")
+    void testMigrateDeanRoles_Exitoso() {
+        // Configurar decanos con roles nulos
+        dean1.setRole(null);
+        dean2.setRole(null);
+        List<Dean> deans = Arrays.asList(dean1, dean2);
+
+        when(deanService.getAllDeans()).thenReturn(deans);
+        when(deanService.updateDean(anyString(), any(Dean.class))).thenReturn(dean1);
+
+        ResponseEntity<?> response = deanController.migrateDeanRoles();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertEquals("Migración de roles de decanos completada", responseBody.get("message"));
+        assertEquals(2, responseBody.get("deansUpdated"));
+        assertEquals(2, responseBody.get("totalDeans"));
+        verify(deanService, times(2)).updateDean(anyString(), any(Dean.class));
+    }
+
+    @Test
+    @DisplayName("Caso error - Migrar roles de decanos con excepción")
+    void testMigrateDeanRoles_ConExcepcion() {
+        when(deanService.getAllDeans()).thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.migrateDeanRoles();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertTrue(errorResponse.get("error").contains("Error durante la migración"));
+        verify(deanService, times(1)).getAllDeans();
+    }
+
+    @Test
+    @DisplayName("Caso borde - Migrar roles cuando no hay decanos para actualizar")
+    void testMigrateDeanRoles_SinActualizaciones() {
+        // Los decanos ya tienen rol asignado
+        List<Dean> deans = Arrays.asList(dean1, dean2);
+        when(deanService.getAllDeans()).thenReturn(deans);
+
+        ResponseEntity<?> response = deanController.migrateDeanRoles();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertEquals(0, responseBody.get("deansUpdated"));
+        verify(deanService, never()).updateDean(anyString(), any(Dean.class));
+    }
+
+    @Test
+    @DisplayName("Caso error - Obtener todos los decanos con excepción")
+    void testGetAllDeans_ConExcepcion() {
+        when(deanService.getAllDeans()).thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.getAllDeans();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al obtener la lista de decanos", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Buscar por facultad con excepción")
+    void testFindByFaculty_ConExcepcion() {
+        when(deanService.findByFaculty("Engineering"))
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.findByFaculty("Engineering");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al buscar decanos por facultad", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Buscar por ubicación de oficina con excepción")
+    void testFindByOfficeLocation_ConExcepcion() {
+        when(deanService.findByOfficeLocation("Building A"))
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.findByOfficeLocation("Building A");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al buscar decanos por ubicación de oficina", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Buscar por nombre con excepción")
+    void testFindByNameContaining_ConExcepcion() {
+        when(deanService.findByNameContaining("Star"))
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.findByNameContaining("Star");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al buscar decanos por nombre", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Buscar por patrón de facultad con excepción")
+    void testFindByFacultyPattern_ConExcepcion() {
+        when(deanService.findByFacultyContaining("Eng"))
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.findByFacultyPattern("Eng");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al buscar decanos por patrón de facultad", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Buscar por patrón de ubicación con excepción")
+    void testFindByOfficeLocationPattern_ConExcepcion() {
+        when(deanService.findByOfficeLocationContaining("Building"))
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.findByOfficeLocationPattern("Building");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al buscar decanos por patrón de ubicación de oficina", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Obtener decanos activos con excepción")
+    void testFindActiveDeans_ConExcepcion() {
+        when(deanService.findActiveDeans())
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.findActiveDeans();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al obtener los decanos activos", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Búsqueda de decanos con excepción")
+    void testSearchDeans_ConExcepcion() {
+        when(deanService.getAllDeans())
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.searchDeans("Engineering", "Building A", true);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error en la búsqueda de decanos", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Obtener facultades con excepción")
+    void testGetAllFaculties_ConExcepcion() {
+        when(deanService.getAllDeans())
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.getAllFaculties();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al obtener la lista de facultades", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Contar por facultad con excepción")
+    void testCountByFaculty_ConExcepcion() {
+        when(deanService.countByFaculty("Engineering"))
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.countByFaculty("Engineering");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al contar decanos por facultad", errorResponse.get("error"));
+    }
+
+    @Test
+    @DisplayName("Caso error - Contar por ubicación de oficina con excepción")
+    void testCountByOfficeLocation_ConExcepcion() {
+        when(deanService.countByOfficeLocation("Building A"))
+                .thenThrow(new RuntimeException("Error de base de datos"));
+
+        ResponseEntity<?> response = deanController.countByOfficeLocation("Building A");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        assertEquals("Error al contar decanos por ubicación de oficina", errorResponse.get("error"));
+    }
+
+
+
 }
