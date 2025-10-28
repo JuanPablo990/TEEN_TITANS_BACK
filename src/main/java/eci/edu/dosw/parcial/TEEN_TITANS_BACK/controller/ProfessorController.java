@@ -4,6 +4,7 @@ import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dto.ProfessorDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Professor;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.service.ProfessorService;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -330,6 +331,37 @@ public class ProfessorController {
     }
 
     /**
+     * Endpoint para migrar todos los profesores existentes y asignarles el rol PROFESSOR
+     * si no lo tienen.
+     *
+     * @return mensaje de confirmación de migración
+     */
+    @PostMapping("/migrate-roles")
+    public ResponseEntity<?> migrateProfessorRoles() {
+        try {
+            List<Professor> allProfessors = professorService.getAllProfessors();
+            int updatedCount = 0;
+
+            for (Professor professor : allProfessors) {
+                if (professor.getRole() == null) {
+                    professor.setRole(UserRole.PROFESSOR);
+                    professorService.updateProfessor(professor.getId(), professor);
+                    updatedCount++;
+                }
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Migración de roles de profesores completada",
+                    "professorsUpdated", updatedCount,
+                    "totalProfessors", allProfessors.size()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error durante la migración: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Verifica el estado del controlador.
      *
      * @return mensaje de estado
@@ -346,14 +378,33 @@ public class ProfessorController {
      * @return entidad {@link Professor}
      */
     private Professor convertToEntity(ProfessorDTO dto) {
-        Professor professor = new Professor();
-        professor.setId(dto.getId());
-        professor.setName(dto.getName());
-        professor.setEmail(dto.getEmail());
-        professor.setDepartment(dto.getDepartment());
-        professor.setIsTenured(dto.getIsTenured());
-        professor.setAreasOfExpertise(dto.getAreasOfExpertise());
-        professor.setActive(dto.getActive() != null ? dto.getActive() : true);
+        // Usar el constructor de Professor que incluye el rol
+        Professor professor = new Professor(
+                dto.getId(),
+                dto.getName(),
+                dto.getEmail(),
+                dto.getPassword(),
+                dto.getDepartment(),
+                dto.getIsTenured(),
+                dto.getAreasOfExpertise()
+        );
+
+        // Establecer propiedades adicionales
+        if (dto.getActive() != null) {
+            professor.setActive(dto.getActive());
+        }
+        if (dto.getCreatedAt() != null) {
+            professor.setCreatedAt(dto.getCreatedAt());
+        }
+        if (dto.getUpdatedAt() != null) {
+            professor.setUpdatedAt(dto.getUpdatedAt());
+        }
+
+        // Asegurar que el rol esté establecido (por si acaso)
+        if (professor.getRole() == null) {
+            professor.setRole(UserRole.PROFESSOR);
+        }
+
         return professor;
     }
 
@@ -368,6 +419,8 @@ public class ProfessorController {
         dto.setId(professor.getId());
         dto.setName(professor.getName());
         dto.setEmail(professor.getEmail());
+        dto.setPassword(professor.getPassword());
+        dto.setRole("PROFESSOR"); // Asegurar que el rol se incluya siempre
         dto.setDepartment(professor.getDepartment());
         dto.setIsTenured(professor.getIsTenured());
         dto.setAreasOfExpertise(professor.getAreasOfExpertise());

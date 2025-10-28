@@ -1,217 +1,207 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.controller;
 
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dto.GroupDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.*;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.service.AdminGroupService;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Controlador REST para la gestión administrativa de grupos, cursos, profesores y aulas.
  * Proporciona endpoints para crear grupos, asignar profesores o aulas, y consultar información
  * académica relacionada.
  *
- * @author
- * @version 1.0
+ * @author Equipo Teen Titans
+ * @version 2.0
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class AdminGroupController {
 
-    @Autowired
-    private AdminGroupService adminGroupService;
-
-    private static final String INTERNAL_SERVER_ERROR = "Error interno del servidor";
-    private static final String NOT_FOUND = "Recurso no encontrado";
-    private static final String SUCCESS = "Operación exitosa";
+    private final AdminGroupService adminGroupService;
 
     /**
      * Crea un nuevo grupo académico.
-     *
-     * @param group objeto {@link Group} con los datos del grupo a crear.
-     * @return respuesta con el grupo creado o un mensaje de error.
      */
     @PostMapping("/groups")
     public ResponseEntity<?> createGroup(@RequestBody Group group) {
+        log.info("Solicitud para crear grupo: {}", group.getGroupId());
         try {
             Group createdGroup = adminGroupService.createGroup(group);
+            log.info("Grupo creado exitosamente: {}", createdGroup.getGroupId());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdGroup);
         } catch (AppException e) {
+            log.warn("Error al crear grupo: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return errorResponse("al crear el grupo");
+            log.error("Error interno al crear grupo: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al crear el grupo");
+        }
+    }
+
+    /**
+     * Crea un nuevo grupo académico a partir de un DTO validado.
+     */
+    @PostMapping("/groups/dto")
+    public ResponseEntity<?> createGroupFromDTO(@Valid @RequestBody GroupDTO groupDTO, BindingResult bindingResult) {
+        log.info("Solicitud para crear grupo desde DTO: {}", groupDTO.getGroupId());
+
+        // Validar errores de validación del DTO
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getFieldErrors()
+                    .stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            log.warn("Errores de validación en DTO: {}", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    Map.of(
+                            "message", "Errores de validación",
+                            "errors", errors,
+                            "timestamp", LocalDateTime.now()
+                    )
+            );
+        }
+
+        try {
+            Group createdGroup = adminGroupService.createGroupFromDTO(groupDTO);
+            log.info("Grupo creado exitosamente desde DTO: {}", createdGroup.getGroupId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdGroup);
+        } catch (AppException e) {
+            log.warn("Error al crear grupo desde DTO: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    Map.of(
+                            "message", e.getMessage(),
+                            "timestamp", LocalDateTime.now()
+                    )
+            );
+        } catch (Exception e) {
+            log.error("Error interno al crear grupo desde DTO: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al crear el grupo desde DTO");
         }
     }
 
     /**
      * Obtiene todos los grupos registrados.
-     *
-     * @return lista de grupos o mensaje de error.
      */
     @GetMapping("/groups")
     public ResponseEntity<?> getAllGroups() {
         try {
             List<Group> groups = adminGroupService.listAllGroups();
+            log.info("Obtenidos {} grupos", groups.size());
             return ResponseEntity.ok(groups);
         } catch (Exception e) {
-            return errorResponse("al obtener los grupos");
+            log.error("Error al obtener todos los grupos: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al obtener los grupos");
+        }
+    }
+
+    /**
+     * Obtiene un grupo específico por ID.
+     */
+    @GetMapping("/groups/{groupId}")
+    public ResponseEntity<?> getGroupById(@PathVariable String groupId) {
+        log.info("Solicitando grupo: {}", groupId);
+        try {
+            Group group = adminGroupService.getGroupById(groupId);
+            return ResponseEntity.ok(group);
+        } catch (AppException e) {
+            log.warn("Grupo no encontrado: {}", groupId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error interno al obtener grupo {}: {}", groupId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al obtener el grupo");
+        }
+    }
+
+    /**
+     * Elimina un grupo por ID.
+     */
+    @DeleteMapping("/groups/{groupId}")
+    public ResponseEntity<?> deleteGroup(@PathVariable String groupId) {
+        log.info("Solicitud para eliminar grupo: {}", groupId);
+        try {
+            adminGroupService.deleteGroup(groupId);
+            log.info("Grupo eliminado exitosamente: {}", groupId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Grupo eliminado exitosamente",
+                    "groupId", groupId
+            ));
+        } catch (AppException e) {
+            log.warn("Error al eliminar grupo: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error interno al eliminar grupo {}: {}", groupId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al eliminar el grupo");
         }
     }
 
     /**
      * Asigna un profesor a un grupo.
-     *
-     * @param groupId     identificador del grupo.
-     * @param professorId identificador del profesor.
-     * @return mensaje de éxito o error.
      */
     @PutMapping("/groups/{groupId}/professor/{professorId}")
     public ResponseEntity<?> assignProfessorToGroup(@PathVariable String groupId,
                                                     @PathVariable String professorId) {
+        log.info("Asignando profesor {} al grupo {}", professorId, groupId);
         try {
             adminGroupService.assignProfessorToGroup(groupId, professorId);
+            log.info("Profesor asignado exitosamente");
             return ResponseEntity.ok().body("Profesor asignado al grupo exitosamente");
         } catch (AppException e) {
-            return notFoundResponse(e.getMessage());
+            log.warn("Error al asignar profesor: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return errorResponse("al asignar el profesor al grupo");
+            log.error("Error interno al asignar profesor: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al asignar el profesor al grupo");
         }
     }
 
     /**
      * Asigna un aula a un grupo.
-     *
-     * @param groupId     identificador del grupo.
-     * @param classroomId identificador del aula.
-     * @return mensaje de éxito o error.
      */
     @PutMapping("/groups/{groupId}/classroom/{classroomId}")
     public ResponseEntity<?> assignClassroomToGroup(@PathVariable String groupId,
                                                     @PathVariable String classroomId) {
+        log.info("Asignando aula {} al grupo {}", classroomId, groupId);
         try {
             adminGroupService.assignClassroomToGroup(groupId, classroomId);
+            log.info("Aula asignada exitosamente");
             return ResponseEntity.ok().body("Aula asignada al grupo exitosamente");
         } catch (AppException e) {
-            return notFoundResponse(e.getMessage());
+            log.warn("Error al asignar aula: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return errorResponse("al asignar el aula al grupo");
+            log.error("Error interno al asignar aula: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al asignar el aula al grupo");
         }
     }
 
     /**
-     * Obtiene el curso asociado a un grupo.
-     *
-     * @param groupId identificador del grupo.
-     * @return objeto {@link Course} o mensaje de error.
+     * Endpoint de salud para verificar que el controlador está funcionando.
      */
-    @GetMapping("/groups/{groupId}/course")
-    public ResponseEntity<?> getCourse(@PathVariable String groupId) {
-        try {
-            Course course = adminGroupService.getCourse(groupId);
-            return ResponseEntity.ok(course);
-        } catch (AppException e) {
-            return notFoundResponse(e.getMessage());
-        } catch (Exception e) {
-            return errorResponse("al obtener el curso del grupo");
-        }
-    }
-
-    /**
-     * Obtiene la capacidad máxima permitida de un grupo.
-     *
-     * @param groupId identificador del grupo.
-     * @return capacidad máxima o mensaje de error.
-     */
-    @GetMapping("/groups/{groupId}/max-capacity")
-    public ResponseEntity<?> getMaxCapacity(@PathVariable String groupId) {
-        try {
-            Integer maxCapacity = adminGroupService.getMaxCapacity(groupId);
-            return ResponseEntity.ok(maxCapacity);
-        } catch (AppException e) {
-            return notFoundResponse(e.getMessage());
-        } catch (Exception e) {
-            return errorResponse("al obtener la capacidad máxima");
-        }
-    }
-
-    /**
-     * Obtiene la cantidad actual de estudiantes inscritos en un grupo.
-     *
-     * @param groupId identificador del grupo.
-     * @return número de inscripciones actuales o mensaje de error.
-     */
-    @GetMapping("/groups/{groupId}/current-enrollment")
-    public ResponseEntity<?> getCurrentEnrollment(@PathVariable String groupId) {
-        try {
-            Integer enrollment = adminGroupService.getCurrentEnrollment(groupId);
-            return ResponseEntity.ok(enrollment);
-        } catch (AppException e) {
-            return notFoundResponse(e.getMessage());
-        } catch (Exception e) {
-            return errorResponse("al obtener la inscripción actual");
-        }
-    }
-
-    /**
-     * Obtiene la lista de solicitudes en espera para un grupo.
-     *
-     * @param groupId identificador del grupo.
-     * @return lista de {@link ScheduleChangeRequest} o mensaje de error.
-     */
-    @GetMapping("/groups/{groupId}/waiting-list")
-    public ResponseEntity<?> getWaitingList(@PathVariable String groupId) {
-        try {
-            List<ScheduleChangeRequest> waitingList = adminGroupService.getWaitingList(groupId);
-            return ResponseEntity.ok(waitingList);
-        } catch (AppException e) {
-            return notFoundResponse(e.getMessage());
-        } catch (Exception e) {
-            return errorResponse("al obtener la lista de espera");
-        }
-    }
-
-    /**
-     * Obtiene el total de estudiantes inscritos en cada grupo de un curso.
-     *
-     * @param courseCode código del curso.
-     * @return mapa con el ID del grupo y su número de inscritos, o mensaje de error.
-     */
-    @GetMapping("/courses/{courseCode}/enrollment-by-group")
-    public ResponseEntity<?> getTotalEnrolledByCourse(@PathVariable String courseCode) {
-        try {
-            Map<String, Integer> enrollmentByGroup = adminGroupService.getTotalEnrolledByCourse(courseCode);
-            return ResponseEntity.ok(enrollmentByGroup);
-        } catch (AppException e) {
-            return notFoundResponse(e.getMessage());
-        } catch (Exception e) {
-            return errorResponse("al obtener las inscripciones por grupo");
-        }
-    }
-
-    /**
-     * Genera una respuesta de error interno del servidor.
-     *
-     * @param operation descripción de la operación que falló.
-     * @return respuesta con código HTTP 500.
-     */
-    private ResponseEntity<String> errorResponse(String operation) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(INTERNAL_SERVER_ERROR + " " + operation);
-    }
-
-    /**
-     * Genera una respuesta de recurso no encontrado.
-     *
-     * @param message mensaje de error a mostrar.
-     * @return respuesta con código HTTP 404.
-     */
-    private ResponseEntity<String> notFoundResponse(String message) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        log.info("Health check administrativo solicitado");
+        return ResponseEntity.ok("AdminGroupController is working properly");
     }
 }

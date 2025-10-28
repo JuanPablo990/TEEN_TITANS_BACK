@@ -23,8 +23,8 @@ public class StudentDTO {
     private String id;
     private String name;
     private String email;
-    private String password; // Solo para creación
-    private String role;
+    private String password;
+    private Object role;
     private Boolean active;
     private Date createdAt;
     private Date updatedAt;

@@ -4,6 +4,7 @@ import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dto.AdministratorDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Administrator;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.service.AdministratorService;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +58,7 @@ public class AdministratorController {
                     .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al crear el administrador"));
+                    .body(Map.of("error", "Error al crear el administrador: " + e.getMessage()));
         }
     }
 
@@ -248,6 +249,38 @@ public class AdministratorController {
     }
 
     /**
+     * Endpoint temporal para migrar roles de administradores existentes.
+     * Corrige administradores que tengan role: null asignándoles ADMINISTRATOR.
+     *
+     * @return resultado de la migración
+     */
+    @PostMapping("/migrate-roles")
+    public ResponseEntity<?> migrateRoles() {
+        try {
+            int updatedCount = 0;
+            List<Administrator> administrators = administratorService.getAllAdministrators();
+
+            for (Administrator admin : administrators) {
+                if (admin.getRole() == null) {
+                    admin.setRole(UserRole.ADMINISTRATOR);
+                    administratorService.updateAdministrator(admin.getId(), admin);
+                    updatedCount++;
+                }
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Migración de roles completada exitosamente",
+                    "administratorsUpdated", updatedCount,
+                    "totalAdministrators", administrators.size()
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error durante la migración de roles: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Endpoint de prueba para verificar el estado del controlador.
      *
      * @return mensaje de estado
@@ -265,11 +298,22 @@ public class AdministratorController {
      */
     private Administrator convertToEntity(AdministratorDTO dto) {
         Administrator administrator = new Administrator();
+
+        // Establecer los campos individualmente usando setters
         administrator.setId(dto.getId());
         administrator.setName(dto.getName());
         administrator.setEmail(dto.getEmail());
+        administrator.setPassword(dto.getPassword());
         administrator.setDepartment(dto.getDepartment());
         administrator.setActive(dto.getActive() != null ? dto.getActive() : true);
+
+        // Manejar el rol de forma robusta
+        if (dto.getRole() != null) {
+            administrator.setRole(dto.getRole());
+        } else {
+            administrator.setRole(UserRole.ADMINISTRATOR);
+        }
+
         return administrator;
     }
 
@@ -284,6 +328,8 @@ public class AdministratorController {
         dto.setId(administrator.getId());
         dto.setName(administrator.getName());
         dto.setEmail(administrator.getEmail());
+        dto.setPassword(administrator.getPassword());
+        dto.setRole(administrator.getRole());
         dto.setDepartment(administrator.getDepartment());
         dto.setActive(administrator.isActive());
         dto.setCreatedAt(administrator.getCreatedAt());

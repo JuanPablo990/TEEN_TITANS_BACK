@@ -22,6 +22,8 @@ public class ProfessorDTO {
     private String id;
     private String name;
     private String email;
+    private String password;
+    private Object role;
     private String department;
     private Boolean isTenured;
     private List<String> areasOfExpertise;

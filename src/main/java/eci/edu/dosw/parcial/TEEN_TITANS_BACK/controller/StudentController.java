@@ -4,6 +4,7 @@ import eci.edu.dosw.parcial.TEEN_TITANS_BACK.dto.StudentDTO;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.model.Student;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.service.StudentService;
 import eci.edu.dosw.parcial.TEEN_TITANS_BACK.exceptions.AppException;
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -338,21 +339,72 @@ public class StudentController {
     }
 
     /**
+     * Endpoint para migrar todos los estudiantes existentes y asignarles el rol STUDENT
+     * si no lo tienen.
+     *
+     * @return mensaje de confirmación de migración
+     */
+    @PostMapping("/migrate-roles")
+    public ResponseEntity<?> migrateStudentRoles() {
+        try {
+            List<Student> allStudents = studentService.getAllStudents();
+            int updatedCount = 0;
+
+            for (Student student : allStudents) {
+                if (student.getRole() == null) {
+                    student.setRole(UserRole.STUDENT);
+                    studentService.updateStudent(student.getId(), student);
+                    updatedCount++;
+                }
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Migración de roles completada",
+                    "studentsUpdated", updatedCount,
+                    "totalStudents", allStudents.size()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error durante la migración: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Convierte un objeto DTO a entidad {@link Student}.
      *
      * @param studentDTO datos del estudiante
      * @return entidad {@link Student}
      */
     private Student convertToStudent(StudentDTO studentDTO) {
-        Student student = new Student();
-        student.setId(studentDTO.getId());
-        student.setName(studentDTO.getName());
-        student.setEmail(studentDTO.getEmail());
-        student.setPassword(studentDTO.getPassword());
-        student.setActive(studentDTO.getActive() != null ? studentDTO.getActive() : true);
-        student.setAcademicProgram(studentDTO.getAcademicProgram());
-        student.setSemester(studentDTO.getSemester());
-        student.setGradeAverage(studentDTO.getGradeAverage());
+        // Usar el constructor que incluye el rol
+        Student student = new Student(
+                studentDTO.getId(),
+                studentDTO.getName(),
+                studentDTO.getEmail(),
+                studentDTO.getPassword(),
+                studentDTO.getAcademicProgram(),
+                studentDTO.getSemester()
+        );
+
+        // Establecer propiedades adicionales que no están en el constructor
+        if (studentDTO.getGradeAverage() != null) {
+            student.setGradeAverage(studentDTO.getGradeAverage());
+        }
+        if (studentDTO.getActive() != null) {
+            student.setActive(studentDTO.getActive());
+        }
+        if (studentDTO.getCreatedAt() != null) {
+            student.setCreatedAt(studentDTO.getCreatedAt());
+        }
+        if (studentDTO.getUpdatedAt() != null) {
+            student.setUpdatedAt(studentDTO.getUpdatedAt());
+        }
+
+        // Asegurar que el rol esté establecido (por si acaso)
+        if (student.getRole() == null) {
+            student.setRole(UserRole.STUDENT);
+        }
+
         return student;
     }
 
@@ -367,7 +419,8 @@ public class StudentController {
         studentDTO.setId(student.getId());
         studentDTO.setName(student.getName());
         studentDTO.setEmail(student.getEmail());
-        studentDTO.setRole("STUDENT");
+        studentDTO.setPassword(student.getPassword());
+        studentDTO.setRole("STUDENT"); // Asegurar que el rol se incluya siempre
         studentDTO.setActive(student.isActive());
         studentDTO.setCreatedAt(student.getCreatedAt());
         studentDTO.setUpdatedAt(student.getUpdatedAt());

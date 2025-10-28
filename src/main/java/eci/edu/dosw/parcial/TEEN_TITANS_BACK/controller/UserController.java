@@ -384,10 +384,12 @@ public class UserController {
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
+        userDTO.setPassword(user.getPassword()); // 👈 aquí
         userDTO.setRole(user.getRole().name());
         userDTO.setActive(user.isActive());
         userDTO.setCreatedAt(user.getCreatedAt());
         userDTO.setUpdatedAt(user.getUpdatedAt());
         return userDTO;
     }
+
 }

@@ -1,5 +1,6 @@
 package eci.edu.dosw.parcial.TEEN_TITANS_BACK.dto;
 
+import eci.edu.dosw.parcial.TEEN_TITANS_BACK.enums.UserRole;
 import lombok.Data;
 import java.util.Date;
 
@@ -22,9 +23,10 @@ public class AdministratorDTO {
     private String id;
     private String name;
     private String email;
+    private String password;
+    private UserRole role;
     private String department;
     private Boolean active;
     private Date createdAt;
     private Date updatedAt;
-
 }
