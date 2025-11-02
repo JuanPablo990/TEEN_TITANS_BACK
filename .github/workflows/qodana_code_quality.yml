@@ -3,7 +3,7 @@
 #             https://www.jetbrains.com/help/qodana/about-qodana.html           #
 #-------------------------------------------------------------------------------#
 
-name: CI/CD - Teen Titans Backend
+name: CI - Teen Titans Backend
 
 on:
   push:
@@ -28,31 +28,33 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
-      # 3️⃣ Permitir ejecutar el wrapper de Maven
+      # 3️⃣ Permite ejecutar Maven Wrapper
       - name: Make mvnw executable
         run: chmod +x mvnw
 
-      # 4️⃣ Compila el proyecto y ejecuta los tests
+      # 4️⃣ Compila y ejecuta pruebas
       - name: Build with Maven and run tests
         run: ./mvnw clean verify -DskipTests=false
 
-      # 5️⃣ Subir reporte de cobertura (JaCoCo)
+      # 5️⃣ Sube el reporte JaCoCo
       - name: Upload JaCoCo Report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
           path: target/site/jacoco/
 
-      # 6️⃣ Análisis de calidad con SonarCloud
+      # 6️⃣ Análisis de calidad con SonarCloud (corregido)
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./mvnw sonar:sonar \
-          -Dsonar.projectKey=TEEN_TITANS_BACK \
-          -Dsonar.host.url=https://sonarcloud.io \
+        run: >
+          ./mvnw sonar:sonar
+          -Dsonar.projectKey=TEEN_TITANS_BACK
+          -Dsonar.organization=tu_org_sonar
+          -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-      # 7️⃣ Generar documentación Swagger
+      # 7️⃣ Genera el archivo Swagger JSON
       - name: Generate Swagger JSON
         run: |
           ./mvnw spring-boot:run &
@@ -60,18 +62,9 @@ jobs:
           curl -o swagger.json http://localhost:8080/v3/api-docs
           pkill -f 'spring-boot'
 
-      # 8️⃣ Subir Swagger como artefacto
+      # 8️⃣ Sube el Swagger JSON como artefacto
       - name: Upload Swagger JSON
         uses: actions/upload-artifact@v4
         with:
           name: swagger-docs
           path: swagger.json
-
-      # 9️⃣ Desplegar automáticamente en Render (CD)
-      - name: Deploy to Render
-        if: github.ref == 'refs/heads/main'
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-        run: |
-          echo "Triggering deployment on Render..."
-          curl -X POST "$RENDER_DEPLOY_HOOK"
