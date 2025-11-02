@@ -3,37 +3,66 @@
 #             https://www.jetbrains.com/help/qodana/about-qodana.html           #
 #-------------------------------------------------------------------------------#
 
-name: Qodana
+name: CI - Teen Titans Backend
+
 on:
-  workflow_dispatch:
-  pull_request:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  qodana:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      checks: write
+
     steps:
-      - uses: actions/checkout@v4
+      # 1️⃣ Clona el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Configura JDK 17 (Temurin)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-      - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2025.2
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+
+      - name: Make mvnw executable
+        run: chmod +x mvnw
+
+
+      - name: Build with Maven and run tests
+        run: ./mvnw clean verify -DskipTests=false
+
+
+      - name: Upload JaCoCo Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
+
+      - name: SonarQube Scan
         env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./mvnw sonar:sonar \
+          -Dsonar.projectKey=TEEN_TITANS_BACK \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+
+      - name: Generate Swagger JSON
+        run: |
+          ./mvnw spring-boot:run &
+          sleep 20
+          curl -o swagger.json http://localhost:8080/v3/api-docs
+          pkill -f 'spring-boot'
+      
+
+      - name: Upload Swagger JSON
+        uses: actions/upload-artifact@v4
         with:
-          # When pr-mode is set to true, Qodana analyzes only the files that have been changed
-          pr-mode: false
-          use-caches: true
-          post-pr-comment: true
-          use-annotations: true
-          # Upload Qodana results (SARIF, other artifacts, logs) as an artifact to the job
-          upload-result: false
-          # quick-fixes available in Ultimate and Ultimate Plus plans
-          push-fixes: 'none'
+          name: swagger-docs
+          path: swagger.json
